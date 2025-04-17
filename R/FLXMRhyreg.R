@@ -36,7 +36,7 @@
 #' @export
 
 
-#require(flexmix)
+
 
 ### FLXMRhyreg ###
 # not completly working (refit is missing)
@@ -63,9 +63,8 @@ FLXMRhyreg <- function(formula= .~. ,
 {
   family <- match.arg(family)
 
-  # fit function has to depend on x,y,w.
-  # actual Problem: we need logLik2 but it can´t be found from R
-  # The fit() function returns an object of class "FLXcomponent"
+  # refit function has to depend on x,y,w.
+
 
   hyregrefit <- function(x, y, w) {
     # use mle2?
@@ -88,8 +87,8 @@ FLXMRhyreg <- function(formula= .~. ,
            family="hyreg", refit=hyregrefit)
 
   z@preproc.y <- function(x){
-    #    if (ncol(x) > 1)
-    #      stop(paste("for the", family, "family y must be univariate"))
+        if (ncol(x) > 1)
+          stop(paste("for the", family, "family y must be univariate"))
     x
   }
 
@@ -112,13 +111,12 @@ FLXMRhyreg <- function(formula= .~. ,
         p
       }
 
-      #
-      #
+
+
       logLik <- function(x, y, sigma = para$sigma, theta = para$theta, return_vector = TRUE, ...){
 
 
         # choose subset of x and y depending on type
-        # use predict?
         x1 <- x[type == type_cont,c(variables_cont,variables_both)]
         x2 <-  x[type == type_dich,c(variables_dich,variables_both)]
         y1 <- y[type == type_cont]
@@ -144,7 +142,7 @@ FLXMRhyreg <- function(formula= .~. ,
         ### for box constraints ?
 
         if(upper != Inf){
-          censV <- y1 == upper
+          censV <- y1 == upper # adadpt for lower
           pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = upper, sd = sigma, lower.tail = T, log.p = T) -  # mean = 2 in xreg
             pnorm(q =  Xb1[censV], mean = lower, sd = sigma, lower.tail = T, log.p = T) # mean = Inf in xreg
           # or do we have to use log.p = F and than log(pnorm() - pnorm())?
@@ -153,8 +151,8 @@ FLXMRhyreg <- function(formula= .~. ,
 
         pvals <- c(pvals1,pvals2)
 
-        pvals[pvals == -Inf] <- log(.Machine$double.xmin) # or without log?
-        pvals[pvals == Inf] <- log(.Machine$double.xmax) # or without log?
+        pvals[pvals == -Inf] <- log(.Machine$double.xmin)
+        pvals[pvals == Inf] <- log(.Machine$double.xmax)
 
         if(return_vector == TRUE){
           return(pvals)
@@ -194,22 +192,10 @@ FLXMRhyreg <- function(formula= .~. ,
 
 
 
-        sigma <- exp(stv[is.element(names(stv),c("sigma"))][[1]]) # exp like in xreg?
-        theta <- exp(stv[is.element(names(stv),c("theta"))][[1]]) # exp like in xreg?
+        sigma <- exp(stv[is.element(names(stv),c("sigma"))][[1]])
+        theta <- exp(stv[is.element(names(stv),c("theta"))][[1]])
         stv_cont <- stv[!is.element(names(stv),c("sigma","theta", variables_dich))]
         stv_dich <- stv[!is.element(names(stv),c("sigma","theta", variables_cont))]
-
-
-        # x1 <- x[type == type_cont,]
-        # x2 <-  x[type == type_dich,]
-        # y1 <- y[type == type_cont]
-        # y2 <-  y[type == type_dich]
-        #
-        #
-        #
-        # sigma <- exp(stv[is.element(names(stv),c("sigma"))][[1]]) # exp like in xreg?
-        # theta <- exp(stv[is.element(names(stv),c("theta"))][[1]]) # exp like in xreg?
-        # stv <- stv[!is.element(names(stv),c("sigma","theta"))]
 
 
         Xb1 <- x1 %*% stv_cont[colnames(x1)] # hier könnte man ggf nur TTO spezifische Variablen einfließen lassen, Interaktionen etc beachten
@@ -224,13 +210,10 @@ FLXMRhyreg <- function(formula= .~. ,
         # Likelihood calculation
         pvals1 <- dnorm(y1, mean=Xb1, sd=sigma, log=TRUE) # cont_normal
 
-        # for box constraints ?
-
-        ### from xreg ###
-        ### for box constraints ?
+        # for box constraints:
 
         if(upper != Inf){
-          censV <- y1 == upper # anpassen für lower bzw upper und lower zeitgleich
+          censV <- y1 == upper # adapt for lower, anpassen für lower bzw upper und lower zeitgleich
           pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = upper, sd = sigma, lower.tail = T, log.p = T) -  # mean = 2 in xreg
             pnorm(q =  Xb1[censV], mean = lower, sd = sigma, lower.tail = T, log.p = T) # mean = Inf in xreg
           # or do we have to use log.p = F and than log(pnorm() - pnorm())?
@@ -307,28 +290,6 @@ FLXMRhyreg <- function(formula= .~. ,
         }
       }
 
-
-      # if(iter == 1){ # maybe we can ask if the object components already has elements and use them, maybe use k in FLEXmstep for different start values in different classes
-      #   fit <- bbmle::mle2(minuslogl = logLik2,
-      #                      start = stv,
-      #                      optimizer = optimizer,
-      #                      method = opt_method,
-      #                      lower = lower,
-      #                      upper = upper)
-      # }else{
-      #   stv_new <- setNames(c(component$coef,component$sigma,component$theta),c(colnames(x),"sigma","theta"))
-      #   fit <- bbmle::mle2(minuslogl = logLik2,
-      #                      start = stv_new,
-      #                      optimizer = optimizer,
-      #                      method = opt_method,
-      #                      lower = lower,
-      #                      upper = upper)
-      # }
-
-      # z@definecomponent(para = list(coef = fit@coef[!is.element(names(fit@coef),c("sigma","theta"))],
-      #                               df = ncol(x)+1, # not changed yet
-      #                               sigma =  fit@coef[is.element(names(fit@coef),c("sigma"))], # does this has to be calculted outside mle2?
-      #                               theta = fit@coef[is.element(names(fit@coef),c("theta"))])) # does this has to be calculted outside mle2?
 
       z@defineComponent(para = list(coef = fit_mle@coef[!is.element(names(fit_mle@coef),c("sigma","theta"))],
                                     df = ncol(x)+1, # not changed yet

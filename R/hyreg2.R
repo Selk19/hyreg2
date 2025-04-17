@@ -2,7 +2,7 @@
 
 #' hyreg2
 #'
-#' @description Estimation of hybrid model for EQ-5D data
+#' @description Estimation of hybrid model for EQ-5D data, not implemnted for het yet
 #'
 #' @param formula Model formula
 #' @param data a dataframe containing the data
@@ -55,12 +55,16 @@ hyreg2 <-function(formula,
                   variables_both = NULL,
                   variables_dich = NULL,
                   variables_cont = NULL,
+                  # additional arguments for flexmix or optimizer ?
                   #cluster = NULL,
                   #concomitant=NULL,
                   #weights=NULL,
-                  # weitere Parameter für gemeinsame und getrennte Formeln für TTO und DCE
-                  # Formel und Schätzung bei non linear regression
+
+                  # non linear regression not implemented yet
+                  #   Xb in FLXMRhyreg must be computed differently for that
+
                   ...){
+
 
 
 if(is.null(variables_both)){
@@ -68,7 +72,7 @@ if(is.null(variables_both)){
 }
 
  if(latent == "both"){
-   # stv <- setNames(c(rep(0.1,20),1,1),c(colnames(data)[17:36],c("sigma","theta"))) # anstatt data muss man Bezug zu formula herstellen
+
    model <- list(FLXMRhyreg(type= type,
                             stv = stv,
                             type_cont = type_cont,
@@ -140,7 +144,7 @@ if(is.null(variables_both)){
 
    mod_list <- lapply(data_list, function(x){
      model <- list(FLXMRhyreg(type= type[data$mod_comp == unique(x$mod_comp)],
-                              stv = stv, # hier ggf anpassen, wenn stv für jede Comp spezifisch sein soll
+                              stv = stv, # stv can be a list
                               type_cont = type_cont,
                               type_dich = type_dich,
                               variables_both = variables_both,

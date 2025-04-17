@@ -35,7 +35,7 @@
 #' @export
 
 
-#require(flexmix)
+
 
 ### FLXMRhyreg ###
 # not completly working (refit is missing)
@@ -65,9 +65,7 @@ FLXMRhyreg_het <- function(formula= .~. ,
  # rm(counter)
   family <- match.arg(family)
 
-  # fit function has to depend on x,y,w.
-  # actual Problem: we need logLik2 but it can´t be found from R
-  # The fit() function returns an object of class "FLXcomponent"
+  # refit function has to depend on x,y,w.
 
   hyregrefit <- function(x, y, w) {
     # use mle2?
@@ -90,8 +88,8 @@ FLXMRhyreg_het <- function(formula= .~. ,
            family="hyreg", refit=hyregrefit)
 
   z@preproc.y <- function(x){
-    #    if (ncol(x) > 1)
-    #      stop(paste("for the", family, "family y must be univariate"))
+        if (ncol(x) > 1)
+          stop(paste("for the", family, "family y must be univariate"))
     x
   }
 
@@ -121,7 +119,6 @@ FLXMRhyreg_het <- function(formula= .~. ,
 
 
         # choose subset of x and y depending on type
-        # use predict?
 
         # at the moment sigma formula can use only same dependet variables as formula itself
         x1 <- x[type == type_cont,c(variables_cont,variables_both)]
@@ -149,10 +146,10 @@ FLXMRhyreg_het <- function(formula= .~. ,
 
 
         ### from xreg ###
-        ### for box constraints ?
+        ### for box constraints
 
         if(upper != Inf){
-          censV <- y1 == upper
+          censV <- y1 == upper # adapt for lower
           pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = upper, sd = sigma[censV], lower.tail = T, log.p = T) -  # mean = 2 in xreg
             pnorm(q =  Xb1[censV], mean = lower, sd = sigma[censV], lower.tail = T, log.p = T) # mean = Inf in xreg
           # or do we have to use log.p = F and than log(pnorm() - pnorm())?
@@ -161,8 +158,8 @@ FLXMRhyreg_het <- function(formula= .~. ,
 
         pvals <- c(pvals1,pvals2)
 
-        pvals[pvals == -Inf] <- log(.Machine$double.xmin) # or without log?
-        pvals[pvals == Inf] <- log(.Machine$double.xmax) # or without log?
+        pvals[pvals == -Inf] <- log(.Machine$double.xmin)
+        pvals[pvals == Inf] <- log(.Machine$double.xmax)
 
         if(return_vector == TRUE){
           return(pvals)
@@ -203,7 +200,7 @@ FLXMRhyreg_het <- function(formula= .~. ,
         # include vector of 1s for intercept ?
         # if Intercept in stv_sigma but not in stv, than include ones
         sigma <- exp( as.matrix(cbind(rep(1,dim(x1)[1]),x1)) %*% stv[is.element(names(stv),names(stv_sigma))]) # exp like in xreg?
-        theta <- exp(stv[is.element(names(stv),c("theta"))][[1]]) # exp like in xreg?
+        theta <- exp(stv[is.element(names(stv),c("theta"))][[1]])
         stv_cont <- stv[!is.element(names(stv),c("sigma","theta", variables_dich))]
         stv_dich <- stv[!is.element(names(stv),c("sigma","theta", variables_cont))]
 
@@ -219,13 +216,10 @@ FLXMRhyreg_het <- function(formula= .~. ,
         # Likelihood calculation
         pvals1 <- dnorm(y1, mean=Xb1, sd=sigma, log=TRUE) # cont_normal
 
-        # for box constraints ?
-
-        ### from xreg ###
-        ### for box constraints ?
+        # for box constraints:
 
         if(upper != Inf){
-          censV <- y1 == upper # anpassen für lower bzw upper und lower zeitgleich
+          censV <- y1 == upper # ADAPT for lower, anpassen für lower bzw upper und lower zeitgleich
           pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = upper, sd = sigma[censV], lower.tail = T, log.p = T) -  # mean = 2 in xreg
             pnorm(q =  Xb1[censV], mean = lower, sd = sigma[censV], lower.tail = T, log.p = T) # mean = Inf in xreg
           # or do we have to use log.p = F and than log(pnorm() - pnorm())?
@@ -255,7 +249,6 @@ FLXMRhyreg_het <- function(formula= .~. ,
        bbmle::parnames(logLik2) <- c(colnames(x),"theta",names(stv_sigma)) # set names of inputs for logLik2
 
        if(!exists("counter")){
-         # if(iter == 1){
          counter <<- 1
 
          # use different stv for different components
@@ -299,29 +292,6 @@ FLXMRhyreg_het <- function(formula= .~. ,
                                   upper = upper)
          }
        }
-
-
-      # if(iter == 1){ # maybe we can ask if the object components already has elements and use them, maybe use k in FLEXmstep for different start values in different classes
-      #   fit <- bbmle::mle2(minuslogl = logLik2,
-      #                      start = stv,
-      #                      optimizer = optimizer,
-      #                      method = opt_method,
-      #                      lower = lower,
-      #                      upper = upper)
-      # }else{
-      #   stv_new <- setNames(c(component$coef,component$sigma,component$theta),c(colnames(x),"sigma","theta"))
-      #   fit <- bbmle::mle2(minuslogl = logLik2,
-      #                      start = stv_new,
-      #                      optimizer = optimizer,
-      #                      method = opt_method,
-      #                      lower = lower,
-      #                      upper = upper)
-      # }
-
-      # z@definecomponent(para = list(coef = fit@coef[!is.element(names(fit@coef),c("sigma","theta"))],
-      #                               df = ncol(x)+1, # not changed yet
-      #                               sigma =  fit@coef[is.element(names(fit@coef),c("sigma"))], # does this has to be calculted outside mle2?
-      #                               theta = fit@coef[is.element(names(fit@coef),c("theta"))])) # does this has to be calculted outside mle2?
 
       z@defineComponent(para = list(coef = fit_mle@coef[!is.element(names(fit_mle@coef),c(names(stv_sigma),"theta"))],
                                     df = ncol(x)+1, # not changed yet
