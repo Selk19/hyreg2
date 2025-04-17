@@ -236,6 +236,7 @@ refit <- function(object){
 
 ## TEST ####
 
+
 library(flexmix)
 library(EQ5Ddata)
 TTOonly <- hyregdata[hyregdata$method == "TTO" & hyregdata$fb_flagged == 0 & hyregdata$state_id > 0,]
@@ -248,7 +249,7 @@ data <- rbind(TTOonly,DCEonly)
 formula <- value ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad3 +
   mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5 | id
 
-k <- 2
+k <- 1
 
 #cluster <- NULL
 #concomitant=NULL
@@ -272,6 +273,10 @@ mod1 <- hyreg2(formula = formula,
 #      variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
 #      "mo4","sc4","ua4","pd4","ad4","ua5","pd5")
       )
+
+# if you get an Error like this:
+# Error in names(object) <- nm : attempt to set an attribute on NULL
+# use rm(counter) and try again
 
 summary(mod1)
 summary_hyreg2(mod1)

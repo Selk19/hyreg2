@@ -41,6 +41,12 @@
 # not completly working (refit is missing)
 
 
+# at the moment we get:
+# Error in postunscaled + FLXdeterminePostunscaled(model[[n]], components[[n]]) :
+# non-conformable arrays
+# change flexmix:::FLXdeterminePostunscaled ? and upload an adpted version?
+
+
 #### WITH Formula for sigma to account for heteroscedastisity ###
 # formula for sigma can only be the same as in formula estimated on only the TTO values
 # idea: use additional formula_sigma argument to be more flexible
