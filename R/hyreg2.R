@@ -125,7 +125,7 @@ if(is.null(variables_both)){
                               upper = upper))
 
 
-     mod <- flexmix::flexmix(formula = formula, data = data_cont, k = k, model = model, control = control)
+     mod <- flexmix::flexmix(formula = formula, data = data_dich, k = k, model = model, control = control)
      rm(counter, envir = .GlobalEnv) # counter wird während flexmix erstellt
 
      data_dich$mod_comp <- mod@cluster
@@ -227,45 +227,45 @@ refit <- function(object){
 ##################################
 
 
-### TEST ####
-#
-#
-# library(EQ5Ddata)
-# TTOonly <- hyregdata[hyregdata$method == "TTO" & hyregdata$fb_flagged == 0 & hyregdata$state_id > 0,]
-# DCEonly <- hyregdata[hyregdata$method == "DCE_A" & hyregdata$state_id < 197,]
-#
-# TTOonly <- TTOonly[1:250,]
-# DCEonly <- DCEonly[1:150,]
-# data <- rbind(TTOonly,DCEonly)
-#
-# formula <- value ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad3 +
-#   mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5 | id
-#
-# k <- 2
-#
-# #cluster <- NULL
-# #concomitant=NULL
-# #control=NULL
-# control = list(iter.max = 500, verbose = 5)
-# #weights=NULL
-# stv <- setNames(c(rep(0.1,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
-#
-#
-# mod1 <- hyreg2(formula = formula,
-#        data = data,
-#        type = data$method,
-#        stv = stv,
-#        k = k,
-#        type_cont = "TTO",
-#        type_dich = "DCE_A",
-#        control = control,
-#        latent = "both",
-#        id_col = "id",
-#       variables_cont = c("mo5","sc5"),
-#       variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
-#       "mo4","sc4","ua4","pd4","ad4","ua5","pd5"))
-#
-# summary(mod1)
-# xreg2:::summary_hyreg2(mod1)
-# summary_hyreg2(mod1)
-# xreg2:::refit(mod1)
+## TEST ####
+
+library(flexmix)
+library(EQ5Ddata)
+TTOonly <- hyregdata[hyregdata$method == "TTO" & hyregdata$fb_flagged == 0 & hyregdata$state_id > 0,]
+DCEonly <- hyregdata[hyregdata$method == "DCE_A" & hyregdata$state_id < 197,]
+
+TTOonly <- TTOonly[1:250,]
+DCEonly <- DCEonly[1:150,]
+data <- rbind(TTOonly,DCEonly)
+
+formula <- value ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad3 +
+  mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5 | id
+
+k <- 2
+
+#cluster <- NULL
+#concomitant=NULL
+#control=NULL
+control = list(iter.max = 500, verbose = 5)
+#weights=NULL
+stv <- setNames(c(rep(0.1,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
+
+
+mod1 <- hyreg2(formula = formula,
+       data = data,
+       type = data$method,
+       stv = stv,
+       k = k,
+       type_cont = "TTO",
+       type_dich = "DCE_A",
+       control = control,
+       latent = "both", # "dich" not working yet
+       id_col = "id"
+#      variables_cont = c("mo5","sc5"),
+#      variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
+#      "mo4","sc4","ua4","pd4","ad4","ua5","pd5")
+      )
+
+summary(mod1)
+summary_hyreg2(mod1)
+#xreg2:::refit(mod1)
