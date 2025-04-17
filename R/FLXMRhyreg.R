@@ -6,16 +6,37 @@
 #'
 #' @description Function used in flexmix M-Step to estimate hybrid model
 #'
-#' @param formula: Model formula
+#' @param formula Model formula
+#' @param family default = "hyreg"
+#' @param type a vector containing an indicator wheter that datapoint contains to TTO or DCE Data
+#' @param type_cont indicator for continous data
+#' @param type_dich indicator for dichotoums data
+#' @param variables_both character vactor; variables to be fitted on TTO and DCE data, if not specified all variables from formula are used
+#' @param variables_cont character vactor; variables to be fitted only on TTO data
+#' @param variables_dich character vactor; variables to be fitted only on DCE data
+#' @param stv named vector or list of named vactors containing start values,
+#'            has to be a vector if the same start values should be used for all latent classes,
+#'            has to be a list of named vectores if different start values are assumed for the latent classes
+#'            has to include start values for sigma and theta as well
+#' @param offset offset as in flexmix
+#' @param optimizer optimizer to be used in bbmle::mle2, default = "optim"
+#' @param opt_method optimization method to be used in optimizer, default = "BFGS"
+#' @param lower opt_method must be set to "L-BFGS-B", lower bound for censored data
+#' @param upper opt_method must be set to "L-BFGS-B", upper bound for censored data
+#' @param ... additional arguments for flexmix or bbmle::mle2
 #'
 #' @return a model with hybrid likelihood
 #'
 #' @author Kim Rand & Svenja Elkenkamp
 #' @examples Put Example here
 
-
+#' @importFrom flexmix flexmix
+#' @importFrom  bbmle mle2
+#' @importFrom  bbmle summary
 #' @export
 
+
+#require(flexmix)
 
 ### FLXMRhyreg ###
 # not completly working (refit is missing)
@@ -28,12 +49,16 @@ FLXMRhyreg <- function(formula= .~. ,
                        type = NULL,
                        type_cont = NULL,
                        type_dich = NULL,
+                       variables_both = NULL,
+                       variables_cont = NULL,
+                       variables_dich = NULL,
                        stv = NULL, # has to include starting values for sigma and theta as well
                        offset = NULL,
                        opt_method = "BFGS",
                        optimizer = "optim",
                        lower = -Inf,
-                       upper = Inf
+                       upper = Inf,
+                       ...
 )
 {
   family <- match.arg(family)
@@ -77,10 +102,10 @@ FLXMRhyreg <- function(formula= .~. ,
         if("offset" %in% names(dotarg)) offset <- dotarg$offset
 
         if(type == type_cont){
-          p <- x %*% para$coef  # Xb in xreg
+          p <- x %*% para$coef[is.element(names(para$coef),c(variables_cont,variables_both))]  # Xb in xreg
         }
         if(type == type_dich){
-          p <- (x %*% para$coef) * para$theta
+          p <- (x %*% para$coef[is.element(names(para$coef),c(variables_dich,variables_both))]) * para$theta
         }
 
         if (!is.null(offset)) p <-  p + offset
@@ -94,15 +119,16 @@ FLXMRhyreg <- function(formula= .~. ,
 
         # choose subset of x and y depending on type
         # use predict?
-        x1 <- x[type == type_cont,]
-        x2 <-  x[type == type_dich,]
+        x1 <- x[type == type_cont,c(variables_cont,variables_both)]
+        x2 <-  x[type == type_dich,c(variables_dich,variables_both)]
         y1 <- y[type == type_cont]
         y2 <-  y[type == type_dich]
 
+
         sigma <- exp(sigma)
 
-        Xb1 <- x1 %*% para$coef
-        Xb2 <- (x2 %*% para$coef) * exp(theta)
+        Xb1 <- x1 %*% para$coef[colnames(x1)] # only cont and both variables
+        Xb2 <- (x2 %*% para$coef[colnames(x2)]) * exp(theta)  # only dich and both variables
 
 
         logistic_tmp <- .5+.5*tanh(Xb2/2)
@@ -142,8 +168,10 @@ FLXMRhyreg <- function(formula= .~. ,
           parameters=list(coef=para$coef,
                           sigma=para$sigma,
                           theta = para$theta,
-                          stderror = para$stderror,
-                          pvalue = para$pvalue),
+                        #  stderror = para$stderror,
+                        #  pvalue = para$pvalue,
+          fit_mle = para$fit_mle),
+        #  counter = counter), # Error: unzulässiger Name für Slot der Klasse “FLXcomponent”; fit_mle
           #minLik = para$minLik),
           logLik=logLik, predict=predict,
           df=para$df)
@@ -156,8 +184,11 @@ FLXMRhyreg <- function(formula= .~. ,
       # function to use in mle, same as logLik but depending on stv and giving out the neg logL directly
       logLik2 <- function(stv){
 
-        x1 <- x[type == type_cont,]
-        x2 <-  x[type == type_dich,]
+
+        # variables_cont, variables_both, variables_dich
+        # as charachter, names of variables to be fitted for only specific type of data
+        x1 <- x[type == type_cont,c(variables_cont,variables_both)]
+        x2 <-  x[type == type_dich,c(variables_dich,variables_both)]
         y1 <- y[type == type_cont]
         y2 <-  y[type == type_dich]
 
@@ -165,10 +196,24 @@ FLXMRhyreg <- function(formula= .~. ,
 
         sigma <- exp(stv[is.element(names(stv),c("sigma"))][[1]]) # exp like in xreg?
         theta <- exp(stv[is.element(names(stv),c("theta"))][[1]]) # exp like in xreg?
-        stv <- stv[!is.element(names(stv),c("sigma","theta"))]
+        stv_cont <- stv[!is.element(names(stv),c("sigma","theta", variables_dich))]
+        stv_dich <- stv[!is.element(names(stv),c("sigma","theta", variables_cont))]
 
-        Xb1 <- x1 %*% stv
-        Xb2 <- x2 %*% stv
+
+        # x1 <- x[type == type_cont,]
+        # x2 <-  x[type == type_dich,]
+        # y1 <- y[type == type_cont]
+        # y2 <-  y[type == type_dich]
+        #
+        #
+        #
+        # sigma <- exp(stv[is.element(names(stv),c("sigma"))][[1]]) # exp like in xreg?
+        # theta <- exp(stv[is.element(names(stv),c("theta"))][[1]]) # exp like in xreg?
+        # stv <- stv[!is.element(names(stv),c("sigma","theta"))]
+
+
+        Xb1 <- x1 %*% stv_cont[colnames(x1)] # hier könnte man ggf nur TTO spezifische Variablen einfließen lassen, Interaktionen etc beachten
+        Xb2 <- x2 %*% stv_dich[colnames(x2)]
 
 
         Xb2 <- Xb2*theta
@@ -214,67 +259,89 @@ FLXMRhyreg <- function(formula= .~. ,
 
       bbmle::parnames(logLik2) <- c(colnames(x),"sigma","theta") # set names of inputs for logLik2
 
-      if(iter == 1){ # maybe we can ask if the object components already has elements and use them, maybe use k in FLEXmstep for different start values in different classes
-        fit <- bbmle::mle2(minuslogl = logLik2,
-                           start = stv,
-                           optimizer = optimizer,
-                           method = opt_method,
-                           lower = lower,
-                           upper = upper)
+      if(!exists("counter")){
+        # if(iter == 1){
+        counter <<- 1
+
+        # use different stv for different components
+        # implement stv as lits? and ask if it is a list, then
+        # use stv[[counter]] as stv
+        # for the next iterations of EM its not requried since we use component$coef
+
+        if(class(stv) == "list"){
+          stv <- stv[[counter]]
+        }
+
+        fit_mle <- bbmle::mle2(minuslogl = logLik2,
+                               start = stv,
+                               optimizer = optimizer,
+                               method = opt_method,
+                               lower = lower,
+                               upper = upper)
+
       }else{
-        stv_new <- setNames(c(component$coef,component$sigma,component$theta),c(colnames(x),"sigma","theta"))
-        fit <- bbmle::mle2(minuslogl = logLik2,
-                           start = stv_new,
-                           optimizer = optimizer,
-                           method = opt_method,
-                           lower = lower,
-                           upper = upper)
+        if(counter < k){
+          counter <<- counter + 1
+
+          if(class(stv) == "list"){
+            stv <- stv[[counter]]
+          }
+
+          fit_mle <- bbmle::mle2(minuslogl = logLik2,
+                                 start = stv,
+                                 optimizer = optimizer,
+                                 method = opt_method,
+                                 lower = lower,
+                                 upper = upper)
+
+
+
+        }else{
+          stv_new <- setNames(c(component$coef,component$sigma,component$theta),c(colnames(x),"sigma","theta"))
+          fit_mle <- bbmle::mle2(minuslogl = logLik2,
+                                 start = stv_new,
+                                 optimizer = optimizer,
+                                 method = opt_method,
+                                 lower = lower,
+                                 upper = upper)
+        }
       }
+
+
+      # if(iter == 1){ # maybe we can ask if the object components already has elements and use them, maybe use k in FLEXmstep for different start values in different classes
+      #   fit <- bbmle::mle2(minuslogl = logLik2,
+      #                      start = stv,
+      #                      optimizer = optimizer,
+      #                      method = opt_method,
+      #                      lower = lower,
+      #                      upper = upper)
+      # }else{
+      #   stv_new <- setNames(c(component$coef,component$sigma,component$theta),c(colnames(x),"sigma","theta"))
+      #   fit <- bbmle::mle2(minuslogl = logLik2,
+      #                      start = stv_new,
+      #                      optimizer = optimizer,
+      #                      method = opt_method,
+      #                      lower = lower,
+      #                      upper = upper)
+      # }
 
       # z@definecomponent(para = list(coef = fit@coef[!is.element(names(fit@coef),c("sigma","theta"))],
       #                               df = ncol(x)+1, # not changed yet
       #                               sigma =  fit@coef[is.element(names(fit@coef),c("sigma"))], # does this has to be calculted outside mle2?
       #                               theta = fit@coef[is.element(names(fit@coef),c("theta"))])) # does this has to be calculted outside mle2?
 
-      z@defineComponent(para = list(coef = fit@coef[!is.element(names(fit@coef),c("sigma","theta"))],
+      z@defineComponent(para = list(coef = fit_mle@coef[!is.element(names(fit_mle@coef),c("sigma","theta"))],
                                     df = ncol(x)+1, # not changed yet
-                                    sigma = fit@coef[is.element(names(fit@coef),c("sigma"))],
-                                    theta = fit@coef[is.element(names(fit@coef),c("theta"))],
-                                    stderror = summary(fit)@coef[,2],
-                                    pvalue = summary(fit)@coef[,4],
-                                    minLik = fit@min)
+                                    sigma = fit_mle@coef[is.element(names(fit_mle@coef),c("sigma"))],
+                                    theta = fit_mle@coef[is.element(names(fit_mle@coef),c("theta"))],
+                                    fit_mle = fit_mle,
+                                  #  counter = counter,
+                                   # stderror = summary(fit_mle)@coef[,2],  # trying to get slot "coef" from an object (class "summaryDefault") that is not an S4 object
+                                  #  pvalue = summary(fit_mle)@coef[,4],
+                                    minLik = fit_mle@min)
       )
     }
   }
 
   z
 }
-
-### REFIT OUTSIDE THE M STEP DRIVER ###
-# construct output with standard errors and p values (like refit should normaly do)
-# can we include this in the m step driver? change method for refit?
-
-gendf <- function(list){
-  df <- list()
-  for(j in 1:length(list)){
-    df[[j]] <- data.frame("Estimates" = c(list[[j]]@parameters[["coef"]], #  maybe include an other apply function here?
-                                          list[[j]]@parameters[["sigma"]],
-                                          list[[j]]@parameters[["theta"]]),
-                          "Std Error" = list[[j]]@parameters[["stderror"]],
-                          "pvalue" = list[[j]]@parameters[["pvalue"]])
-    # give AIC, loglik here as additional arguments?
-  }
-
-  return(df)
-}
-
-
-refit <- function(object){
-  comp <- object@components
-  out <- lapply(comp, function(j) {gendf(j)})
-  return(out)
-}
-
-
-devtools::document()
-
