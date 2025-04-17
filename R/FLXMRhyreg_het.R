@@ -42,6 +42,9 @@
 
 
 #### WITH Formula for sigma to account for heteroscedastisity ###
+# formula for sigma can only be the same as in formula estimated on only the TTO values
+# idea: use additional formula_sigma argument to be more flexible
+# stv_sigma must be named vector
 
 FLXMRhyreg_het <- function(formula= .~. ,
                         #   formula_sigma = NULL,
@@ -260,7 +263,7 @@ FLXMRhyreg_het <- function(formula= .~. ,
            stv <- stv[[counter]]
          }
          fit_mle <- bbmle::mle2(minuslogl = logLik2,
-                                start = stv,
+                                start = c(stv,stv_sigma),
                                 optimizer = optimizer,
                                 method = opt_method,
                                 lower = lower,
@@ -275,7 +278,7 @@ FLXMRhyreg_het <- function(formula= .~. ,
            }
 
            fit_mle <- bbmle::mle2(minuslogl = logLik2,
-                                  start = stv,
+                                  start = c(stv,stv_sigma),
                                   optimizer = optimizer,
                                   method = opt_method,
                                   lower = lower,
@@ -283,7 +286,7 @@ FLXMRhyreg_het <- function(formula= .~. ,
 
 
          }else{
-           stv_new <- setNames(c(component$coef,component$sigma,component$theta),c(colnames(x),"sigma","theta"))
+           stv_new <- setNames(c(component$coef,component$theta,component$sigma),c(colnames(x),"theta",names(stv_sigma)))
            fit_mle <- bbmle::mle2(minuslogl = logLik2,
                                   start = stv_new,
                                   optimizer = optimizer,

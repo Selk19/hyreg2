@@ -63,6 +63,9 @@ hyreg2 <-function(formula,
                   # non linear regression not implemented yet
                   #   Xb in FLXMRhyreg must be computed differently for that
 
+                  # FLXMRhyreg_het is not implemnted here, maybe better write new function hyreg2_het?
+
+
                   ...){
 
 
