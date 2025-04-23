@@ -100,7 +100,9 @@ if(is.null(variables_both)){
    idcount <- as.data.frame(table(unique(idframe)))
    #as.character(idcount[idcount$Freq == 0,"id"])
    data <- data[!is.element(as.character(data[,id_col]), as.character(idcount[idcount$Freq == 0,"id"])),]
+   type <- idframe[!is.element(as.character(idframe[,"id"]), as.character(idcount[idcount$Freq == 0,"id"])),"type"]
    # type anpassen ohne die entsprechenden Zeilen zu den IDs, die raus sind
+
 
    if(latent == "cont"){
      data_cont <- data[type == type_cont,]
