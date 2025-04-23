@@ -114,10 +114,14 @@ if(is.null(variables_both)){
      rm(counter, envir = .GlobalEnv) # counter wird während flexmix erstellt
 
      data_cont$mod_comp <- mod@cluster
+
+     data$roworder <- 1:nrow(data)
      data <- merge(data, unique(data_cont[,c(id_col,"mod_comp")]), by = id_col)
+     data <- data[order(data$roworder), ]
+
    }
 
-   if (latent == "dich"){
+   if(latent == "dich"){
      data_dich <- data[type == type_dich,]
      model <- list(FLXMRhyreg(type= type[type == type_dich],
                               stv = stv,
@@ -136,7 +140,10 @@ if(is.null(variables_both)){
      rm(counter, envir = .GlobalEnv) # counter wird während flexmix erstellt
 
      data_dich$mod_comp <- mod@cluster
+
+     data$roworder <- 1:nrow(data)
      data <- merge(data, unique(data_dich[,c(id_col,"mod_comp")]), by = id_col)
+     data <- data[order(data$roworder), ]
    }
 
 
@@ -145,8 +152,8 @@ if(is.null(variables_both)){
      data_list[[i]] <- data[data$mod_comp == i,]
    }
 
-   mod_list <- lapply(data_list, function(x){
-     model <- list(FLXMRhyreg(type= type[data$mod_comp == unique(x$mod_comp)],
+   mod_list <- lapply(data_list, function(xy){
+     model <- list(FLXMRhyreg(type= type[data$mod_comp == unique(xy$mod_comp)],
                               stv = stv, # stv can be a list
                               type_cont = type_cont,
                               type_dich = type_dich,
@@ -157,7 +164,7 @@ if(is.null(variables_both)){
                               optimizer = optimizer,
                               lower = lower,
                               upper = upper))
-     mod <- flexmix::flexmix(formula = formula, data = x, k = 1, model = model, control = control)
+     mod <- flexmix::flexmix(formula = formula, data = xy, k = 1, model = model, control = control)
      rm(counter, envir = .GlobalEnv)
      return(mod)
    })
@@ -249,7 +256,7 @@ data <- rbind(TTOonly,DCEonly)
 formula <- value ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad3 +
   mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5 | id
 
-k <- 1
+k <- 2
 
 #cluster <- NULL
 #concomitant=NULL
@@ -267,7 +274,7 @@ mod1 <- hyreg2(formula = formula,
        type_cont = "TTO",
        type_dich = "DCE_A",
        control = control,
-       latent = "both", # "dich" not working yet
+       latent = "cont", # "dich" not working yet
        id_col = "id"
 #      variables_cont = c("mo5","sc5"),
 #      variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
