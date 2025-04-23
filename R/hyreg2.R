@@ -89,12 +89,19 @@ if(is.null(variables_both)){
                             upper = upper))
 
 
-   fit <- flexmix::flexmix(formula = formula, data = data, k = k, model = model, control = control, ...)
+   fit <- flexmix::flexmix(formula = formula, data = data, k = k, model = model, control = control)
    rm(counter, envir = .GlobalEnv) # counter wird während flexmix erstellt
 
    return(fit)
 
  }else{
+
+   idframe <- data.frame(id = data[,id_col],type)
+   idcount <- as.data.frame(table(unique(idframe)))
+   #as.character(idcount[idcount$Freq == 0,"id"])
+   data <- data[!is.element(as.character(data[,id_col]), as.character(idcount[idcount$Freq == 0,"id"])),]
+   # type anpassen ohne die entsprechenden Zeilen zu den IDs, die raus sind
+
    if(latent == "cont"){
      data_cont <- data[type == type_cont,]
      model <- list(FLXMRhyreg(type= type[type == type_cont],
@@ -154,6 +161,7 @@ if(is.null(variables_both)){
 
    mod_list <- lapply(data_list, function(xy){
      model <- list(FLXMRhyreg(type= type[data$mod_comp == unique(xy$mod_comp)],
+                              #type = type,
                               stv = stv, # stv can be a list
                               type_cont = type_cont,
                               type_dich = type_dich,
