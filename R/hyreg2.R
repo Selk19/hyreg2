@@ -103,6 +103,10 @@ if(is.null(variables_both)){
    type <- idframe[!is.element(as.character(idframe[,"id"]), as.character(idcount[idcount$Freq == 0,"id"])),"type"]
    # type anpassen ohne die entsprechenden Zeilen zu den IDs, die raus sind
 
+   # paste deleted IDs for user?
+   warning(paste(length(as.character(idcount[idcount$Freq == 0,"id"])), "IDs were removed since they were only part of one type of data"))
+   # whiich IDS as.character(idcount[idcount$Freq == 0,"id"]),
+
 
    if(latent == "cont"){
      data_cont <- data[type == type_cont,]
@@ -161,21 +165,27 @@ if(is.null(variables_both)){
      data_list[[i]] <- data[data$mod_comp == i,]
    }
 
+
    mod_list <- lapply(data_list, function(xy){
-     model <- list(FLXMRhyreg(type= type[data$mod_comp == unique(xy$mod_comp)],
-                              #type = type,
-                              stv = stv, # stv can be a list
-                              type_cont = type_cont,
-                              type_dich = type_dich,
-                              variables_both = variables_both,
-                              variables_cont = variables_cont,
-                              variables_dich = variables_dich,
-                              opt_method = opt_method,
-                              optimizer = optimizer,
-                              lower = lower,
-                              upper = upper))
-     mod <- flexmix::flexmix(formula = formula, data = xy, k = 1, model = model, control = control)
-     rm(counter, envir = .GlobalEnv)
+     if(is.null(xy)){
+      mod <- NULL
+      warning( paste("one or more components are empty. Set mod to NULL"))
+     }else{
+       model <- list(FLXMRhyreg(type= type[data$mod_comp == unique(xy$mod_comp)],
+                                #type = type,
+                                stv = stv, # stv can be a list
+                                type_cont = type_cont,
+                                type_dich = type_dich,
+                                variables_both = variables_both,
+                                variables_cont = variables_cont,
+                                variables_dich = variables_dich,
+                                opt_method = opt_method,
+                                optimizer = optimizer,
+                                lower = lower,
+                                upper = upper))
+       mod <- flexmix::flexmix(formula = formula, data = xy, k = 1, model = model, control = control)
+       rm(counter, envir = .GlobalEnv)
+     }
      return(mod)
    })
 
@@ -252,7 +262,7 @@ refit <- function(object){
 
 
 ## TEST ####
-
+#
 
 library(flexmix)
 library(EQ5Ddata)
@@ -284,7 +294,7 @@ mod1 <- hyreg2(formula = formula,
        type_cont = "TTO",
        type_dich = "DCE_A",
        control = control,
-       latent = "cont", # "dich" not working yet
+       latent = "dich", # "dich" not working yet
        id_col = "id"
 #      variables_cont = c("mo5","sc5"),
 #      variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
