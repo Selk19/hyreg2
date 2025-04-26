@@ -210,8 +210,8 @@ FLXMRhyreg_het <- function(formula= .~. ,
         # if Intercept in stv_sigma but not in stv, than include ones
         sigma <- exp( as.matrix(cbind(rep(1,dim(x1)[1]),x1)) %*% stv[is.element(names(stv),names(stv_sigma))]) # exp like in xreg?
         theta <- exp(stv[is.element(names(stv),c("theta"))][[1]])
-        stv_cont <- stv[!is.element(names(stv),c("sigma","theta", variables_dich))]
-        stv_dich <- stv[!is.element(names(stv),c("sigma","theta", variables_cont))]
+        stv_cont <- stv[!is.element(names(stv),c("sigma","theta", variables_dich,names(stv_sigma)))]
+        stv_dich <- stv[!is.element(names(stv),c("sigma","theta", variables_cont,names(stv_sigma)))]
 
         Xb1 <- x1 %*% stv_cont[colnames(x1)] # hier könnte man ggf nur TTO spezifische Variablen einfließen lassen, Interaktionen etc beachten
         Xb2 <- x2 %*% stv_dich[colnames(x2)]
@@ -266,7 +266,7 @@ FLXMRhyreg_het <- function(formula= .~. ,
          # for the next iterations of EM its not requried since we use component$coef
 
          if(class(stv) == "list"){
-           stv <- stv[[counter]]
+           stv <- stv[[counter]]   # adapt for stv_sigma
          }
          fit_mle <- bbmle::mle2(minuslogl = logLik2,
                                 start = c(stv,stv_sigma),
@@ -280,7 +280,7 @@ FLXMRhyreg_het <- function(formula= .~. ,
            counter <<- counter + 1
 
            if(class(stv) == "list"){
-             stv <- stv[[counter]]
+             stv <- stv[[counter]] # adapt for stv_sigma
            }
 
            fit_mle <- bbmle::mle2(minuslogl = logLik2,
