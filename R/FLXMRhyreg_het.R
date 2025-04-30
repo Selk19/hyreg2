@@ -211,6 +211,9 @@ FLXMRhyreg_het <- function(formula= .~. ,
         # if Intercept in stv_sigma but not in stv, than include ones
         # names(stv_sigma) have to be same variable names as in formula but with _h at the ending
 
+
+        # CHECK:
+        # hat stv_sigma Namen am Ende ein _h? Wenn Nein, dann Error Meldung entsprechend
         if(!is.element("(Intercept)",colnames(x)) & is.element("(Intercept)_h",names(stv_sigma))){
           sigma <- exp( as.matrix(cbind(rep(1,dim(x1)[1]),x1)) %*% stv[is.element(names(stv),names(stv_sigma))]) # exp like in xreg?
         }else{
