@@ -51,6 +51,7 @@
 # formula for sigma can only be the same as in formula estimated on only the TTO values
 # idea: use additional formula_sigma argument to be more flexible
 # stv_sigma must be named vector
+# names(stv_sigma) have to be same variable names as in formula/data but with _h at the ending
 
 FLXMRhyreg_het <- function(formula= .~. ,
                         #   formula_sigma = NULL,
@@ -208,7 +209,14 @@ FLXMRhyreg_het <- function(formula= .~. ,
 
         # include vector of 1s for intercept ?
         # if Intercept in stv_sigma but not in stv, than include ones
-        sigma <- exp( as.matrix(cbind(rep(1,dim(x1)[1]),x1)) %*% stv[is.element(names(stv),names(stv_sigma))]) # exp like in xreg?
+        # names(stv_sigma) have to be same variable names as in formula but with _h at the ending
+
+        if(!is.element("(Intercept)",colnames(x)) & is.element("(Intercept)_h",names(stv_sigma))){
+          sigma <- exp( as.matrix(cbind(rep(1,dim(x1)[1]),x1)) %*% stv[is.element(names(stv),names(stv_sigma))]) # exp like in xreg?
+        }else{
+          sigma <- exp( x1[,unlist(strsplit(names(stv_sigma),"_h"))] %*% stv[is.element(names(stv),names(stv_sigma))])
+        }
+
         theta <- exp(stv[is.element(names(stv),c("theta"))][[1]])
         stv_cont <- stv[!is.element(names(stv),c("sigma","theta", variables_dich,names(stv_sigma)))]
         stv_dich <- stv[!is.element(names(stv),c("sigma","theta", variables_cont,names(stv_sigma)))]
@@ -266,7 +274,8 @@ FLXMRhyreg_het <- function(formula= .~. ,
          # for the next iterations of EM its not requried since we use component$coef
 
          if(class(stv) == "list"){
-           stv <- stv[[counter]]   # adapt for stv_sigma
+           stv <- stv[[counter]]
+           stv_sigma <- stv_sigma[[counter]]
          }
          fit_mle <- bbmle::mle2(minuslogl = logLik2,
                                 start = c(stv,stv_sigma),
@@ -280,7 +289,8 @@ FLXMRhyreg_het <- function(formula= .~. ,
            counter <<- counter + 1
 
            if(class(stv) == "list"){
-             stv <- stv[[counter]] # adapt for stv_sigma
+             stv <- stv[[counter]]
+             stv_sigma <- stv_sigma[[counter]]
            }
 
            fit_mle <- bbmle::mle2(minuslogl = logLik2,
