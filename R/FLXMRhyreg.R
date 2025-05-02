@@ -44,7 +44,7 @@
 
 #### WITH SIGNA AND THETA INCLUDED IN ESTIMATION ###
 
-FLXMRhyreg <- function(formula= .~. ,
+FLXMRhyreg <- function(formula= formula_orig ,
                        family=c("hyreg"),
                        type = NULL,
                        type_cont = NULL,
@@ -58,6 +58,7 @@ FLXMRhyreg <- function(formula= .~. ,
                        optimizer = "optim",
                        lower = -Inf,
                        upper = Inf,
+                       non_linear = FALSE,
                        ...
 )
 {
@@ -101,9 +102,11 @@ FLXMRhyreg <- function(formula= .~. ,
         if("offset" %in% names(dotarg)) offset <- dotarg$offset
 
         if(type == type_cont){
+          # change for non-linear functions
           p <- x %*% para$coef[is.element(names(para$coef),c(variables_cont,variables_both))]  # Xb in xreg
         }
         if(type == type_dich){
+          # change for non-linear functions
           p <- (x %*% para$coef[is.element(names(para$coef),c(variables_dich,variables_both))]) * para$theta
         }
 
@@ -125,6 +128,7 @@ FLXMRhyreg <- function(formula= .~. ,
 
         sigma <- exp(sigma)
 
+        # change for non-linear functions
         Xb1 <- x1 %*% para$coef[colnames(x1)] # only cont and both variables
         Xb2 <- (x2 %*% para$coef[colnames(x2)]) * exp(theta)  # only dich and both variables
 
@@ -185,6 +189,8 @@ FLXMRhyreg <- function(formula= .~. ,
 
         # variables_cont, variables_both, variables_dich
         # as charachter, names of variables to be fitted for only specific type of data
+
+        # change for non-linear functions
         x1 <- x[type == type_cont,c(variables_cont,variables_both)]
         x2 <-  x[type == type_dich,c(variables_dich,variables_both)]
         y1 <- y[type == type_cont]

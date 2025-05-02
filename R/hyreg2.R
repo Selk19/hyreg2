@@ -55,6 +55,7 @@ hyreg2 <-function(formula,
                   variables_both = NULL,
                   variables_dich = NULL,
                   variables_cont = NULL,
+                  non_linear = FALSE,
                   # additional arguments for flexmix or optimizer ?
                   #cluster = NULL,
                   #concomitant=NULL,
@@ -74,9 +75,18 @@ if(is.null(variables_both)){
   variables_both <- names(stv)[!is.element(names(stv),c("sigma","theta"))]
 }
 
+  formula_orig <- formula
+  if(non_linear == TRUE){
+    # formel umwandeln, so dass nur Bestandteile aus data columns in formula stehen
+    # mit neuer Funktion?
+    # formula <- Umwandlungsfunktion
+  }
+  # for linear functoins formula and formula_orig are the same
+
  if(latent == "both"){
 
-   model <- list(FLXMRhyreg(type= type,
+   model <- list(FLXMRhyreg(formula = formula_orig,
+                            type= type,
                             stv = stv,
                             type_cont = type_cont,
                             type_dich = type_dich,
@@ -86,7 +96,8 @@ if(is.null(variables_both)){
                             opt_method = opt_method,
                             optimizer = optimizer,
                             lower = lower,
-                            upper = upper))
+                            upper = upper,
+                            non_linear = non_linear))
 
 
    fit <- flexmix::flexmix(formula = formula, data = data, k = k, model = model, control = control)
@@ -110,7 +121,8 @@ if(is.null(variables_both)){
 
    if(latent == "cont"){
      data_cont <- data[type == type_cont,]
-     model <- list(FLXMRhyreg(type= type[type == type_cont],
+     model <- list(FLXMRhyreg(formula = formula_orig,
+                              type= type[type == type_cont],
                               stv = stv,
                               type_cont = type_cont,
                               type_dich = type_dich,
@@ -120,7 +132,8 @@ if(is.null(variables_both)){
                               opt_method = opt_method,
                               optimizer = optimizer,
                               lower = lower,
-                              upper = upper))
+                              upper = upper,
+                              non_linear = non_linear))
 
 
      mod <- flexmix::flexmix(formula = formula, data = data_cont, k = k, model = model, control = control)
@@ -136,7 +149,8 @@ if(is.null(variables_both)){
 
    if(latent == "dich"){
      data_dich <- data[type == type_dich,]
-     model <- list(FLXMRhyreg(type= type[type == type_dich],
+     model <- list(FLXMRhyreg(formula = formula_orig,
+                              type= type[type == type_dich],
                               stv = stv,
                               type_cont = type_cont,
                               type_dich = type_dich,
@@ -146,7 +160,8 @@ if(is.null(variables_both)){
                               opt_method = opt_method,
                               optimizer = optimizer,
                               lower = lower,
-                              upper = upper))
+                              upper = upper,
+                              non_linear = non_linear))
 
 
      mod <- flexmix::flexmix(formula = formula, data = data_dich, k = k, model = model, control = control)
@@ -171,7 +186,8 @@ if(is.null(variables_both)){
       mod <- NULL
       warning( paste("one or more components are empty. Set mod to NULL"))
      }else{
-       model <- list(FLXMRhyreg(type= type[data$mod_comp == unique(xy$mod_comp)],
+       model <- list(FLXMRhyreg(formula = formula_orig,
+                                type= type[data$mod_comp == unique(xy$mod_comp)],
                                 #type = type,
                                 stv = stv, # stv can be a list
                                 type_cont = type_cont,
@@ -182,7 +198,9 @@ if(is.null(variables_both)){
                                 opt_method = opt_method,
                                 optimizer = optimizer,
                                 lower = lower,
-                                upper = upper))
+                                upper = upper,
+                                non_linear = non_linear))
+
        mod <- flexmix::flexmix(formula = formula, data = xy, k = 1, model = model, control = control)
        rm(counter, envir = .GlobalEnv)
      }

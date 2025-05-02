@@ -53,7 +53,7 @@
 # stv_sigma must be named vector
 # names(stv_sigma) have to be same variable names as in formula/data but with _h at the ending
 
-FLXMRhyreg_het <- function(formula= .~. ,
+FLXMRhyreg_het <- function(formula= formula_orig ,
                         #   formula_sigma = NULL,
                        family=c("hyreg"),
                        type = NULL,
@@ -69,6 +69,7 @@ FLXMRhyreg_het <- function(formula= .~. ,
                        optimizer = "optim",
                        lower = -Inf,
                        upper = Inf,
+                       non_linear = FALSE,
                        ...
 )
 {
@@ -112,9 +113,11 @@ FLXMRhyreg_het <- function(formula= .~. ,
         if("offset" %in% names(dotarg)) offset <- dotarg$offset
 
         if(type == type_cont){
+          # change for non-linear functions
           p <- x %*% para$coef[is.element(names(para$coef),c(variables_cont,variables_both))]  # Xb in xreg
         }
         if(type == type_dich){
+          # change for non-linear functions
           p <- (x %*% para$coef[is.element(names(para$coef),c(variables_dich,variables_both))]) * para$theta
         }
 
@@ -129,8 +132,9 @@ FLXMRhyreg_het <- function(formula= .~. ,
 
 
         # choose subset of x and y depending on type
-
         # at the moment sigma formula can use only same dependet variables as formula itself
+
+        # change for non-linear functions
         x1 <- x[type == type_cont,c(variables_cont,variables_both)]
         x2 <-  x[type == type_dich,c(variables_dich,variables_both)]
         y1 <- y[type == type_cont]
@@ -139,9 +143,16 @@ FLXMRhyreg_het <- function(formula= .~. ,
 
         # if sigma uses Intercept include 1s
         # intercept must be given on first position
-        sigma <- exp(cbind(rep(1,dim(x1)[1]),x1) %*% sigma) # sigma must be a vector now
+        # CHECK:
+        # hat stv_sigma Namen am Ende ein _h? Wenn Nein, dann Error Meldung entsprechend
+        if(!is.element("(Intercept)",colnames(x)) & is.element("(Intercept)_h",names(stv_sigma))){
+          sigma <- exp(cbind(rep(1,dim(x1)[1]),x1) %*% sigma) # sigma must be a vector now
+        }else{
+          sigma <- exp( x1[,unlist(strsplit(names(stv_sigma),"_h"))] %*% sigma)
+        }
 
 
+        # change for non-linear functions
         Xb1 <- x1 %*% para$coef[colnames(x1)] # only cont and both variables
         Xb2 <- (x2 %*% para$coef[colnames(x2)]) * exp(theta)  # only dich and both variables
 
@@ -200,6 +211,8 @@ FLXMRhyreg_het <- function(formula= .~. ,
       logLik2 <- function(stv){
         # variables_cont, variables_both, variables_dich
         # as charachter, names of variables to be fitted for only specific type of data
+
+
         x1 <- x[type == type_cont,c(variables_cont,variables_both)]
         x2 <-  x[type == type_dich,c(variables_dich,variables_both)]
         y1 <- y[type == type_cont]
