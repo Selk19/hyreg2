@@ -69,11 +69,19 @@ hyreg2 <-function(formula,
 
                   ...){
 
+  dotarg <- list(...)
+
+  # is.null(stv)?
+  # check stv for names in x (model.matrix(formula,data))
+
+  # is.element(unique(type), c(type_dich,type_cont)) # was ist wenn es mehr oder weniger sind?
 
 
-if(is.null(variables_both)){
-  variables_both <- names(stv)[!is.element(names(stv),c("sigma","theta"))]
-}
+  if(is.null(variables_both)){
+    variables_both <- names(stv)[!is.element(names(stv),c("sigma","theta"))]
+  }
+  # variables can only be part in one variables_ name
+  # get error if variables are in two or more
 
   formula_orig <- formula
   if(non_linear == TRUE){
@@ -82,6 +90,8 @@ if(is.null(variables_both)){
     # formula <- Umwandlungsfunktion
   }
   # for linear functoins formula and formula_orig are the same
+
+
 
  if(latent == "both"){
 
@@ -106,6 +116,10 @@ if(is.null(variables_both)){
    return(fit)
 
  }else{
+
+   if(is.null(id_col)){
+     stop("id_col needed")
+   }
 
    idframe <- data.frame(id = data[,id_col],type)
    idcount <- as.data.frame(table(unique(idframe)))

@@ -190,7 +190,7 @@ FLXMRhyreg <- function(formula= formula_orig ,
         # variables_cont, variables_both, variables_dich
         # as charachter, names of variables to be fitted for only specific type of data
 
-        # change for non-linear functions
+
         x1 <- x[type == type_cont,c(variables_cont,variables_both)]
         x2 <-  x[type == type_dich,c(variables_dich,variables_both)]
         y1 <- y[type == type_cont]
@@ -203,7 +203,7 @@ FLXMRhyreg <- function(formula= formula_orig ,
         stv_cont <- stv[!is.element(names(stv),c("sigma","theta", variables_dich))]
         stv_dich <- stv[!is.element(names(stv),c("sigma","theta", variables_cont))]
 
-
+        # change for non-linear functions
         Xb1 <- x1 %*% stv_cont[colnames(x1)] # hier könnte man ggf nur TTO spezifische Variablen einfließen lassen, Interaktionen etc beachten
         Xb2 <- x2 %*% stv_dich[colnames(x2)]
 
@@ -265,8 +265,10 @@ FLXMRhyreg <- function(formula= formula_orig ,
                                start = stv,
                                optimizer = optimizer,
                                method = opt_method,
+                               # control?,
                                lower = lower,
                                upper = upper)
+
 
       }else{
         if(counter < k){
@@ -280,6 +282,7 @@ FLXMRhyreg <- function(formula= formula_orig ,
                                  start = stv,
                                  optimizer = optimizer,
                                  method = opt_method,
+                                 # control?,
                                  lower = lower,
                                  upper = upper)
 
@@ -291,6 +294,7 @@ FLXMRhyreg <- function(formula= formula_orig ,
                                  start = stv_new,
                                  optimizer = optimizer,
                                  method = opt_method,
+                                 # control?,
                                  lower = lower,
                                  upper = upper)
         }
