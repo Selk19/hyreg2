@@ -95,8 +95,7 @@ hyreg2 <-function(formula,
 
  if(latent == "both"){
 
-   model <- list(FLXMRhyreg(formula = formula_orig,
-                            type= type,
+   model <- list(FLXMRhyreg(type= type,
                             stv = stv,
                             type_cont = type_cont,
                             type_dich = type_dich,
@@ -135,8 +134,7 @@ hyreg2 <-function(formula,
 
    if(latent == "cont"){
      data_cont <- data[type == type_cont,]
-     model <- list(FLXMRhyreg(formula = formula_orig,
-                              type= type[type == type_cont],
+     model <- list(FLXMRhyreg(type= type[type == type_cont],
                               stv = stv,
                               type_cont = type_cont,
                               type_dich = type_dich,
@@ -163,8 +161,7 @@ hyreg2 <-function(formula,
 
    if(latent == "dich"){
      data_dich <- data[type == type_dich,]
-     model <- list(FLXMRhyreg(formula = formula_orig,
-                              type= type[type == type_dich],
+     model <- list(FLXMRhyreg(type= type[type == type_dich],
                               stv = stv,
                               type_cont = type_cont,
                               type_dich = type_dich,
@@ -200,8 +197,7 @@ hyreg2 <-function(formula,
       mod <- NULL
       warning( paste("one or more components are empty. Set mod to NULL"))
      }else{
-       model <- list(FLXMRhyreg(formula = formula_orig,
-                                type= type[data$mod_comp == unique(xy$mod_comp)],
+       model <- list(FLXMRhyreg(type= type[data$mod_comp == unique(xy$mod_comp)],
                                 #type = type,
                                 stv = stv, # stv can be a list
                                 type_cont = type_cont,
@@ -326,7 +322,7 @@ mod1 <- hyreg2(formula = formula,
        type_cont = "TTO",
        type_dich = "DCE_A",
        control = control,
-       latent = "dich", # "dich" not working yet
+       latent = "both", # "dich" not working yet
        id_col = "id"
 #      variables_cont = c("mo5","sc5"),
 #      variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",

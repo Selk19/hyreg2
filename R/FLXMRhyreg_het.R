@@ -53,7 +53,7 @@
 # stv_sigma must be named vector
 # names(stv_sigma) have to be same variable names as in formula/data but with _h at the ending
 
-FLXMRhyreg_het <- function(formula= formula_orig ,
+FLXMRhyreg_het <- function(formula= . ~ .,
                         #   formula_sigma = NULL,
                        family=c("hyreg"),
                        type = NULL,
@@ -70,6 +70,7 @@ FLXMRhyreg_het <- function(formula= formula_orig ,
                        lower = -Inf,
                        upper = Inf,
                        non_linear = FALSE,
+                       formula_orig = formula_orig,
                        ...
 )
 {

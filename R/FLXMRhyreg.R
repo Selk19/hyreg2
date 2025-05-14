@@ -44,7 +44,7 @@
 
 #### WITH SIGNA AND THETA INCLUDED IN ESTIMATION ###
 
-FLXMRhyreg <- function(formula= formula_orig ,
+FLXMRhyreg <- function(formula= formula ,
                        family=c("hyreg"),
                        type = NULL,
                        type_cont = NULL,
