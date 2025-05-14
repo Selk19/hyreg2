@@ -44,7 +44,7 @@
 
 #### WITH SIGNA AND THETA INCLUDED IN ESTIMATION ###
 
-FLXMRhyreg <- function(formula= formula ,
+FLXMRhyreg <- function(formula= . ~ . ,
                        family=c("hyreg"),
                        type = NULL,
                        type_cont = NULL,
@@ -59,6 +59,7 @@ FLXMRhyreg <- function(formula= formula ,
                        lower = -Inf,
                        upper = Inf,
                        non_linear = FALSE,
+                       formula_orig = formula_orig,
                        ...
 )
 {
@@ -129,6 +130,7 @@ FLXMRhyreg <- function(formula= formula ,
         sigma <- exp(sigma)
 
         # change for non-linear functions
+        # use formula_orig
         Xb1 <- x1 %*% para$coef[colnames(x1)] # only cont and both variables
         Xb2 <- (x2 %*% para$coef[colnames(x2)]) * exp(theta)  # only dich and both variables
 
@@ -204,6 +206,7 @@ FLXMRhyreg <- function(formula= formula ,
         stv_dich <- stv[!is.element(names(stv),c("sigma","theta", variables_cont))]
 
         # change for non-linear functions
+        # use formula_orig
         Xb1 <- x1 %*% stv_cont[colnames(x1)] # hier könnte man ggf nur TTO spezifische Variablen einfließen lassen, Interaktionen etc beachten
         Xb2 <- x2 %*% stv_dich[colnames(x2)]
 
