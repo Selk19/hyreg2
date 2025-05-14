@@ -106,7 +106,8 @@ hyreg2 <-function(formula,
                             optimizer = optimizer,
                             lower = lower,
                             upper = upper,
-                            non_linear = non_linear))
+                            non_linear = non_linear,
+                            formula_orig = formula_orig))
 
 
    fit <- flexmix::flexmix(formula = formula, data = data, k = k, model = model, control = control)
@@ -145,7 +146,8 @@ hyreg2 <-function(formula,
                               optimizer = optimizer,
                               lower = lower,
                               upper = upper,
-                              non_linear = non_linear))
+                              non_linear = non_linear,
+                              formula_orig = formula_orig))
 
 
      mod <- flexmix::flexmix(formula = formula, data = data_cont, k = k, model = model, control = control)
@@ -172,7 +174,8 @@ hyreg2 <-function(formula,
                               optimizer = optimizer,
                               lower = lower,
                               upper = upper,
-                              non_linear = non_linear))
+                              non_linear = non_linear,
+                              formula_orig = formula_orig))
 
 
      mod <- flexmix::flexmix(formula = formula, data = data_dich, k = k, model = model, control = control)
@@ -209,7 +212,8 @@ hyreg2 <-function(formula,
                                 optimizer = optimizer,
                                 lower = lower,
                                 upper = upper,
-                                non_linear = non_linear))
+                                non_linear = non_linear,
+                                formula_orig = formula_orig))
 
        mod <- flexmix::flexmix(formula = formula, data = xy, k = 1, model = model, control = control)
        rm(counter, envir = .GlobalEnv)
