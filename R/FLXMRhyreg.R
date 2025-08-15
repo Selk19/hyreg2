@@ -59,7 +59,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
                        lower = -Inf,
                        upper = Inf,
                        non_linear = FALSE,
-                       formula_orig = formula_orig,
+                      formula_orig = formula_orig,
                        ...
 )
 {
@@ -147,12 +147,33 @@ FLXMRhyreg <- function(formula= . ~ . ,
         ### from xreg ###
         ### for box constraints ?
 
-        if(upper != Inf){
-          censV <- y1 == upper # adadpt for lower
-          pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = upper, sd = sigma, lower.tail = T, log.p = T) -  # mean = 2 in xreg
-            pnorm(q =  Xb1[censV], mean = lower, sd = sigma, lower.tail = T, log.p = T) # mean = Inf in xreg
-          # or do we have to use log.p = F and than log(pnorm() - pnorm())?
+        #in xreg:
+        if(upper != Inf ){
+          censV <- y1 == upper
+          pvals1[which(censV)] <- log(pnorm((Xb1[censV]-upper)/sigma,0,1) - pnorm((Xb1[censV]-Inf)/sigma,0,1))
         }
+
+        if(lower != -Inf ){
+          censV <- y1 == lower
+          pvals1[which(censV)] <- log(pnorm((Xb1[censV]-(-Inf))/sigma,0,1) - pnorm((Xb1[censV]-lower)/sigma,0,1))
+        }
+
+        # if(upper != Inf ){
+        #     censV <- y1 == upper
+        #     pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = upper, sd = sigma, lower.tail = T, log.p = T) -  # mean = 2 in xreg
+        #       pnorm(q =  Xb1[censV], mean = -Inf, sd = sigma, lower.tail = T, log.p = T) # mean = Inf in xreg
+        # }
+#
+#         if(lower != -Inf){
+#           censV <- y1 == lower
+#           pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = Inf, sd = sigma, lower.tail = T, log.p = T) -  # mean = 2 in xreg
+#             pnorm(q =  Xb1[censV], mean = lower, sd = sigma, lower.tail = T, log.p = T) # mean = Inf in xreg
+#         }
+
+
+
+
+
 
 
         pvals <- c(pvals1,pvals2)
@@ -221,13 +242,27 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
         # for box constraints:
 
-        if(upper != Inf){
-          censV <- y1 == upper # adapt for lower, anpassen für lower bzw upper und lower zeitgleich
-          pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = upper, sd = sigma, lower.tail = T, log.p = T) -  # mean = 2 in xreg
-            pnorm(q =  Xb1[censV], mean = lower, sd = sigma, lower.tail = T, log.p = T) # mean = Inf in xreg
-          # or do we have to use log.p = F and than log(pnorm() - pnorm())?
-
+        #in xreg:
+        if(upper != Inf ){
+          censV <- y1 == upper
+          pvals1[which(censV)] <- log(pnorm((Xb1[censV]-upper)/sigma,0,1) - pnorm((Xb1[censV]-Inf)/sigma,0,1))
         }
+        if(lower != -Inf ){
+          censV <- y1 == lower
+          pvals1[which(censV)] <- log(pnorm((Xb1[censV]-(-Inf))/sigma,0,1) - pnorm((Xb1[censV]-lower)/sigma,0,1))
+        }
+
+        # if(upper != Inf ){
+        #     censV <- y1 == upper
+        #     pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = upper, sd = sigma, lower.tail = T, log.p = T) -  # mean = 2 in xreg
+        #       pnorm(q =  Xb1[censV], mean = -Inf, sd = sigma, lower.tail = T, log.p = T) # mean = Inf in xreg
+        # }
+
+        # if(lower != -Inf){
+        #   censV <- y1 == lower
+        #   pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = Inf, sd = sigma, lower.tail = T, log.p = T) -  # mean = 2 in xreg
+        #     pnorm(q =  Xb1[censV], mean = lower, sd = sigma, lower.tail = T, log.p = T) # mean = Inf in xreg
+        # }
 
 
 
@@ -250,6 +285,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
 
       bbmle::parnames(logLik2) <- c(colnames(x),"sigma","theta") # set names of inputs for logLik2
+      # maybe use names(stv) instead of colnames(x) ?
 
       if(!exists("counter")){
         # if(iter == 1){
@@ -261,16 +297,18 @@ FLXMRhyreg <- function(formula= . ~ . ,
         # for the next iterations of EM its not requried since we use component$coef
 
         if(class(stv) == "list"){
-          stv <- stv[[counter]]
+          stv_in <- stv[[counter]]
+        }else{
+          stv_in <- stv
         }
 
         fit_mle <- bbmle::mle2(minuslogl = logLik2,
-                               start = stv,
+                               start = stv_in,
                                optimizer = optimizer,
                                method = opt_method,
                                # control?,
-                               lower = lower,
-                               upper = upper)
+                               lower = -Inf, # or upper and lower from input??
+                               upper = Inf)
 
 
       }else{
@@ -278,16 +316,18 @@ FLXMRhyreg <- function(formula= . ~ . ,
           counter <<- counter + 1
 
           if(class(stv) == "list"){
-            stv <- stv[[counter]]
+            stv_in <- stv[[counter]]
+          }else{
+            stv_in <- stv
           }
 
           fit_mle <- bbmle::mle2(minuslogl = logLik2,
-                                 start = stv,
+                                 start = stv_in,
                                  optimizer = optimizer,
                                  method = opt_method,
                                  # control?,
-                                 lower = lower,
-                                 upper = upper)
+                                 lower = -Inf, # or upper and lower from input??
+                                 upper = Inf)
 
 
 
@@ -298,8 +338,8 @@ FLXMRhyreg <- function(formula= . ~ . ,
                                  optimizer = optimizer,
                                  method = opt_method,
                                  # control?,
-                                 lower = lower,
-                                 upper = upper)
+                                 lower = -Inf, # or upper and lower from input??
+                                 upper = Inf)
         }
       }
 
