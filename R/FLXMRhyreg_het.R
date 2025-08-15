@@ -136,6 +136,7 @@ FLXMRhyreg_het <- function(formula= . ~ .,
         # at the moment sigma formula can use only same dependet variables as formula itself
 
         # change for non-linear functions
+        # use formula_orig
         x1 <- x[type == type_cont,c(variables_cont,variables_both)]
         x2 <-  x[type == type_dich,c(variables_dich,variables_both)]
         y1 <- y[type == type_cont]
@@ -238,6 +239,7 @@ FLXMRhyreg_het <- function(formula= . ~ .,
         stv_cont <- stv[!is.element(names(stv),c("sigma","theta", variables_dich,names(stv_sigma)))]
         stv_dich <- stv[!is.element(names(stv),c("sigma","theta", variables_cont,names(stv_sigma)))]
 
+        # use formula_orig for non-linear functions
         Xb1 <- x1 %*% stv_cont[colnames(x1)] # hier könnte man ggf nur TTO spezifische Variablen einfließen lassen, Interaktionen etc beachten
         Xb2 <- x2 %*% stv_dich[colnames(x2)]
 
