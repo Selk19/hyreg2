@@ -219,16 +219,15 @@ FLXMRhyreg <- function(formula= . ~ . ,
         y1 <- y[type == type_cont]
         y2 <-  y[type == type_dich]
 
-
-
         sigma <- exp(stv[is.element(names(stv),c("sigma"))][[1]])
         theta <- exp(stv[is.element(names(stv),c("theta"))][[1]])
         stv_cont <- stv[!is.element(names(stv),c("sigma","theta", variables_dich))]
         stv_dich <- stv[!is.element(names(stv),c("sigma","theta", variables_cont))]
 
+
         # change for non-linear functions
         # use formula_orig
-        Xb1 <- x1 %*% stv_cont[colnames(x1)] # hier könnte man ggf nur TTO spezifische Variablen einfließen lassen, Interaktionen etc beachten
+        Xb1 <- x1 %*% stv_cont[colnames(x1)] # [] sortiert die Werte von stv in der passenden Reiehenfolge zu x1
         Xb2 <- x2 %*% stv_dich[colnames(x2)]
 
 

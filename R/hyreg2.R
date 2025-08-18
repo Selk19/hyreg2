@@ -71,17 +71,55 @@ hyreg2 <-function(formula,
 
   dotarg <- list(...)
 
-  # is.null(stv)?
+  # Check stv
   # check stv for names in x (model.matrix(formula,data))
+
+  # no stv
+  if(is.null(stv)){
+   warning(paste0("No stv provided. Set all stv from data to 0.1 and sigma = 1 and theta = 1"))
+    stv <- setNames(c(rep(0.1,dim(model.matrix(formula,data))[2]),1,1), c(colnames(model.matrix(formula,data)),c("sigma","theta")))
+  }else{
+
+  # one or more stv missing
+    if(any(!is.element(colnames(model.matrix(formula,data)),names(stv)))){
+      stop(paste0("Some stv are missing. Please provide stv values for all relevant variables.
+                  Using model.matrix(formula,data) you can check, which variables need a stv value.
+                   Additionally, you can give stv values for sigma and theta"))
+      # welche fehlt angeben?
+    }
+
+    # theta missing
+    if(!is.element("theta",names(stv))){
+      stv <- c(stv,setNames(1,"theta"))
+      warning(paste0("No stv for theta provided, set to 1"))
+    }
+
+    # sigma missing
+    if(!is.element("sigma",names(stv))){
+      stv <- c(stv,setNames(1,"sigma"))
+      warning(paste0("No stv for sigma provided, set to 1"))
+    }
+
+    # stv for variables not in formula given, d.h. zu viele angegeben
+    if(any(!is.element(names(stv), c(colnames(model.matrix(formula,data)),"theta","sigma")))){
+      stop(paste0("Too many stv provided.
+                  Using model.matrix(formula,data) you can check, which variables need a stv value.
+                  Additionally, you can give stv values for sigma and theta"))
+      # welche zu viel angegeben und einfach streichen?
+    }
+    # Reihenfolge check in FLXMRhyreg?
+  }
+
 
   # is.element(unique(type), c(type_dich,type_cont)) # was ist wenn es mehr oder weniger sind?
 
 
-  if(is.null(variables_both)){
+  if(is.null(variables_both) & is.null(variables_dich) & is.null(variables_cont)){
     variables_both <- names(stv)[!is.element(names(stv),c("sigma","theta"))]
+  }else if(any(table(c(variables_both,variables_cont,variables_dich))>1)){
+    stop(paste0("variables can only be part in one of the vectors variables_both, variables_dich and variables_cont"))
   }
-  # variables can only be part in one variables_ name
-  # get error if variables are in two or more
+
 
   formula_orig <- formula
   if(non_linear == TRUE){
@@ -308,7 +346,7 @@ DCEonly <- DCEonly[1:150,]
 data <- rbind(TTOonly,DCEonly)
 
 formula <- value ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad3 +
-  mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5 |id
+  mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5
 
 k <- 1
 

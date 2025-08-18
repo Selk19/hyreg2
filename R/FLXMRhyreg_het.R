@@ -171,12 +171,24 @@ FLXMRhyreg_het <- function(formula= . ~ .,
         ### from xreg ###
         ### for box constraints
 
-        if(upper != Inf){
-          censV <- y1 == upper # adapt for lower
-          pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = upper, sd = sigma[censV], lower.tail = T, log.p = T) -  # mean = 2 in xreg
-            pnorm(q =  Xb1[censV], mean = lower, sd = sigma[censV], lower.tail = T, log.p = T) # mean = Inf in xreg
-          # or do we have to use log.p = F and than log(pnorm() - pnorm())?
+
+        #in xreg:
+        if(upper != Inf ){
+          censV <- y1 == upper
+          pvals1[which(censV)] <- log(pnorm((Xb1[censV]-upper)/sigma[censV],0,1) - pnorm((Xb1[censV]-Inf)/sigma,0,1))
         }
+
+        if(lower != -Inf ){
+          censV <- y1 == lower
+          pvals1[which(censV)] <- log(pnorm((Xb1[censV]-(-Inf))/sigma[censV],0,1) - pnorm((Xb1[censV]-lower)/sigma,0,1))
+        }
+
+        # if(upper != Inf){
+        #   censV <- y1 == upper # adapt for lower
+        #   pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = upper, sd = sigma[censV], lower.tail = T, log.p = T) -  # mean = 2 in xreg
+        #     pnorm(q =  Xb1[censV], mean = lower, sd = sigma[censV], lower.tail = T, log.p = T) # mean = Inf in xreg
+        #   # or do we have to use log.p = F and than log(pnorm() - pnorm())?
+        # }
 
 
         pvals <- c(pvals1,pvals2)
@@ -254,13 +266,23 @@ FLXMRhyreg_het <- function(formula= . ~ .,
 
         # for box constraints:
 
-        if(upper != Inf){
-          censV <- y1 == upper # ADAPT for lower, anpassen für lower bzw upper und lower zeitgleich
-          pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = upper, sd = sigma[censV], lower.tail = T, log.p = T) -  # mean = 2 in xreg
-            pnorm(q =  Xb1[censV], mean = lower, sd = sigma[censV], lower.tail = T, log.p = T) # mean = Inf in xreg
-          # or do we have to use log.p = F and than log(pnorm() - pnorm())?
-
+        #in xreg:
+        if(upper != Inf ){
+          censV <- y1 == upper
+          pvals1[which(censV)] <- log(pnorm((Xb1[censV]-upper)/sigma[censV],0,1) - pnorm((Xb1[censV]-Inf)/sigma,0,1))
         }
+
+        if(lower != -Inf ){
+          censV <- y1 == lower
+          pvals1[which(censV)] <- log(pnorm((Xb1[censV]-(-Inf))/sigma[censV],0,1) - pnorm((Xb1[censV]-lower)/sigma,0,1))
+        }
+
+        # if(upper != Inf){
+        #   censV <- y1 == upper # adapt for lower
+        #   pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = upper, sd = sigma[censV], lower.tail = T, log.p = T) -  # mean = 2 in xreg
+        #     pnorm(q =  Xb1[censV], mean = lower, sd = sigma[censV], lower.tail = T, log.p = T) # mean = Inf in xreg
+        #   # or do we have to use log.p = F and than log(pnorm() - pnorm())?
+        # }
 
 
 
