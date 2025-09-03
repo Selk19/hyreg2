@@ -71,17 +71,22 @@ hyreg2 <-function(formula,
 
   dotarg <- list(...)
 
-  # Check stv
+  ### STV Check ###
   # check stv for names in x (model.matrix(formula,data))
+
+  formula_string <- paste(deparse(formula), collapse = "")
+  formula_parts <- strsplit(formula_string, "\\|")[[1]]
+  formula_short <- as.formula(formula_parts[1])
+
 
   # no stv
   if(is.null(stv)){
    warning(paste0("No stv provided. Set all stv from data to 0.1 and sigma = 1 and theta = 1"))
-    stv <- setNames(c(rep(0.1,dim(model.matrix(formula,data))[2]),1,1), c(colnames(model.matrix(formula,data)),c("sigma","theta")))
+    stv <- setNames(c(rep(0.1,dim(model.matrix(formula_short,data))[2]),1,1), c(colnames(model.matrix(formula_short,data)),c("sigma","theta")))
   }else{
 
   # one or more stv missing
-    if(any(!is.element(colnames(model.matrix(formula,data)),names(stv)))){
+    if(any(!is.element(colnames(model.matrix(formula_short,data)),names(stv)))){
       stop(paste0("Some stv are missing. Please provide stv values for all relevant variables.
                   Using model.matrix(formula,data) you can check, which variables need a stv value.
                    Additionally, you can give stv values for sigma and theta"))
@@ -101,7 +106,7 @@ hyreg2 <-function(formula,
     }
 
     # stv for variables not in formula given, d.h. zu viele angegeben
-    if(any(!is.element(names(stv), c(colnames(model.matrix(formula,data)),"theta","sigma")))){
+    if(any(!is.element(names(stv), c(colnames(model.matrix(formula_short,data)),"theta","sigma")))){
       stop(paste0("Too many stv provided.
                   Using model.matrix(formula,data) you can check, which variables need a stv value.
                   Additionally, you can give stv values for sigma and theta"))
@@ -110,10 +115,20 @@ hyreg2 <-function(formula,
     # Reihenfolge check in FLXMRhyreg?
   }
 
+  ### TYPE Check ###
+  if(is.null(type) | is.null(type_dich) | is.null(type_cont)){
+    stop(paste0("inputs for type, type_dich and typ_cont needed"))
+  }else{
+    if(!is.element(type_dich,unique(type))){
+      stop(paste0("Provided type_dich is not part of type"))
+    }
+    if(!is.element(type_cont,unique(type))){
+      stop(paste0("Provided type_cont is not part of type"))
+    }
+  }
 
-  # is.element(unique(type), c(type_dich,type_cont)) # was ist wenn es mehr oder weniger sind?
 
-
+  ### VARIABALES Check ###
   if(is.null(variables_both) & is.null(variables_dich) & is.null(variables_cont)){
     variables_both <- names(stv)[!is.element(names(stv),c("sigma","theta"))]
   }else if(any(table(c(variables_both,variables_cont,variables_dich))>1)){
@@ -130,7 +145,7 @@ hyreg2 <-function(formula,
   # for linear functoins formula and formula_orig are the same
 
 
-
+ ### ESTIMATION ###
  if(latent == "both"){
 
    model <- list(FLXMRhyreg(type= type,
@@ -346,7 +361,12 @@ DCEonly <- DCEonly[1:150,]
 data <- rbind(TTOonly,DCEonly)
 
 formula <- value ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad3 +
+  mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5 |id
+
+# with simulated_data
+formula <- y ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad3 +
   mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5
+
 
 k <- 1
 
@@ -361,11 +381,11 @@ stv1 <- setNames(c(rep(0.1,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
 
 
 mod1 <- hyreg2(formula = formula,
-       data = data,
-       type = data$method,
+       data = simulated_data,
+       type = simulated_data$type,
        stv = stv1,
-       upper = 2,
-       lower = 0, # lower not working
+      # upper = 2,
+      # lower = 0,
        k = k,
        type_cont = "TTO",
        type_dich = "DCE_A",
@@ -402,3 +422,20 @@ hybU
 
 hybC <- hyreg(modformula, data, datatype = "d_method",init = hyb, ll = 0, ul = 2)
 hybC
+
+
+
+
+### with simulated data ###
+modformula <- y ~
+  mo2 * MO2 + sc2 * SC2 + ua2 * UA2 + pd2 * PD2 +  ad2 * AD2 +
+  mo3 * MO3 + sc3 * SC3 + ua3 * UA3 + pd3 * PD3 + ad3 * AD3 +
+  mo4 * MO4 + sc4 * SC4 + ua4 * UA4 + pd4 * PD4 + ad4 * AD4 +
+  mo5 * MO5 + sc5 * SC5 + ua5 * UA5 + pd5 * PD5 + ad5 * AD5
+
+simulated_data$type_num <- simulated_data$type == "TTO"
+
+hybC <- hyreg(modformula, simulated_data, datatype = "type_num")
+hybC
+
+
