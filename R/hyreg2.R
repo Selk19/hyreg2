@@ -365,10 +365,14 @@ formula <- value ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad
 
 # with simulated_data
 formula <- y ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad3 +
-  mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5
+  mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5 | id
 
 
-k <- 1
+k <- 2
+
+### sth wrong with likelihood using simulated_data?
+### values increasing?
+
 
 #cluster <- NULL
 #concomitant=NULL
@@ -402,9 +406,19 @@ mod1 <- hyreg2(formula = formula,
 # Error in names(object) <- nm : attempt to set an attribute on NULL
 # use rm(counter) and try again
 
+
+### SUMMARY ###
+
 summary(mod1)
 summary_hyreg2(mod1)
 #xreg2:::refit(mod1)
+
+# proportion of correct classification
+(sum(mod1@cluster == simulated_data$class))/dim(simulated_data)[1]
+
+x <- 4
+mod1@cluster[c(x,x+120)]
+
 
 
 # compare to xreg#
