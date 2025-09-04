@@ -120,12 +120,13 @@ hyreg2 <-function(formula,
     stop(paste0("inputs for type, type_dich and typ_cont needed"))
   }else{
     if(!is.element(type_dich,unique(type))){
-      stop(paste0("Provided type_dich is not part of type"))
+      warning(paste0("Provided type_dich is not part of type"))
     }
     if(!is.element(type_cont,unique(type))){
-      stop(paste0("Provided type_cont is not part of type"))
+      warning(paste0("Provided type_cont is not part of type"))
     }
   }
+
 
 
   ### VARIABALES Check ###

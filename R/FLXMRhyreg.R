@@ -214,6 +214,8 @@ FLXMRhyreg <- function(formula= . ~ . ,
         # as charachter, names of variables to be fitted for only specific type of data
 
 
+        # adjust for only TTO or only DCE data?
+
         x1 <- x[type == type_cont,c(variables_cont,variables_both)]
         x2 <-  x[type == type_dich,c(variables_dich,variables_both)]
         y1 <- y[type == type_cont]
