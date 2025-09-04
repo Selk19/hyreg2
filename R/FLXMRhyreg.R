@@ -39,8 +39,6 @@
 
 
 ### FLXMRhyreg ###
-# not completly working (refit is missing)
-
 
 #### WITH SIGNA AND THETA INCLUDED IN ESTIMATION ###
 
@@ -66,22 +64,8 @@ FLXMRhyreg <- function(formula= . ~ . ,
   family <- match.arg(family)
 
   # refit function has to depend on x,y,w.
-
-
   hyregrefit <- function(x, y, w) {
-    # use mle2?
-    fit <- bbmle::mle2() ## or use optim?
-
-    # in FLXMRglm they use:
-    #c(glm.fit(x, y, weights=w, offset=offset,
-    #         family=get(family, mode="function")()),
-    # list(call = sys.call(), offset = offset,
-    #      control = eval(formals(glm.fit)$control),
-    #      method = "weighted.glm.fit"))
-    #  fit$df.null <- sum(w) + fit$df.null - fit$df.residual - fit$rank
-    #  fit$df.residual <- sum(w) - fit$rank
-    #  fit$x <- x
-    #  fit
+    paste0("not defined")
   }
 
   z <- new("FLXMRglm", weighted=TRUE, formula=formula,
@@ -144,9 +128,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
 
 
-        ### from xreg ###
-        ### for box constraints ?
-
+        # for censored data
         #in xreg:
         if(upper != Inf ){
           censV <- y1 == upper
@@ -157,23 +139,6 @@ FLXMRhyreg <- function(formula= . ~ . ,
           censV <- y1 == lower
           pvals1[which(censV)] <- log(pnorm((Xb1[censV]-(-Inf))/sigma,0,1) - pnorm((Xb1[censV]-lower)/sigma,0,1))
         }
-
-        # if(upper != Inf ){
-        #     censV <- y1 == upper
-        #     pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = upper, sd = sigma, lower.tail = T, log.p = T) -  # mean = 2 in xreg
-        #       pnorm(q =  Xb1[censV], mean = -Inf, sd = sigma, lower.tail = T, log.p = T) # mean = Inf in xreg
-        # }
-#
-#         if(lower != -Inf){
-#           censV <- y1 == lower
-#           pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = Inf, sd = sigma, lower.tail = T, log.p = T) -  # mean = 2 in xreg
-#             pnorm(q =  Xb1[censV], mean = lower, sd = sigma, lower.tail = T, log.p = T) # mean = Inf in xreg
-#         }
-
-
-
-
-
 
 
         pvals <- c(pvals1,pvals2)
@@ -210,12 +175,6 @@ FLXMRhyreg <- function(formula= . ~ . ,
       logLik2 <- function(stv){
 
 
-        # variables_cont, variables_both, variables_dich
-        # as charachter, names of variables to be fitted for only specific type of data
-
-
-        # adjust for only TTO or only DCE data?
-
         x1 <- x[type == type_cont,c(variables_cont,variables_both)]
         x2 <-  x[type == type_dich,c(variables_dich,variables_both)]
         y1 <- y[type == type_cont]
@@ -241,8 +200,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
         # Likelihood calculation
         pvals1 <- dnorm(y1, mean=Xb1, sd=sigma, log=TRUE) # cont_normal
 
-        # for box constraints:
-
+        # for box constraints, censored data
         #in xreg:
         if(upper != Inf ){
           censV <- y1 == upper
@@ -253,27 +211,14 @@ FLXMRhyreg <- function(formula= . ~ . ,
           pvals1[which(censV)] <- log(pnorm((Xb1[censV]-(-Inf))/sigma,0,1) - pnorm((Xb1[censV]-lower)/sigma,0,1))
         }
 
-        # if(upper != Inf ){
-        #     censV <- y1 == upper
-        #     pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = upper, sd = sigma, lower.tail = T, log.p = T) -  # mean = 2 in xreg
-        #       pnorm(q =  Xb1[censV], mean = -Inf, sd = sigma, lower.tail = T, log.p = T) # mean = Inf in xreg
-        # }
-
-        # if(lower != -Inf){
-        #   censV <- y1 == lower
-        #   pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = Inf, sd = sigma, lower.tail = T, log.p = T) -  # mean = 2 in xreg
-        #     pnorm(q =  Xb1[censV], mean = lower, sd = sigma, lower.tail = T, log.p = T) # mean = Inf in xreg
-        # }
-
-
 
         pvals <- c(pvals1,pvals2)
 
 
-        pvals[pvals == -Inf] <- log(.Machine$double.xmin) # or without log?
+        pvals[pvals == -Inf] <- log(.Machine$double.xmin)
         pvals[pvals == Inf] <- log(.Machine$double.xmax)
 
-        # what to do with NaN
+        # what to do with NaN ? fixed by log(-Machine...)?
 
 
         pvals_w <- pvals * w
@@ -289,13 +234,14 @@ FLXMRhyreg <- function(formula= . ~ . ,
       # maybe use names(stv) instead of colnames(x) ?
 
       if(!exists("counter")){
-        # if(iter == 1){
+
         counter <<- 1
 
         # use different stv for different components
         # implement stv as lits? and ask if it is a list, then
         # use stv[[counter]] as stv
         # for the next iterations of EM its not requried since we use component$coef
+        # stv as list NOT WORKING YET
 
         if(class(stv) == "list"){
           stv_in <- stv[[counter]]

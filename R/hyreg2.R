@@ -57,15 +57,11 @@ hyreg2 <-function(formula,
                   variables_cont = NULL,
                   non_linear = FALSE,
                   # additional arguments for flexmix or optimizer ?
-                  #cluster = NULL,
-                  #concomitant=NULL,
-                  #weights=NULL,
 
+                  # MISSING:
                   # non linear regression not implemented yet
                   #   Xb in FLXMRhyreg must be computed differently for that
-
                   # FLXMRhyreg_het is not implemnted here, maybe better write new function hyreg2_het?
-
 
                   ...){
 
@@ -90,7 +86,6 @@ hyreg2 <-function(formula,
       stop(paste0("Some stv are missing. Please provide stv values for all relevant variables.
                   Using model.matrix(formula,data) you can check, which variables need a stv value.
                    Additionally, you can give stv values for sigma and theta"))
-      # welche fehlt angeben?
     }
 
     # theta missing
@@ -110,9 +105,8 @@ hyreg2 <-function(formula,
       stop(paste0("Too many stv provided.
                   Using model.matrix(formula,data) you can check, which variables need a stv value.
                   Additionally, you can give stv values for sigma and theta"))
-      # welche zu viel angegeben und einfach streichen?
     }
-    # Reihenfolge check in FLXMRhyreg?
+    #  check order in FLXMRhyreg
   }
 
   ### TYPE Check ###
@@ -137,13 +131,15 @@ hyreg2 <-function(formula,
   }
 
 
+  # for non linear functions:
+  # NOT IMPLEMENTED YET
+
   formula_orig <- formula
   if(non_linear == TRUE){
-    # formel umwandeln, so dass nur Bestandteile aus data columns in formula stehen
-    # mit neuer Funktion?
-    # formula <- Umwandlungsfunktion
+    # formula <- function to keep only names of data columns
   }
   # for linear functoins formula and formula_orig are the same
+
 
 
  ### ESTIMATION ###
@@ -163,11 +159,10 @@ hyreg2 <-function(formula,
                             non_linear = non_linear))
                             #formula_orig = formula
 
-   # formula_orig funktioniert noch nicht!!!
 
 
    fit <- flexmix::flexmix(formula = formula, data = data, k = k, model = model, control = control)
-   rm(counter, envir = .GlobalEnv) # counter wird während flexmix erstellt
+   rm(counter, envir = .GlobalEnv) # counter will be created during the M-step driver
 
    return(fit)
 
@@ -182,11 +177,10 @@ hyreg2 <-function(formula,
    #as.character(idcount[idcount$Freq == 0,"id"])
    data <- data[!is.element(as.character(data[,id_col]), as.character(idcount[idcount$Freq == 0,"id"])),]
    type <- idframe[!is.element(as.character(idframe[,"id"]), as.character(idcount[idcount$Freq == 0,"id"])),"type"]
-   # type anpassen ohne die entsprechenden Zeilen zu den IDs, die raus sind
 
    # paste deleted IDs for user?
    warning(paste(length(as.character(idcount[idcount$Freq == 0,"id"])), "IDs were removed since they were only part of one type of data"))
-   # whiich IDS as.character(idcount[idcount$Freq == 0,"id"]),
+   # which IDS as.character(idcount[idcount$Freq == 0,"id"]),
 
 
    if(latent == "cont"){
@@ -207,7 +201,7 @@ hyreg2 <-function(formula,
 
 
      mod <- flexmix::flexmix(formula = formula, data = data_cont, k = k, model = model, control = control)
-     rm(counter, envir = .GlobalEnv) # counter wird während flexmix erstellt
+     rm(counter, envir = .GlobalEnv)
 
      data_cont$mod_comp <- mod@cluster
 
@@ -235,7 +229,7 @@ hyreg2 <-function(formula,
 
 
      mod <- flexmix::flexmix(formula = formula, data = data_dich, k = k, model = model, control = control)
-     rm(counter, envir = .GlobalEnv) # counter wird während flexmix erstellt
+     rm(counter, envir = .GlobalEnv) # counter will be created during the M-step driver
 
      data_dich$mod_comp <- mod@cluster
 
@@ -272,7 +266,7 @@ hyreg2 <-function(formula,
                                 formula_orig = formula_orig))
 
        mod <- flexmix::flexmix(formula = formula, data = xy, k = 1, model = model, control = control)
-       rm(counter, envir = .GlobalEnv)
+       rm(counter, envir = .GlobalEnv) # counter will be created during the M-step driver
      }
      return(mod)
    })
@@ -281,7 +275,8 @@ hyreg2 <-function(formula,
  }
 }
 
-##############################
+
+### new summary function ###
 
 #' summary_hyreg2
 #'
@@ -328,6 +323,8 @@ gendf <- function(list){
   return(df)
 }
 
+
+### refit function ###
 
 # get parametervalues of models
 # object is outcome of hyreg2
