@@ -112,6 +112,9 @@ simulated_data_dce <- simulated_data[simulated_data$type == "DCE_A",]
 
 data1 <- simulated_data
 rm(simulated_data)
+rm(simulated_data1)
+rm(simulated_data2)
+
 
 
 

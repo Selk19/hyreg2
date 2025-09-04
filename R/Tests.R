@@ -11,7 +11,7 @@ library(EQ5Ddata)
 
 
 # random numbers from normal dist
-formula <- y ~  -1 + x1 + x2 + x3
+formula <- y ~  -1 + x1 + x2 + x3 | ID
 
 k <- 2
 
@@ -29,8 +29,8 @@ hyflex_mod <- hyreg2(formula = formula,
                      type_dich = "DCE_A",
                      opt_method = "L-BFGS-B",
                      control = control,
-                     latent = "both",
-                     id_col = "id"
+                     latent = "dich",
+                     id_col = "ID"
 )
 
 
@@ -39,8 +39,16 @@ summary_hyreg2(hyflex_mod)
 parameters(hyflex_mod, component=1)
 parameters(hyflex_mod, component=2)
 
+(sum(hyflex_mod@cluster != data1$c))/dim(data1)[1]
+
+# if latent was "cont" or "dich"
+proof <- merge(unique(data1[,c("ID","c")]),hyflex_mod[["id_classes"]], by = "ID")
+sum((proof$c == proof$mod_comp)/dim(proof)[1])
 
 
+# with latent == "dich" we get warning
+# In bbmle::mle2(minuslogl = logLik2, start = stv_new, optimizer = optimizer,  :
+#                  convergence failure: code=52 (ERROR: ABNORMAL_TERMINATION_IN_LNSRCH)
 
 
 ############################

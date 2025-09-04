@@ -209,6 +209,9 @@ hyreg2 <-function(formula,
      data <- merge(data, unique(data_cont[,c(id_col,"mod_comp")]), by = id_col)
      data <- data[order(data$roworder), ]
 
+     # später auch ausgeben können, welche ID zu welcher Klasse zugeordnet wurde
+     id_classes <- data_cont[,c(id_col,"mod_comp")]
+
    }
 
    if(latent == "dich"){
@@ -236,6 +239,9 @@ hyreg2 <-function(formula,
      data$roworder <- 1:nrow(data)
      data <- merge(data, unique(data_dich[,c(id_col,"mod_comp")]), by = id_col)
      data <- data[order(data$roworder), ]
+
+     # später auch ausgeben können, welche ID zu welcher Klasse zugeordnet wurde
+     id_classes <- data_dich[,c(id_col,"mod_comp")]
    }
 
 
@@ -271,6 +277,7 @@ hyreg2 <-function(formula,
      return(mod)
    })
 
+   mod_list$id_classes <- unique(id_classes)
    return(mod_list)
  }
 }
@@ -292,6 +299,7 @@ hyreg2 <-function(formula,
 
 summary_hyreg2 <- function(object){
   if(class(object) == "list"){
+    object <- object[1:(length(object) - 1)]
     out <- lapply(object, function(k){
       comp <- k@components
       out_list <- lapply(comp, function(j){bbmle::summary(j[[1]]@parameters[["fit_mle"]])})
