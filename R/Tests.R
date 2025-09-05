@@ -156,8 +156,11 @@ hybC
 
 
 
+### RESULT ###
+# for k= 1 we get the same estimates as with xreg
+# censoring (using lower and upper) also leads to the same estimates as with xreg function hyreg
 
-
+# k = 2 works, but the results can not be evaluated, since we do not know the true parameter values
 
 
 ####################################

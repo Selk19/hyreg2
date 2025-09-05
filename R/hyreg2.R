@@ -21,7 +21,7 @@
 #' @param lower opt_method must be set to "L-BFGS-B", lower bound for censored data
 #' @param upper opt_method must be set to "L-BFGS-B", upper bound for censored data
 #' @param latent one of "both","cont" or "dich", see details
-#' @param id_col character, column name containing participant ids
+#' @param id_col character, column name containing participant ids, need if latent != "both
 #' @param variables_both character vactor; variables to be fitted on TTO and DCE data, if not specified all variables from formula are used
 #' @param variables_cont character vactor; variables to be fitted only on TTO data
 #' @param variables_dich character vactor; variables to be fitted only on DCE data
@@ -129,6 +129,7 @@ hyreg2 <-function(formula,
   }else if(any(table(c(variables_both,variables_cont,variables_dich))>1)){
     stop(paste0("variables can only be part in one of the vectors variables_both, variables_dich and variables_cont"))
   }
+  # more cheks needed
 
 
   # for non linear functions:
