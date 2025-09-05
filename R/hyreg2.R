@@ -126,14 +126,6 @@ hyreg2 <-function(formula,
   ### VARIABALES Check ###
   if(is.null(variables_both) & is.null(variables_dich) & is.null(variables_cont)){
     variables_both <- names(stv)[!is.element(names(stv),c("sigma","theta"))]
-  }else if(any(table(c(variables_both,variables_cont,variables_dich))>1)){
-    stop(paste0("variables can only be part in one of the vectors variables_both, variables_dich and variables_cont"))
-  }
-  # more cheks needed
-
-  ### VARIABALES Check ###
-  if(is.null(variables_both) & is.null(variables_dich) & is.null(variables_cont)){
-    variables_both <- names(stv)[!is.element(names(stv),c("sigma","theta"))]
   }else{
     if(any(!is.element(names(stv)[!is.element(names(stv),c("sigma","theta"))],
                        c(variables_both,variables_dich,variables_cont)))){
