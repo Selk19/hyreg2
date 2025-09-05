@@ -92,25 +92,25 @@ k <- 1
 control = list(iter.max = 5000, verbose = 5)
 stv2 <- setNames(c(rep(0.1,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
 stv1 <- setNames(c(rep(0.1,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
-#stv <- list(stv1,stv2) # not working
+# stv <- list(stv1,stv2) # not working yet
 
 
 mod1 <- hyreg2(formula = formula,
-               data = data[data$method == "TTO",],
-               type = data[data$method == "TTO",]$method,
+               data = data,
+               type = data$method,
                stv = stv1,
-               # upper = 2,
-               # lower = 0,
+            #   upper = 2,
+            #   lower = 0,
                k = k,
                type_cont = "TTO",
                type_dich = "DCE_A",
                opt_method = "L-BFGS-B",
                control = control,
                latent = "both",
-               id_col = "id"
-               #      variables_cont = c("mo5","sc5"),
-               #      variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
-               #      "mo4","sc4","ua4","pd4","ad4","ua5","pd5")
+               id_col = "id",
+              #  variables_cont = c("mo5","sc5"),
+              #  variables_both = c("mo4","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
+              #  "mo4","sc4","ua4","pd4","ad4","ua5","pd5")
 )
 
 # if you get an Error like this:
@@ -131,7 +131,7 @@ summary_hyreg2(mod1)
 
 
 
-# TTO lm #
+# check only TTO with lm #
 # lm(value ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 +
 #      pd3 + ad3 + mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 +
 #      pd5 + ad5,
@@ -151,8 +151,8 @@ modformula <- value ~
 
 
 
-hybC <- hyreg(modformula, data, datatype = "d_method", ll = 0, ul = 2)
-hybC
+hyb <- hyreg(modformula, data, datatype = "d_method")# ll = 0, ul = 2)
+hyb
 
 
 
@@ -160,7 +160,23 @@ hybC
 # for k= 1 we get the same estimates as with xreg
 # censoring (using lower and upper) also leads to the same estimates as with xreg function hyreg
 
-# k = 2 works, but the results can not be evaluated, since we do not know the true parameter values
+# k = 2 works (with and without censoring),
+# but the results can not be evaluated, since we do not know the true parameter values
+
+# partial coefficients using variables_cont, variables_dich and variables_both work
+# Error messages occur in situations, where the entries are wrong (that is good)
+
+# sometimes I get
+# Warning message:
+# In bbmle::mle2(minuslogl = logLik2, start = stv_new, optimizer = optimizer,  :
+# convergence failure: code=1 (NEW_X)
+# but having a close look we seem not to have any convergence problem ?!
+# I do not know whats the problem or what causes this warning...
+
+# not using |id in formula is problematic, because than it says TTO data are the one class and DCE data are the other
+# --> this is not what we want, therefore we need to use | id
+
+
 
 
 ####################################
@@ -173,7 +189,7 @@ formula <- y ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad3 +
   mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5 | id
 
 
-k <- 1
+k <- 2
 
 
 control = list(iter.max = 5000, verbose = 5)
@@ -193,11 +209,8 @@ mod1 <- hyreg2(formula = formula,
                type_dich = "DCE_A",
                opt_method = "L-BFGS-B",
                control = control,
-               latent = "both",
+               latent = "cont",
                id_col = "id"
-               #      variables_cont = c("mo5","sc5"),
-               #      variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
-               #      "mo4","sc4","ua4","pd4","ad4","ua5","pd5")
 )
 
 # if you get an Error like this:
@@ -215,30 +228,19 @@ summary_hyreg2(mod1)
 (sum(mod1@cluster == simulated_data$class))/dim(simulated_data)[1]
 
 
-
-# TTO lm #
-# lm(value ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 +
-#      pd3 + ad3 + mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 +
-#      pd5 + ad5,
-#    data =simulated_data[simulated_data$type == "TTO",])
+# if latent was "cont" or "dich"
+proof <- merge(unique(simulated_data[,c("id","class")]),mod1[["id_classes"]], by = "id")
+sum((proof$class != proof$mod_comp)/dim(proof)[1])
 
 
 
-# compare to xreg#
 
-library(xreg)
-
-### with simulated data ###
-modformula <- y ~
-  mo2 * MO2 + sc2 * SC2 + ua2 * UA2 + pd2 * PD2 +  ad2 * AD2 +
-  mo3 * MO3 + sc3 * SC3 + ua3 * UA3 + pd3 * PD3 + ad3 * AD3 +
-  mo4 * MO4 + sc4 * SC4 + ua4 * UA4 + pd4 * PD4 + ad4 * AD4 +
-  mo5 * MO5 + sc5 * SC5 + ua5 * UA5 + pd5 * PD5 + ad5 * AD5
-
-simulated_data$type_num <- simulated_data$type == "TTO"
-
-hyb <- hyreg(modformula, simulated_data, datatype = "type_num")
-hyb
+### RESULT ###
+# for k = 2 and latent = "cont"
+#  96 % of datapoints are classified to the correct class
+# the estimates of class 2 (from simulated_data) are very well and close to the true values from simulation
+# for class 1 it is less accurate, problematic are especially low values close to zero like 0.005 (lower than 0.1 ?)
+# but I think in general it is okay
 
 
 
@@ -248,7 +250,7 @@ hyb
 
 #### Using simulated_data_mo ####
 
-formula <- y ~ -1 + mo2 + mo3 + mo4 +  mo5
+formula <- y ~ -1 + mo2 + mo3 + mo4 +  mo5 | id
 
 
 k <- 2
@@ -268,7 +270,7 @@ modMO <- hyreg2(formula = formula,
                type_dich = "DCE_A",
                opt_method = "L-BFGS-B",
                control = control,
-               latent = "cont",
+               latent = "both",
                id_col = "id"
 )
 
@@ -276,13 +278,32 @@ summary(modMO)
 summary_hyreg2(modMO)
 
 
-(sum(modMO@cluster == simulated_data_mo$class))/dim(simulated_data_mo)[1]
+(sum(modMO@cluster != simulated_data_mo$class))/dim(simulated_data_mo)[1]
 
 
 
 # if latent was "cont" or "dich"
 proof <- merge(unique(simulated_data_mo[,c("id","class")]),modMO[["id_classes"]], by = "id")
-sum((proof$class == proof$mod_comp)/dim(proof)[1])
+sum((proof$class != proof$mod_comp)/dim(proof)[1])
+
+
+
+
+### RESULT ###
+# for k = 2 and latent = "both"
+# 62.5 % of datapoints are classified to the correct class
+# some estimates seem to be mixed between classes:
+# class 1 from data: estimate of mo2 and mo4 are close to true values,
+# but estimates of mo3 and mo5 are close to true values of class 2
+# all in all estimates and classification is statisfying here
+
+
+# for k = 2 and latent = "cont"
+#  100 % of datapoints are classified to the correct class
+# estimates for both classes are cose to the true values
+
+# --> latent = "cont" leads to very good results
+
 
 
 
