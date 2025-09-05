@@ -108,9 +108,9 @@ mod1 <- hyreg2(formula = formula,
                control = control,
                latent = "both",
                id_col = "id",
-              #  variables_cont = c("mo5","sc5"),
-              #  variables_both = c("mo4","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
-              #  "mo4","sc4","ua4","pd4","ad4","ua5","pd5")
+               variables_cont = c("mo5","sc3"),
+               variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
+                "mo4","sc4","ua4","pd4","ad4","ua5","pd5", "ad5")
 )
 
 # if you get an Error like this:

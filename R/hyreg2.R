@@ -131,6 +131,26 @@ hyreg2 <-function(formula,
   }
   # more cheks needed
 
+  ### VARIABALES Check ###
+  if(is.null(variables_both) & is.null(variables_dich) & is.null(variables_cont)){
+    variables_both <- names(stv)[!is.element(names(stv),c("sigma","theta"))]
+  }else{
+    if(any(!is.element(names(stv)[!is.element(names(stv),c("sigma","theta"))],
+                       c(variables_both,variables_dich,variables_cont)))){
+      # check if all variables are included
+      stop(paste0("all variables from stv have to be part of exactly one of the vectors variables_both, variables_dich or variables_cont"))
+      # alternative: do not provide any of the vectors
+      # than all relevent variables are set to variables_both automatically
+    }
+    if(any(table(c(variables_both,variables_cont,variables_dich))>1)){
+      stop(paste0("variables can only be part in one of the vectors variables_both, variables_dich and variables_cont"))
+    }
+  }
+
+  # more cheks needed
+
+
+
 
   # for non linear functions:
   # NOT IMPLEMENTED YET
