@@ -131,7 +131,7 @@ set.seed(42)
 n_samples_tto <- 120
 n_samples_dce <- 120
 sigma <- 0.001
-theta <- 2
+theta <- 0.2
 stv <- c(0.005, 0.01, 0.08, 0.1) # MO
 
 
@@ -198,7 +198,7 @@ glm(y~ -1 + mo2 + mo3 + mo4 + mo5,
 set.seed(84)
 n_samples_tto <- 120
 n_samples_dce <- 120
-sigma <- 0.02
+sigma <- 0.1
 theta <- 2
 stv <- c(0.2, 0.4, 0.6, 0.8) # MO
 
@@ -249,7 +249,7 @@ simulated_data2$id <- c((1+n_samples_tto):(2*n_samples_tto) , (1+n_samples_dce):
 ### all together ###
 simulated_data_mo <- rbind(simulated_data1, simulated_data2)
 
-
+rm(simulated_data1,simulated_data2)
 
 
 

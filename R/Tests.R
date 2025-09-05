@@ -29,7 +29,7 @@ hyflex_mod <- hyreg2(formula = formula,
                      type_dich = "DCE_A",
                      opt_method = "L-BFGS-B",
                      control = control,
-                     latent = "dich",
+                     latent = "cont",
                      id_col = "ID"
 )
 
@@ -39,7 +39,7 @@ summary_hyreg2(hyflex_mod)
 parameters(hyflex_mod, component=1)
 parameters(hyflex_mod, component=2)
 
-(sum(hyflex_mod@cluster != data1$c))/dim(data1)[1]
+(sum(hyflex_mod@cluster == data1$c))/dim(data1)[1]
 
 # if latent was "cont" or "dich"
 proof <- merge(unique(data1[,c("ID","c")]),hyflex_mod[["id_classes"]], by = "ID")
@@ -49,6 +49,23 @@ sum((proof$c == proof$mod_comp)/dim(proof)[1])
 # with latent == "dich" we get warning
 # In bbmle::mle2(minuslogl = logLik2, start = stv_new, optimizer = optimizer,  :
 #                  convergence failure: code=52 (ERROR: ABNORMAL_TERMINATION_IN_LNSRCH)
+
+
+
+### RESULT ###
+
+# WITH latent = "both" and | ID in formula #
+# 74 % of datapoints are classified to the correct class
+# prop 1: 67% (402 of 600), prop 2: 33 % (198 of 600)
+# parameter estimation is well for comp 2 of the data but bad for comp 1
+
+
+# WITH latent = "cont" and | ID in formula #
+# 95 % of datapoints are classified to the correct class
+# # prop 1: 50% (300 of 600), prop 2: 50 % (300 of 600)
+# parameter estimation is well ans close to the true values, except for theta in one class ( estimated as 3, true value is 5)
+
+# --> code seem to work fine with latent = "cont"
 
 
 ############################
@@ -228,7 +245,7 @@ hyb
 
 #### Using simulated_data_mo ####
 
-formula <- y ~ -1 + mo2 + mo3 + mo4 +  mo5 | id
+formula <- y ~ -1 + mo2 + mo3 + mo4 +  mo5
 
 
 k <- 2
@@ -248,11 +265,22 @@ modMO <- hyreg2(formula = formula,
                type_dich = "DCE_A",
                opt_method = "L-BFGS-B",
                control = control,
-               latent = "both",
+               latent = "cont",
                id_col = "id"
 )
 
 summary(modMO)
 summary_hyreg2(modMO)
+
+
+(sum(modMO@cluster == simulated_data_mo$class))/dim(simulated_data_mo)[1]
+
+
+
+# if latent was "cont" or "dich"
+proof <- merge(unique(simulated_data_mo[,c("id","class")]),modMO[["id_classes"]], by = "id")
+sum((proof$class == proof$mod_comp)/dim(proof)[1])
+
+
 
 
