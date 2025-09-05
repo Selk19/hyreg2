@@ -87,18 +87,20 @@ formula <- value ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad
   mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5 | id
 
 
-k <- 1
+k <- 2
 
 control = list(iter.max = 5000, verbose = 5)
-stv2 <- setNames(c(rep(0.1,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
+stv2 <- setNames(c(rep(0.2,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
 stv1 <- setNames(c(rep(0.1,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
-# stv <- list(stv1,stv2) # not working yet
+stv <- list(stv1,stv2) # not working yet
+
+stvint <- setNames(c(rep(0.1,20),1,1,1),c(colnames(data)[17:36],c("sigma","theta","(Intercept)")))
 
 
 mod1 <- hyreg2(formula = formula,
                data = data,
                type = data$method,
-               stv = stv1,
+               stv = stv,
             #   upper = 2,
             #   lower = 0,
                k = k,
@@ -108,14 +110,18 @@ mod1 <- hyreg2(formula = formula,
                control = control,
                latent = "both",
                id_col = "id",
-               variables_cont = c("mo5","sc3"),
-               variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
-                "mo4","sc4","ua4","pd4","ad4","ua5","pd5", "ad5")
+              # variables_cont = c("mo5","sc3"),
+              # variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
+              #  "mo4","sc4","ua4","pd4","ad4","ua5","pd5", "ad5")
 )
 
 # if you get an Error like this:
 # Error in names(object) <- nm : attempt to set an attribute on NULL
 # use rm(counter) and try again
+
+# using stv as list:
+# estimates are just the start values except sigma
+# why does this happen? optimizer seem not to work correct here
 
 
 ### SUMMARY ###
@@ -193,8 +199,8 @@ k <- 2
 
 
 control = list(iter.max = 5000, verbose = 5)
-stv2 <- setNames(c(rep(0.1,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
-stv1 <- setNames(c(rep(0.1,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
+stv2 <- setNames(c(rep(0.1,20),1,1),c(colnames(simulated_data)[3:22],c("sigma","theta")))
+stv1 <- setNames(c(rep(0.1,20),1,1),c(colnames(simulated_data)[3:22],c("sigma","theta")))
 #stv <- list(stv1,stv2) # not working
 
 
@@ -230,7 +236,7 @@ summary_hyreg2(mod1)
 
 # if latent was "cont" or "dich"
 proof <- merge(unique(simulated_data[,c("id","class")]),mod1[["id_classes"]], by = "id")
-sum((proof$class != proof$mod_comp)/dim(proof)[1])
+sum((proof$class == proof$mod_comp)/dim(proof)[1])
 
 
 
@@ -295,7 +301,7 @@ sum((proof$class != proof$mod_comp)/dim(proof)[1])
 # some estimates seem to be mixed between classes:
 # class 1 from data: estimate of mo2 and mo4 are close to true values,
 # but estimates of mo3 and mo5 are close to true values of class 2
-# all in all estimates and classification is statisfying here
+# all in all estimates and classification is not statisfying here
 
 
 # for k = 2 and latent = "cont"

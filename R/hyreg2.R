@@ -76,38 +76,41 @@ hyreg2 <-function(formula,
 
 
   # no stv
-  if(is.null(stv)){
-   warning(paste0("No stv provided. Set all stv from data to 0.1 and sigma = 1 and theta = 1"))
-    stv <- setNames(c(rep(0.1,dim(model.matrix(formula_short,data))[2]),1,1), c(colnames(model.matrix(formula_short,data)),c("sigma","theta")))
-  }else{
+  if(class(stv) != "list"){
+    if(is.null(stv)){
+      warning(paste0("No stv provided. Set all stv from data to 0.1 and sigma = 1 and theta = 1"))
+      stv <- setNames(c(rep(0.1,dim(model.matrix(formula_short,data))[2]),1,1), c(colnames(model.matrix(formula_short,data)),c("sigma","theta")))
+    }else{
 
-  # one or more stv missing
-    if(any(!is.element(colnames(model.matrix(formula_short,data)),names(stv)))){
-      stop(paste0("Some stv are missing. Please provide stv values for all relevant variables.
-                  Using model.matrix(formula,data) you can check, which variables need a stv value.
+      # one or more stv missing
+      if(any(!is.element(colnames(model.matrix(formula_short,data)),names(stv)))){
+        stop(paste0("Some stv are missing. Please provide stv values for all relevant variables.
+                  Using model.matrix(formula,data) (formula without |) you can check, which variables need a stv value.
                    Additionally, you can give stv values for sigma and theta"))
-    }
+      }
 
-    # theta missing
-    if(!is.element("theta",names(stv))){
-      stv <- c(stv,setNames(1,"theta"))
-      warning(paste0("No stv for theta provided, set to 1"))
-    }
+      # theta missing
+      if(!is.element("theta",names(stv))){
+        stv <- c(stv,setNames(1,"theta"))
+        warning(paste0("No stv for theta provided, set to 1"))
+      }
 
-    # sigma missing
-    if(!is.element("sigma",names(stv))){
-      stv <- c(stv,setNames(1,"sigma"))
-      warning(paste0("No stv for sigma provided, set to 1"))
-    }
+      # sigma missing
+      if(!is.element("sigma",names(stv))){
+        stv <- c(stv,setNames(1,"sigma"))
+        warning(paste0("No stv for sigma provided, set to 1"))
+      }
 
-    # stv for variables not in formula given, d.h. zu viele angegeben
-    if(any(!is.element(names(stv), c(colnames(model.matrix(formula_short,data)),"theta","sigma")))){
-      stop(paste0("Too many stv provided.
+      # stv for variables not in formula given, d.h. zu viele angegeben
+      if(any(!is.element(names(stv), c(colnames(model.matrix(formula_short,data)),"theta","sigma")))){
+        stop(paste0("Too many stv provided.
                   Using model.matrix(formula,data) you can check, which variables need a stv value.
                   Additionally, you can give stv values for sigma and theta"))
+      }
+      #  check order in FLXMRhyreg
     }
-    #  check order in FLXMRhyreg
   }
+
 
   ### TYPE Check ###
   if(is.null(type) | is.null(type_dich) | is.null(type_cont)){

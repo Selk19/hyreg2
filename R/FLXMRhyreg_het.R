@@ -152,6 +152,7 @@ FLXMRhyreg_het <- function(formula= . ~ .,
         }else{
           sigma <- exp( x1[,unlist(strsplit(names(stv_sigma),"_h"))] %*% sigma)
         }
+        # IDEA: use formula_sigma as input of function and then use model.matrix(formula_sigma,data) here ?
 
 
         # change for non-linear functions
@@ -246,6 +247,8 @@ FLXMRhyreg_het <- function(formula= . ~ .,
         }else{
           sigma <- exp( x1[,unlist(strsplit(names(stv_sigma),"_h"))] %*% stv[is.element(names(stv),names(stv_sigma))])
         }
+        # IDEA: use formula_sigma as input of function and then use model.matrix(formula_sigma,data) here ?
+
 
         theta <- exp(stv[is.element(names(stv),c("theta"))][[1]])
         stv_cont <- stv[!is.element(names(stv),c("sigma","theta", variables_dich,names(stv_sigma)))]
