@@ -540,11 +540,11 @@ simulated_data <- rbind(simulated_data1, simulated_data2)
 # upper bound for data1$y at 3
 # new variable y_cens
 
-for(i in 1:length(simulate_data_norm$y)){
-  if(simulate_data_norm$y[i] <= 3){
-    simulate_data_norm$y_cens[i] <- simulate_data_norm$y[i]
+for(i in 1:length(simulated_data_norm$y)){
+  if(simulated_data_norm$y[i] <= 3){
+    simulated_data_norm$y_cens[i] <- simulated_data_norm$y[i]
   }else{
-    simulate_data_norm$y_cens[i] <- 3
+    simulated_data_norm$y_cens[i] <- 3
   }
 }
 
@@ -584,3 +584,11 @@ for(i in 1:length(simulated_data$y)){
   }
 }
 
+
+
+
+
+### EXPORT ####
+#usethis::use_data(simulated_data_norm, overwrite = TRUE)
+#usethis::use_data(simulated_data_mo, overwrite = TRUE)
+#usethis::use_data(simulated_data, overwrite = TRUE)
