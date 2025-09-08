@@ -36,14 +36,14 @@
 #'
 #'k <- 2
 
-#'stv <- setNames(c(0.2,0,1,1,1),c(colnames(simulate_data_norm)[3:5],c("sigma","theta")))
+#'stv <- setNames(c(0.2,0,1,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
 #'control = list(iter.max = 1000, verbose = 4)
 
 #'rm(counter)
 
 #'mod <- hyreg2(formula = formula,
-#'                     data =  simulate_data_norm,
-#'                     type =  simulate_data_norm$type,
+#'                     data =  simulated_data_norm,
+#'                     type =  simulated_data_norm$type,
 #'                     stv = stv,
 #'                     k = k,
 #'                     type_cont = "TTO",

@@ -14,14 +14,14 @@ formula <- y ~  -1 + x1 + x2 + x3 | id
 
 k <- 2
 
-stv <- setNames(c(0.2,0,1,1,1),c(colnames(simulate_data_norm)[3:5],c("sigma","theta")))
+stv <- setNames(c(0.2,0,1,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
 control = list(iter.max = 1000, verbose = 4)
 
 rm(counter)
 
 hyflex_mod <- hyreg2(formula = formula,
-                     data =  simulate_data_norm,
-                     type =  simulate_data_norm$type,
+                     data =  simulated_data_norm,
+                     type =  simulated_data_norm$type,
                      stv = stv,
                      k = k,
                      type_cont = "TTO",
@@ -35,13 +35,14 @@ hyflex_mod <- hyreg2(formula = formula,
 
 summary(hyflex_mod)
 summary_hyreg2(hyflex_mod)
-parameters(hyflex_mod, component=1)
-parameters(hyflex_mod, component=2)
+#parameters(hyflex_mod, component=1) # works only for latent = "both"
+#parameters(hyflex_mod, component=2)  # works only for latent = "both"
 
+# if latent was "both"
 (sum(hyflex_mod@cluster == simulate_data_norm$class))/dim(simulate_data_norm)[1]
 
 # if latent was "cont" or "dich"
-proof <- merge(unique(simulate_data_norm[,c("id","class")]),hyflex_mod[["id_classes"]], by = "id")
+proof <- merge(unique(simulated_data_norm[,c("id","class")]),hyflex_mod[["id_classes"]], by = "id")
 sum((proof$class == proof$mod_comp)/dim(proof)[1])
 
 
@@ -86,20 +87,21 @@ formula <- value ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad
   mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5 | id
 
 
-k <- 2
+k <- 1
 
 control = list(iter.max = 5000, verbose = 5)
 stv2 <- setNames(c(rep(0.2,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
 stv1 <- setNames(c(rep(0.1,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
-stv <- list(stv1,stv2) # not working yet
+#stv <- list(stv1,stv2) # not working yet (we get back only start values?)
 
+# if formula has an intercept, use this
 stvint <- setNames(c(rep(0.1,20),1,1,1),c(colnames(data)[17:36],c("sigma","theta","(Intercept)")))
 
 
 mod1 <- hyreg2(formula = formula,
                data = data,
                type = data$method,
-               stv = stv,
+               stv = stv1,
                #   upper = 2,
                #   lower = 0,
                k = k,
@@ -127,12 +129,6 @@ mod1 <- hyreg2(formula = formula,
 
 summary(mod1)
 summary_hyreg2(mod1)
-
-
-
-# check if 1 = class 1 in data or not
-# proportion of correct classification
-(sum(mod1@cluster == simulated_data$class))/dim(simulated_data)[1]
 
 
 
@@ -229,7 +225,7 @@ summary(mod1)
 summary_hyreg2(mod1)
 
 # check if 1 = class 1 in data or not
-# proportion of correct classification
+# proportion of correct classification (latent = "both")
 (sum(mod1@cluster == simulated_data$class))/dim(simulated_data)[1]
 
 
@@ -261,7 +257,7 @@ formula <- y ~ -1 + mo2 + mo3 + mo4 +  mo5 | id
 k <- 2
 
 control = list(iter.max = 5000, verbose = 5)
-stv_mo <- setNames(c(rep(0.1,4),1,1),c(colnames(simulated_data_mo)[3:6],c("sigma","theta")))
+stv_mo <- setNames(c(rep(0.3,4),1,1),c(colnames(simulated_data_mo)[3:6],c("sigma","theta")))
 
 
 modMO <- hyreg2(formula = formula,
@@ -275,7 +271,7 @@ modMO <- hyreg2(formula = formula,
                 type_dich = "DCE_A",
                 opt_method = "L-BFGS-B",
                 control = control,
-                latent = "both",
+                latent = "cont",
                 id_col = "id"
 )
 
@@ -283,13 +279,13 @@ summary(modMO)
 summary_hyreg2(modMO)
 
 
+# latent was "both"
 (sum(modMO@cluster != simulated_data_mo$class))/dim(simulated_data_mo)[1]
-
 
 
 # if latent was "cont" or "dich"
 proof <- merge(unique(simulated_data_mo[,c("id","class")]),modMO[["id_classes"]], by = "id")
-sum((proof$class != proof$mod_comp)/dim(proof)[1])
+sum((proof$class == proof$mod_comp)/dim(proof)[1])
 
 
 
@@ -304,10 +300,14 @@ sum((proof$class != proof$mod_comp)/dim(proof)[1])
 
 
 # for k = 2 and latent = "cont"
-#  100 % of datapoints are classified to the correct class
-# estimates for both classes are cose to the true values
+# we get many different results between 50 % and 97 % correct classification
 
-# --> latent = "cont" leads to very good results
+#  with loglik 619.5833 in first step
+# we get 97 % of datapoints classified to the correct class
+# estimates for both classes are very close to the true values then
+
+# --> latent = "cont" can lead to very good results, but when?
+# depending on start values? different start values for different components not working yet
 
 
 
