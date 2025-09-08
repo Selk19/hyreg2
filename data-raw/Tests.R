@@ -1,5 +1,4 @@
 
-
 ## TESTs ####
 
 library(flexmix)
@@ -11,18 +10,18 @@ library(EQ5Ddata)
 
 
 # random numbers from normal dist
-formula <- y ~  -1 + x1 + x2 + x3 | ID
+formula <- y ~  -1 + x1 + x2 + x3 | id
 
 k <- 2
 
-stv <- setNames(c(0.2,0,1,1,1),c(colnames(data1)[3:5],c("sigma","theta")))
+stv <- setNames(c(0.2,0,1,1,1),c(colnames(simulate_data_norm)[3:5],c("sigma","theta")))
 control = list(iter.max = 1000, verbose = 4)
 
 rm(counter)
 
 hyflex_mod <- hyreg2(formula = formula,
-                     data =  data1,
-                     type =  data1$type,
+                     data =  simulate_data_norm,
+                     type =  simulate_data_norm$type,
                      stv = stv,
                      k = k,
                      type_cont = "TTO",
@@ -30,7 +29,7 @@ hyflex_mod <- hyreg2(formula = formula,
                      opt_method = "L-BFGS-B",
                      control = control,
                      latent = "cont",
-                     id_col = "ID"
+                     id_col = "id"
 )
 
 
@@ -39,11 +38,11 @@ summary_hyreg2(hyflex_mod)
 parameters(hyflex_mod, component=1)
 parameters(hyflex_mod, component=2)
 
-(sum(hyflex_mod@cluster == data1$c))/dim(data1)[1]
+(sum(hyflex_mod@cluster == simulate_data_norm$class))/dim(simulate_data_norm)[1]
 
 # if latent was "cont" or "dich"
-proof <- merge(unique(data1[,c("ID","c")]),hyflex_mod[["id_classes"]], by = "ID")
-sum((proof$c == proof$mod_comp)/dim(proof)[1])
+proof <- merge(unique(simulate_data_norm[,c("id","class")]),hyflex_mod[["id_classes"]], by = "id")
+sum((proof$class == proof$mod_comp)/dim(proof)[1])
 
 
 # with latent == "dich" we get warning
@@ -60,7 +59,7 @@ sum((proof$c == proof$mod_comp)/dim(proof)[1])
 # parameter estimation is well for comp 2 of the data but bad for comp 1
 
 
-# WITH latent = "cont" and | ID in formula #
+# WITH latent = "cont" and | id in formula #
 # 95 % of datapoints are classified to the correct class
 # # prop 1: 50% (300 of 600), prop 2: 50 % (300 of 600)
 # parameter estimation is well ans close to the true values, except for theta in one class ( estimated as 3, true value is 5)
@@ -101,8 +100,8 @@ mod1 <- hyreg2(formula = formula,
                data = data,
                type = data$method,
                stv = stv,
-            #   upper = 2,
-            #   lower = 0,
+               #   upper = 2,
+               #   lower = 0,
                k = k,
                type_cont = "TTO",
                type_dich = "DCE_A",
@@ -110,9 +109,9 @@ mod1 <- hyreg2(formula = formula,
                control = control,
                latent = "both",
                id_col = "id",
-              # variables_cont = c("mo5","sc3"),
-              # variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
-              #  "mo4","sc4","ua4","pd4","ad4","ua5","pd5", "ad5")
+               # variables_cont = c("mo5","sc3"),
+               # variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
+               #  "mo4","sc4","ua4","pd4","ad4","ua5","pd5", "ad5")
 )
 
 # if you get an Error like this:
@@ -266,18 +265,18 @@ stv_mo <- setNames(c(rep(0.1,4),1,1),c(colnames(simulated_data_mo)[3:6],c("sigma
 
 
 modMO <- hyreg2(formula = formula,
-               data = simulated_data_mo,
-               type = simulated_data_mo$type,
-               stv = stv_mo,
-               # upper = 2,
-               # lower = 0,
-               k = k,
-               type_cont = "TTO",
-               type_dich = "DCE_A",
-               opt_method = "L-BFGS-B",
-               control = control,
-               latent = "both",
-               id_col = "id"
+                data = simulated_data_mo,
+                type = simulated_data_mo$type,
+                stv = stv_mo,
+                # upper = 2,
+                # lower = 0,
+                k = k,
+                type_cont = "TTO",
+                type_dich = "DCE_A",
+                opt_method = "L-BFGS-B",
+                control = control,
+                latent = "both",
+                id_col = "id"
 )
 
 summary(modMO)

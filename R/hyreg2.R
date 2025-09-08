@@ -30,7 +30,30 @@
 #' @return model of type flemix
 #'
 #' @author Kim Rand & Svenja Elkenkamp
-#' @examples Put Example here
+#' @examples
+#'
+#'formula <- y ~  -1 + x1 + x2 + x3 | id
+#'
+#'k <- 2
+
+#'stv <- setNames(c(0.2,0,1,1,1),c(colnames(simulate_data_norm)[3:5],c("sigma","theta")))
+#'control = list(iter.max = 1000, verbose = 4)
+
+#'rm(counter)
+
+#'mod <- hyreg2(formula = formula,
+#'                     data =  simulate_data_norm,
+#'                     type =  simulate_data_norm$type,
+#'                     stv = stv,
+#'                     k = k,
+#'                     type_cont = "TTO",
+#'                     type_dich = "DCE_A",
+#'                     opt_method = "L-BFGS-B",
+#'                     control = control,
+#'                     latent = "cont",
+#'                     id_col = "id"
+#')
+#'summary_hyreg2(mod)
 
 #' @importFrom flexmix flexmix
 #' @importFrom bbmle mle2

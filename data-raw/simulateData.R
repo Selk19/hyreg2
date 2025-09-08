@@ -101,11 +101,11 @@ simulated_data2 <- rbind(data_tto, data_dce)
 
 
 ### whole dataset with two comp. ###
-simulated_data1$c <- 1
-simulated_data2$c <- 2
+simulated_data1$class <- 1
+simulated_data2$class <- 2
 
-simulated_data1$ID <- c(1:100, 1:100, 1:100)
-simulated_data2$ID <- c(101:200, 101:200, 101:200)
+simulated_data1$id <- c(1:100, 1:100, 1:100)
+simulated_data2$id <- c(101:200, 101:200, 101:200)
 
 
 simulated_data <- rbind(simulated_data1,simulated_data2)
@@ -113,7 +113,7 @@ simulated_data_too <- simulated_data[simulated_data$type == "TTO",]
 simulated_data_dce <- simulated_data[simulated_data$type == "DCE_A",]
 
 
-data1 <- simulated_data
+simulated_data_norm <- simulated_data
 
 rm(simulated_data)
 rm(simulated_data1)
@@ -540,11 +540,11 @@ simulated_data <- rbind(simulated_data1, simulated_data2)
 # upper bound for data1$y at 3
 # new variable y_cens
 
-for(i in 1:length(data1$y)){
-  if(data1$y[i] <= 3){
-    data1$y_cens[i] <- data1$y[i]
+for(i in 1:length(simulate_data_norm$y)){
+  if(simulate_data_norm$y[i] <= 3){
+    simulate_data_norm$y_cens[i] <- simulate_data_norm$y[i]
   }else{
-    data1$y_cens[i] <- 3
+    simulate_data_norm$y_cens[i] <- 3
   }
 }
 
