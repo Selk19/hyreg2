@@ -57,13 +57,40 @@ has to include start values for sigma and theta as well}
 \item{...}{additional arguments for flexmix or bbmle::mle2}
 }
 \value{
-a model with hybrid likelihood
+a model, that can be used in hyreg2 as input for parameter model or
 }
 \description{
 Function used in flexmix M-Step to estimate hybrid model
 }
 \examples{
-Put Example here
+
+formula <- y ~  -1 + x1 + x2 + x3
+k <- 2
+stv <- setNames(c(0.2,0,1,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
+rm(counter)
+
+
+
+x <- model.matrix(formula,simulated_data_norm)
+y <- simulated_data$y
+w <- 1
+model <- FLXMRhyreg(formula = formula,
+                    family=c("hyreg"),
+                    type =  simulate_data_norm$type,
+                    stv = stv,
+                    k = k,
+                    type_cont = "TTO",
+                    type_dich = "DCE_A",
+                    opt_method = "L-BFGS-B",
+                    control = list(iter.max = 1000, verbose = 4),
+                    offset = NULL,
+                    optimizer = "optim",
+                    variables_both =  names(stv)[!is.element(names(stv),c("sigma","theta"))],
+                    variables_cont = NULL,
+                    variables_dich = NULL,
+                    lower = -Inf,
+                    upper = Inf,
+)
 }
 \author{
 Kim Rand & Svenja Elkenkamp

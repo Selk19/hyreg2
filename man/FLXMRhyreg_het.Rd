@@ -2,7 +2,7 @@
 % Please edit documentation in R/FLXMRhyreg_het.R
 \name{FLXMRhyreg_het}
 \alias{FLXMRhyreg_het}
-\title{FLXMRhyreg}
+\title{FLXMRhyreg_het}
 \usage{
 FLXMRhyreg_het(
   formula = . ~ .,

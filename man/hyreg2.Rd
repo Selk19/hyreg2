@@ -23,6 +23,7 @@ hyreg2(
   variables_both = NULL,
   variables_dich = NULL,
   variables_cont = NULL,
+  non_linear = FALSE,
   ...
 )
 }
@@ -58,7 +59,7 @@ has to include start values for sigma and theta as well}
 
 \item{latent}{one of "both","cont" or "dich", see details}
 
-\item{id_col}{character, column name containing participant ids}
+\item{id_col}{character, column name containing participant ids, needed if latent != "both}
 
 \item{variables_both}{character vactor; variables to be fitted on TTO and DCE data, if not specified all variables from formula are used}
 
@@ -72,10 +73,29 @@ has to include start values for sigma and theta as well}
 model of type flemix
 }
 \description{
-Estimation of hybrid model for EQ-5D data
+Estimation of hybrid model for EQ-5D data, not implemnted for het yet
 }
 \examples{
-Put Example here
+
+formula <- y ~  -1 + x1 + x2 + x3 | id
+
+k <- 2
+stv <- setNames(c(0.2,0,1,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
+control = list(iter.max = 1000, verbose = 4)
+rm(counter)
+mod <- hyreg2(formula = formula,
+                    data =  simulated_data_norm,
+                    type =  simulated_data_norm$type,
+                    stv = stv,
+                    k = k,
+                    type_cont = "TTO",
+                    type_dich = "DCE_A",
+                    opt_method = "L-BFGS-B",
+                    control = control,
+                    latent = "cont",
+                    id_col = "id"
+)
+summary_hyreg2(mod)
 }
 \author{
 Kim Rand & Svenja Elkenkamp
