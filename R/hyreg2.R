@@ -15,6 +15,8 @@
 #'            has to be a vector if the same start values should be used for all latent classes,
 #'            has to be a list of named vectores if different start values are assumed for the latent classes
 #'            has to include start values for sigma and theta as well
+#'            Using colnames(model.matrix(formula,data)) (formula without |) you can check, which variables need a stv value.
+#'
 #' @param offset offset as in flexmix
 #' @param optimizer optimizer to be used in bbmle::mle2, default = "optim"
 #' @param opt_method optimization method to be used in optimizer, default = "BFGS"
@@ -22,6 +24,8 @@
 #' @param upper opt_method must be set to "L-BFGS-B", upper bound for censored data
 #' @param latent one of "both","cont" or "dich", see details
 #' @param id_col character, column name containing participant ids, needed if latent != "both
+#' @param classes_only logical, default FALSE, indicate if only classification should be done without estimating model parameters
+#'                    only possible for latent = "cont" or "dich"
 #' @param variables_both character vactor; variables to be fitted on TTO and DCE data, if not specified all variables from formula are used
 #' @param variables_cont character vactor; variables to be fitted only on TTO data
 #' @param variables_dich character vactor; variables to be fitted only on DCE data
@@ -75,6 +79,7 @@ hyreg2 <-function(formula,
                   upper = Inf,
                   latent = "both", # one of "both", "cont", "dich"
                   id_col = NULL, # as character
+                  classes_only = FALSE,
                   variables_both = NULL,
                   variables_dich = NULL,
                   variables_cont = NULL,
@@ -107,9 +112,9 @@ hyreg2 <-function(formula,
 
       # one or more stv missing
       if(any(!is.element(colnames(model.matrix(formula_short,data)),names(stv)))){
-        stop(paste0("Some stv are missing. Please provide stv values for all relevant variables.
-                  Using colnames(model.matrix(formula,data)) (formula without |) you can check, which variables need a stv value.
-                   Additionally, you can give stv values for sigma and theta"))
+        miss <- colnames(model.matrix(formula_short,data))[!is.element(colnames(model.matrix(formula_short,data)),names(stv))]
+        stop(paste0("start values missing for ", paste(miss, collapse = ", ") ," Please provide stv values for all relevant variables."
+        ))
       }
 
       # theta missing
@@ -126,9 +131,8 @@ hyreg2 <-function(formula,
 
       # stv for variables not in formula given, d.h. zu viele angegeben
       if(any(!is.element(names(stv), c(colnames(model.matrix(formula_short,data)),"theta","sigma")))){
-        stop(paste0("Too many stv provided.
-                  Using colnames(model.matrix(formula,data)) you can check, which variables need a stv value.
-                  Additionally, you can give stv values for sigma and theta"))
+        much <- names(stv)[!is.element(names(stv), c(colnames(model.matrix(formula_short,data)),"theta","sigma"))]
+        stop(paste0("Too many stv provided. ",paste(much, collapse = ", "), " is/are no variable in formula and does not need a stv"))
       }
       #  check order in FLXMRhyreg
     }
@@ -139,9 +143,9 @@ hyreg2 <-function(formula,
       for(i in 1:length(stv)){
         # one or more stv missing
         if(any(!is.element(colnames(model.matrix(formula_short,data)),names(stv[[i]])))){
-          stop(paste0("Some stv are missing. Please provide stv values for all relevant variables.
-                  Using colnames(model.matrix(formula,data)) (formula without |) you can check, which variables need a stv value.
-                   Additionally, you can give stv values for sigma and theta"))
+          miss <- colnames(model.matrix(formula_short,data))[!is.element(colnames(model.matrix(formula_short,data)),names(stv[[i]]))]
+          stop(paste0("start values missing for ", paste(miss, collapse = ", ") ," Please provide stv values for all relevant variables."
+          ))
         }
 
         # theta missing
@@ -158,9 +162,8 @@ hyreg2 <-function(formula,
 
         # stv for variables not in formula given, d.h. zu viele angegeben
         if(any(!is.element(names(stv[[i]]), c(colnames(model.matrix(formula_short,data)),"theta","sigma")))){
-          stop(paste0("Too many stv provided.
-                  Using colnames(model.matrix(formula,data)) you can check, which variables need a stv value.
-                  Additionally, you can give stv values for sigma and theta"))
+          much <- names(stv[[i]])[!is.element(names(stv[[i]]), c(colnames(model.matrix(formula_short,data)),"theta","sigma"))]
+          stop(paste0("Too many stv provided. ",paste(much, collapse = ", "), " is/are no variable in formula and does not need a stv"))
         }
 
       }
@@ -199,7 +202,11 @@ hyreg2 <-function(formula,
     }
 
   }else{
-    # if stv is a list, both classes have to depend on the same variable set (otherwiese change here needed)
+
+    # if stv is a list, both classes have to depend on the same variable set,
+    # stv of different classes have same names (hence using stv[[1]] is okay here)
+    # different set of variables for each class not supported yet!
+
     if(is.null(variables_both) & is.null(variables_dich) & is.null(variables_cont)){
       variables_both <- names(stv[[1]])[!is.element(names(stv[[1]]),c("sigma","theta"))]
     }else{
@@ -266,9 +273,10 @@ hyreg2 <-function(formula,
    data <- data[!is.element(as.character(data[,id_col]), as.character(idcount[idcount$Freq == 0,"id"])),]
    type <- idframe[!is.element(as.character(idframe[,"id"]), as.character(idcount[idcount$Freq == 0,"id"])),"type"]
 
-   # paste deleted IDs for user?
-   warning(paste(length(as.character(idcount[idcount$Freq == 0,"id"])), "IDs were removed since they were only part of one type of data"))
-   # which IDS as.character(idcount[idcount$Freq == 0,"id"]),
+   if(any(idcount$Freq == 0)){
+     miss <- idcount[idcount$Freq == 0,"id"]
+     warning(paste0( "IDs ",paste(miss, collapse = ", "), " were removed, since they were only part in one type of data"))
+   }
 
 
    if(latent == "cont"){
@@ -332,6 +340,10 @@ hyreg2 <-function(formula,
      id_classes <- data_dich[,c(id_col,"mod_comp")]
    }
 
+   # return only estimated classes without model new model coefficients
+   if(classes_only == TRUE){
+     return(id_classes)
+   }
 
    data_list <- list()
    for(i in unique(mod@cluster)){

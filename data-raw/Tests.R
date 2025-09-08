@@ -4,9 +4,9 @@
 library(flexmix)
 library(EQ5Ddata)
 
-#################
-### USE DATA1 ###
-#################
+###############################
+### USE SIMULATED_DATA_NORM ###
+###############################
 
 
 # random numbers from normal dist
@@ -109,7 +109,7 @@ mod1 <- hyreg2(formula = formula,
                type_dich = "DCE_A",
                opt_method = "L-BFGS-B",
                control = control,
-               latent = "both",
+               latent = "cont",
                id_col = "id",
                # variables_cont = c("mo5","sc3"),
                # variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
@@ -264,6 +264,7 @@ stv_mo1 <- setNames(c(rep(0.1,4),1,1),c(colnames(simulated_data_mo)[3:6],c("sigm
 stv_mo2 <- setNames(c(rep(0.6,4),1,1),c(colnames(simulated_data_mo)[3:6],c("sigma","theta")))
 stvl <- list(stv_mo1,stv_mo2)
 
+
 modMO <- hyreg2(formula = formula,
                 data = simulated_data_mo,
                 type = simulated_data_mo$type,
@@ -276,7 +277,9 @@ modMO <- hyreg2(formula = formula,
                 opt_method = "L-BFGS-B",
                 control = control,
                 latent = "cont",
+               # classes_only = TRUE,
                 id_col = "id"
+
 )
 
 summary(modMO)
@@ -311,7 +314,8 @@ sum((proof$class == proof$mod_comp)/dim(proof)[1])
 # estimates for both classes are very close to the true values then
 
 # --> latent = "cont" can lead to very good results, but when?
-# depending on start values? different start values for different components not working yet
+# depending on start values?
+#
 
 
 
