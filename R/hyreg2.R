@@ -99,7 +99,7 @@ hyreg2 <-function(formula,
 
 
   # no stv
-  if(class(stv) != "list"){
+  if(!is.list(stv)){
     if(is.null(stv)){
       warning(paste0("No stv provided. Set all stv from data to 0.1 and sigma = 1 and theta = 1"))
       stv <- setNames(c(rep(0.1,dim(model.matrix(formula_short,data))[2]),1,1), c(colnames(model.matrix(formula_short,data)),c("sigma","theta")))
@@ -132,7 +132,39 @@ hyreg2 <-function(formula,
       }
       #  check order in FLXMRhyreg
     }
-  }
+
+  }else{ # stv is a list
+   # warning(paste0("stv is a list. Please ensure that variables_both, variables_dich and variables_cont are provided"))
+  # more checks for elements of the list
+      for(i in 1:length(stv)){
+        # one or more stv missing
+        if(any(!is.element(colnames(model.matrix(formula_short,data)),names(stv[[i]])))){
+          stop(paste0("Some stv are missing. Please provide stv values for all relevant variables.
+                  Using colnames(model.matrix(formula,data)) (formula without |) you can check, which variables need a stv value.
+                   Additionally, you can give stv values for sigma and theta"))
+        }
+
+        # theta missing
+        if(!is.element("theta",names(stv[[i]]))){
+          stv[[i]] <- c(stv[[i]],setNames(1,"theta"))
+          warning(paste0("No stv for theta provided, set to 1"))
+        }
+
+        # sigma missing
+        if(!is.element("sigma",names(stv[[i]]))){
+          stv[[i]] <- c(stv[[i]],setNames(1,"sigma"))
+          warning(paste0("No stv for sigma provided, set to 1"))
+        }
+
+        # stv for variables not in formula given, d.h. zu viele angegeben
+        if(any(!is.element(names(stv[[i]]), c(colnames(model.matrix(formula_short,data)),"theta","sigma")))){
+          stop(paste0("Too many stv provided.
+                  Using colnames(model.matrix(formula,data)) you can check, which variables need a stv value.
+                  Additionally, you can give stv values for sigma and theta"))
+        }
+
+      }
+    }
 
 
   ### TYPE Check ###
@@ -150,20 +182,40 @@ hyreg2 <-function(formula,
 
 
   ### VARIABALES Check ###
-  if(is.null(variables_both) & is.null(variables_dich) & is.null(variables_cont)){
-    variables_both <- names(stv)[!is.element(names(stv),c("sigma","theta"))]
-  }else{
-    if(any(!is.element(names(stv)[!is.element(names(stv),c("sigma","theta"))],
-                       c(variables_both,variables_dich,variables_cont)))){
-      # check if all variables are included
-      stop(paste0("all variables from stv have to be part of exactly one of the vectors variables_both, variables_dich or variables_cont"))
-      # alternative: do not provide any of the vectors
-      # than all relevant variables are set to variables_both automatically
+  if(!is.list(stv)){
+    if(is.null(variables_both) & is.null(variables_dich) & is.null(variables_cont)){
+      variables_both <- names(stv)[!is.element(names(stv),c("sigma","theta"))]
+    }else{
+      if(any(!is.element(names(stv)[!is.element(names(stv),c("sigma","theta"))],
+                         c(variables_both,variables_dich,variables_cont)))){
+        # check if all variables are included
+        stop(paste0("all variables from stv have to be part of exactly one of the vectors variables_both, variables_dich or variables_cont"))
+        # alternative: do not provide any of the vectors
+        # than all relevant variables are set to variables_both automatically
+      }
+      if(any(table(c(variables_both,variables_cont,variables_dich))>1)){
+        stop(paste0("variables can only be part in one of the vectors variables_both, variables_dich and variables_cont"))
+      }
     }
-    if(any(table(c(variables_both,variables_cont,variables_dich))>1)){
-      stop(paste0("variables can only be part in one of the vectors variables_both, variables_dich and variables_cont"))
+
+  }else{
+    # if stv is a list, both classes have to depend on the same variable set (otherwiese change here needed)
+    if(is.null(variables_both) & is.null(variables_dich) & is.null(variables_cont)){
+      variables_both <- names(stv[[1]])[!is.element(names(stv[[1]]),c("sigma","theta"))]
+    }else{
+      if(any(!is.element(names(stv[[1]])[!is.element(names(stv[[1]]),c("sigma","theta"))],
+                         c(variables_both,variables_dich,variables_cont)))){
+        # check if all variables are included
+        stop(paste0("all variables from stv have to be part of exactly one of the vectors variables_both, variables_dich or variables_cont"))
+        # alternative: do not provide any of the vectors
+        # than all relevant variables are set to variables_both automatically
+      }
+      if(any(table(c(variables_both,variables_cont,variables_dich))>1)){
+        stop(paste0("variables can only be part in one of the vectors variables_both, variables_dich and variables_cont"))
+      }
     }
   }
+
 
 
 
@@ -328,7 +380,28 @@ hyreg2 <-function(formula,
 #' @return summary object of bbmle::mle2 model
 #'
 #' @author Kim Rand & Svenja Elkenkamp
-#' @examples Put Example here
+#' @examples
+#' #'formula <- y ~  -1 + x1 + x2 + x3 | id
+#'k <- 2
+#'stv <- setNames(c(0.2,0,1,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
+#'control = list(iter.max = 1000, verbose = 4)
+
+#'rm(counter)
+
+#'mod <- hyreg2(formula = formula,
+#'                     data =  simulated_data_norm,
+#'                     type =  simulated_data_norm$type,
+#'                     stv = stv,
+#'                     k = k,
+#'                     type_cont = "TTO",
+#'                     type_dich = "DCE_A",
+#'                     opt_method = "L-BFGS-B",
+#'                     control = control,
+#'                     latent = "both",
+#'                     id_col = "id"
+#')
+#'summary_hyreg2(mod)
+#'
 #' @importFrom bbmle mle2
 #' @export
 
@@ -349,6 +422,62 @@ summary_hyreg2 <- function(object){
 
 
 ##############################
+#' getstv
+#'
+#' @description function to export coefficent values and names from a model fitted with k = 1 and latent = "both".
+#' These values can be used as stv for a new model with k > 1
+#' @param mod modeloutput from hyreg2(...k = 1, latent = "both", ...)
+#' @return named vector
+#'
+#' @author Kim Rand & Svenja Elkenkamp
+#' @examples
+#'formula <- y ~  -1 + x1 + x2 + x3 | id
+#'
+#'k <- 1
+#'stv <- setNames(c(0.2,0,1,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
+#'control = list(iter.max = 1000, verbose = 4)
+
+#'rm(counter)
+
+#'mod <- hyreg2(formula = formula,
+#'                     data =  simulated_data_norm,
+#'                     type =  simulated_data_norm$type,
+#'                     stv = stv,
+#'                     k = k,
+#'                     type_cont = "TTO",
+#'                     type_dich = "DCE_A",
+#'                     opt_method = "L-BFGS-B",
+#'                     control = control,
+#'                     latent = "both",
+#'                     id_col = "id"
+#')
+#'new_stv <- getstv(mod)
+#'
+#'### use new_stv in new model ###
+#'
+#'#'mod <- hyreg2(formula = formula,
+#'                     data =  simulated_data_norm,
+#'                     type =  simulated_data_norm$type,
+#'                     stv = new_stv,
+#'                     k = 2,
+#'                     type_cont = "TTO",
+#'                     type_dich = "DCE_A",
+#'                     opt_method = "L-BFGS-B",
+#'                     control = control,
+#'                     latent = "both",
+#'                     id_col = "id"
+#' @export
+
+getstv <- function(mod){
+  stv <- c(mod@components[["Comp.1"]][[1]]@parameters$coef,
+           mod@components[["Comp.1"]][[1]]@parameters$sigma,
+           mod@components[["Comp.1"]][[1]]@parameters$theta)
+  return(stv)
+}
+
+
+##################################
+
 
 
 # for use of fit_mle
@@ -387,4 +516,3 @@ refit <- function(object){
 
 
 
-##################################

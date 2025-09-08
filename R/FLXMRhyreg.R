@@ -43,7 +43,7 @@
 
 #'model <- FLXMRhyreg(formula = formula,
 #'                     family=c("hyreg"),
-#'                     type =  simulate_data_norm$type,
+#'                     type =  simulated_data_norm$type,
 #'                     stv = stv,
 #'                     k = k,
 #'                     type_cont = "TTO",
@@ -272,8 +272,9 @@ FLXMRhyreg <- function(formula= . ~ . ,
         # use stv[[counter]] as stv
         # for the next iterations of EM its not requried since we use component$coef
         # stv as list NOT WORKING YET
+        # WHY??
 
-        if(class(stv) == "list"){
+        if(is.list(stv)){
           stv_in <- stv[[counter]]
         }else{
           stv_in <- stv
@@ -292,7 +293,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
         if(counter < k){
           counter <<- counter + 1
 
-          if(class(stv) == "list"){
+          if(is.list(stv)){
             stv_in <- stv[[counter]]
           }else{
             stv_in <- stv
@@ -322,7 +323,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
 
       z@defineComponent(para = list(coef = fit_mle@coef[!is.element(names(fit_mle@coef),c("sigma","theta"))],
-                                    df = ncol(x)+1, # not changed yet
+                                   # df = ncol(x)+1, # not changed yet
                                     sigma = fit_mle@coef[is.element(names(fit_mle@coef),c("sigma"))],
                                     theta = fit_mle@coef[is.element(names(fit_mle@coef),c("theta"))],
                                     fit_mle = fit_mle,

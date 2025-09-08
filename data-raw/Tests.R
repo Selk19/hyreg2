@@ -14,7 +14,7 @@ formula <- y ~  -1 + x1 + x2 + x3 | id
 
 k <- 2
 
-stv <- setNames(c(0.2,0,1,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
+stv <- setNames(c(0.2,0.2,0.2,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
 control = list(iter.max = 1000, verbose = 4)
 
 rm(counter)
@@ -28,7 +28,7 @@ hyflex_mod <- hyreg2(formula = formula,
                      type_dich = "DCE_A",
                      opt_method = "L-BFGS-B",
                      control = control,
-                     latent = "cont",
+                     latent = "both",
                      id_col = "id"
 )
 
@@ -39,7 +39,7 @@ summary_hyreg2(hyflex_mod)
 #parameters(hyflex_mod, component=2)  # works only for latent = "both"
 
 # if latent was "both"
-(sum(hyflex_mod@cluster == simulate_data_norm$class))/dim(simulate_data_norm)[1]
+(sum(hyflex_mod@cluster == simulated_data_norm$class))/dim(simulated_data_norm)[1]
 
 # if latent was "cont" or "dich"
 proof <- merge(unique(simulated_data_norm[,c("id","class")]),hyflex_mod[["id_classes"]], by = "id")
@@ -87,12 +87,12 @@ formula <- value ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad
   mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5 | id
 
 
-k <- 1
+k <- 2
 
 control = list(iter.max = 5000, verbose = 5)
 stv2 <- setNames(c(rep(0.2,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
 stv1 <- setNames(c(rep(0.1,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
-#stv <- list(stv1,stv2) # not working yet (we get back only start values?)
+stv <- list(stv1,stv2) # not working yet (we get back only start values?)
 
 # if formula has an intercept, use this
 stvint <- setNames(c(rep(0.1,20),1,1,1),c(colnames(data)[17:36],c("sigma","theta","(Intercept)")))
@@ -101,7 +101,7 @@ stvint <- setNames(c(rep(0.1,20),1,1,1),c(colnames(data)[17:36],c("sigma","theta
 mod1 <- hyreg2(formula = formula,
                data = data,
                type = data$method,
-               stv = stv1,
+               stv = stv,
                #   upper = 2,
                #   lower = 0,
                k = k,
@@ -312,4 +312,24 @@ sum((proof$class == proof$mod_comp)/dim(proof)[1])
 
 
 
+### use getstv to generate stv values ###
 
+# use latent = "cont" and k = 1 in code above to generate modMO
+
+modMO2 <- hyreg2(formula = formula,
+                data = simulated_data_mo,
+                type = simulated_data_mo$type,
+                stv = getstv(modMO),
+                # upper = 2,
+                # lower = 0,
+                k = 2,
+                type_cont = "TTO",
+                type_dich = "DCE_A",
+                opt_method = "L-BFGS-B",
+                control = control,
+                latent = "cont",
+                id_col = "id"
+)
+
+
+summary_hyreg2(modMO2)
