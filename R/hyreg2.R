@@ -21,7 +21,7 @@
 #' @param lower opt_method must be set to "L-BFGS-B", lower bound for censored data
 #' @param upper opt_method must be set to "L-BFGS-B", upper bound for censored data
 #' @param latent one of "both","cont" or "dich", see details
-#' @param id_col character, column name containing participant ids, need if latent != "both
+#' @param id_col character, column name containing participant ids, needed if latent != "both
 #' @param variables_both character vactor; variables to be fitted on TTO and DCE data, if not specified all variables from formula are used
 #' @param variables_cont character vactor; variables to be fitted only on TTO data
 #' @param variables_dich character vactor; variables to be fitted only on DCE data
@@ -85,7 +85,7 @@ hyreg2 <-function(formula,
       # one or more stv missing
       if(any(!is.element(colnames(model.matrix(formula_short,data)),names(stv)))){
         stop(paste0("Some stv are missing. Please provide stv values for all relevant variables.
-                  Using model.matrix(formula,data) (formula without |) you can check, which variables need a stv value.
+                  Using colnames(model.matrix(formula,data)) (formula without |) you can check, which variables need a stv value.
                    Additionally, you can give stv values for sigma and theta"))
       }
 
@@ -104,7 +104,7 @@ hyreg2 <-function(formula,
       # stv for variables not in formula given, d.h. zu viele angegeben
       if(any(!is.element(names(stv), c(colnames(model.matrix(formula_short,data)),"theta","sigma")))){
         stop(paste0("Too many stv provided.
-                  Using model.matrix(formula,data) you can check, which variables need a stv value.
+                  Using colnames(model.matrix(formula,data)) you can check, which variables need a stv value.
                   Additionally, you can give stv values for sigma and theta"))
       }
       #  check order in FLXMRhyreg
@@ -135,15 +135,12 @@ hyreg2 <-function(formula,
       # check if all variables are included
       stop(paste0("all variables from stv have to be part of exactly one of the vectors variables_both, variables_dich or variables_cont"))
       # alternative: do not provide any of the vectors
-      # than all relevent variables are set to variables_both automatically
+      # than all relevant variables are set to variables_both automatically
     }
     if(any(table(c(variables_both,variables_cont,variables_dich))>1)){
       stop(paste0("variables can only be part in one of the vectors variables_both, variables_dich and variables_cont"))
     }
   }
-
-  # more cheks needed
-
 
 
 

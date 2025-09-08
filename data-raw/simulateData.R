@@ -1,3 +1,6 @@
+## code to prepare `simulateData` dataset goes here
+#usethis::use_data(simulateData, overwrite = TRUE)
+
 
 
 # these datasets can be used in Tests file to test the functions
@@ -111,10 +114,12 @@ simulated_data_dce <- simulated_data[simulated_data$type == "DCE_A",]
 
 
 data1 <- simulated_data
+
 rm(simulated_data)
 rm(simulated_data1)
 rm(simulated_data2)
-
+rm(simulated_data_dce)
+rm(simulated_data_too)
 
 
 
@@ -381,8 +386,8 @@ lm(y~ -1 + mo2 + mo3 + mo4 + mo5 +
      ua2 + ua3 + ua4 + ua5 +
      pd2 + pd3 + pd4 + pd5 +
      ad2 + ad3 + ad4 + ad5,
-  # data = data_tto,
-    data = simulated_data1[simulated_data1$type == "TTO",])
+   # data = data_tto,
+   data = simulated_data1[simulated_data1$type == "TTO",])
 
 
 
@@ -517,4 +522,65 @@ simulated_data <- rbind(simulated_data1, simulated_data2)
 
 
 
+
+
+
+
+
+
+
+##########################################
+############ CENSORED DATA ###############
+##########################################
+
+######################################
+### Random Numbers from NormalDist ###
+######################################
+
+# upper bound for data1$y at 3
+# new variable y_cens
+
+for(i in 1:length(data1$y)){
+  if(data1$y[i] <= 3){
+    data1$y_cens[i] <- data1$y[i]
+  }else{
+    data1$y_cens[i] <- 3
+  }
+}
+
+
+
+
+#####################
+### ONLY MOBILITY ###
+#####################
+
+# lower bound for simualted_data$y at 0
+# new variable y_cens
+
+for(i in 1:length(simulated_data_mo$y)){
+  if(simulated_data_mo$y[i] >= 0){
+    simulated_data_mo$y_cens[i] <-simulated_data_mo$y[i]
+  }else{
+    simulated_data_mo$y_cens[i] <- 0
+  }
+}
+
+
+
+
+###########################
+### ALL DIMENSIONS EQ5D ###
+###########################
+
+# upper bound for simualted_data$y at 2
+# new variable y_cens
+
+for(i in 1:length(simulated_data$y)){
+  if(simulated_data$y[i] <= 2){
+    simulated_data$y_cens[i] <-simulated_data$y[i]
+  }else{
+    simulated_data$y_cens[i] <- 2
+  }
+}
 
