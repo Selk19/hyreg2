@@ -259,11 +259,15 @@ k <- 2
 control = list(iter.max = 5000, verbose = 5)
 stv_mo <- setNames(c(rep(0.3,4),1,1),c(colnames(simulated_data_mo)[3:6],c("sigma","theta")))
 
+# stv as list
+stv_mo1 <- setNames(c(rep(0.1,4),1,1),c(colnames(simulated_data_mo)[3:6],c("sigma","theta")))
+stv_mo2 <- setNames(c(rep(0.6,4),1,1),c(colnames(simulated_data_mo)[3:6],c("sigma","theta")))
+stvl <- list(stv_mo1,stv_mo2)
 
 modMO <- hyreg2(formula = formula,
                 data = simulated_data_mo,
                 type = simulated_data_mo$type,
-                stv = stv_mo,
+                stv = stvl,
                 # upper = 2,
                 # lower = 0,
                 k = k,
