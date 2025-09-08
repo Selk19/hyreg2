@@ -271,8 +271,6 @@ FLXMRhyreg <- function(formula= . ~ . ,
         # implement stv as lits? and ask if it is a list, then
         # use stv[[counter]] as stv
         # for the next iterations of EM its not requried since we use component$coef
-        # stv as list NOT WORKING YET
-        # WHY??
 
         if(is.list(stv)){
           stv_in <- stv[[counter]]
@@ -323,7 +321,6 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
 
       z@defineComponent(para = list(coef = fit_mle@coef[!is.element(names(fit_mle@coef),c("sigma","theta"))],
-                                   # df = ncol(x)+1, # not changed yet
                                     sigma = fit_mle@coef[is.element(names(fit_mle@coef),c("sigma"))],
                                     theta = fit_mle@coef[is.element(names(fit_mle@coef),c("theta"))],
                                     fit_mle = fit_mle,
