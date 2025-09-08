@@ -69,8 +69,8 @@ FLXMRhyreg_het <- function(formula= . ~ .,
                        optimizer = "optim",
                        lower = -Inf,
                        upper = Inf,
-                       non_linear = FALSE,
-                       formula_orig = formula_orig,
+#                       non_linear = FALSE,
+#                       formula_orig = formula_orig,
                        ...
 )
 {
