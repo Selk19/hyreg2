@@ -87,7 +87,7 @@ formula <- value ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad
   mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5 | id
 
 
-k <- 2
+k <- 1
 
 control = list(iter.max = 5000, verbose = 5)
 stv2 <- setNames(c(rep(0.2,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
@@ -109,7 +109,7 @@ mod1 <- hyreg2(formula = formula,
                type_dich = "DCE_A",
                opt_method = "L-BFGS-B",
                control = control,
-               latent = "cont",
+               latent = "both",
                id_col = "id",
                # variables_cont = c("mo5","sc3"),
                # variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
@@ -341,3 +341,99 @@ modMO2 <- hyreg2(formula = formula,
 
 
 summary_hyreg2(modMO2)
+
+
+
+
+
+
+
+
+
+####################################################
+########## TEST FOR HETEROSCEDASTICITY #############
+####################################################
+
+
+# model
+formula <- value ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad3 +
+  mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5 | id
+
+
+
+k <- 1
+
+control = list(iter.max = 5000, verbose = 5)
+stv2 <- setNames(c(rep(0.2,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
+stv1 <- setNames(c(rep(0.1,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
+stv <- list(stv1,stv2) # not working yet (we get back only start values?)
+
+# if formula has an intercept, use this
+stvint <- setNames(c(rep(0.1,20),1,1,1),c(colnames(data)[17:36],c("sigma","theta","(Intercept)")))
+
+
+# for het
+formula_sigma <- value ~  mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad3 +
+  mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5
+stvs <- setNames(c(rep(0.1,20),1),c(colnames(data)[17:36],c("theta")))
+stv_sigma <- setNames(c(rep(0.1,20),1),c(colnames(data)[17:36],c("(Intercept)")))
+
+
+
+mod1 <- hyreg2_het(formula = formula,
+                   formula_sigma = formula_sigma,
+                   data = data,
+                   type = data$method,
+                   stv = stvs,
+                   stv_sigma = stv_sigma,
+                   #   upper = 2,
+                   #   lower = 0,
+                   k = k,
+                   type_cont = "TTO",
+                   type_dich = "DCE_A",
+                   opt_method = "L-BFGS-B",
+                   control = control,
+                   latent = "both",
+                   id_col = "id",
+                   # variables_cont = c("mo5","sc3"),
+                   # variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
+                   #  "mo4","sc4","ua4","pd4","ad4","ua5","pd5", "ad5")
+)
+
+# if you get an Error like this:
+# Error in names(object) <- nm : attempt to set an attribute on NULL
+# use rm(counter) and try again
+
+# using stv as list:
+# estimates are just the start values except sigma
+# why does this happen? optimizer seem not to work correct here
+
+
+### SUMMARY ###
+summary_hyreg2(mod1)
+
+
+
+### compare to xreg ###
+library(xreg)
+
+modformula <- value ~
+  mo2 * MO2 + sc2 * SC2 + ua2 * UA2 + pd2 * PD2 +  ad2 * AD2 +
+  mo3 * MO3 + sc3 * SC3 + ua3 * UA3 + pd3 * PD3 + ad3 * AD3 +
+  mo4 * MO4 + sc4 * SC4 + ua4 * UA4 + pd4 * PD4 + ad4 * AD4 +
+  mo5 * MO5 + sc5 * SC5 + ua5 * UA5 + pd5 * PD5 + ad5 * AD5
+
+
+modformula_het <- value ~ INTERCEPT +
+  mo2 * HMO2 + sc2 * HSC2 + ua2 * HUA2 + pd2 * HPD2 + ad2 * HAD2 +
+  mo3 * HMO3 + sc3 * HSC3 + ua3 * HUA3 + pd3 * HPD3 + ad3 * HAD3 +
+  mo4 * HMO4 + sc4 * HSC4 + ua4 * HUA4 + pd4 * HPD4 + ad4 * HAD4 +
+  mo5 * HMO5 + sc5 * HSC5 + ua5 * HUA5 + pd5 * HPD5 + ad5 * HAD5
+
+hyb <- hyreg(modformula, data, datatype = "d_method", hetcont = modformula_het)# ll = 0, ul = 2)
+hyb
+
+
+
+### RESULT ###
+# we get the same results from hyreg2 and hyreg
