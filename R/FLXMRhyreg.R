@@ -38,7 +38,7 @@
 #'
 #'
 #' x <- model.matrix(formula,simulated_data_norm)
-#' y <- simulated_data$y
+#' y <- simulated_data_norm$y
 #' w <- 1
 
 #'model <- FLXMRhyreg(formula = formula,
@@ -95,7 +95,8 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
   # refit function has to depend on x,y,w.
   hyregrefit <- function(x, y, w) {
-    paste0("not defined")
+    warning(paste0("Not defined", "Please try xreg2:::refit"))
+    return(NA)
   }
 
   z <- new("FLXMRglm", weighted=TRUE, formula=formula,
@@ -133,7 +134,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
       logLik <- function(x, y, sigma = para$sigma, theta = para$theta, return_vector = TRUE, ...){
 
-
+        # prepare data
         # choose subset of x and y depending on type
         x1 <- x[type == type_cont,c(variables_cont,variables_both)]
         x2 <-  x[type == type_dich,c(variables_dich,variables_both)]
@@ -143,17 +144,17 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
         sigma <- exp(sigma)
 
+        # linear predictor
         # change for non-linear functions
         # use formula_orig
         Xb1 <- x1 %*% para$coef[colnames(x1)] # only cont and both variables
         Xb2 <- (x2 %*% para$coef[colnames(x2)]) * exp(theta)  # only dich and both variables
 
 
+        # pvals and likelihood
         logistic_tmp <- .5+.5*tanh(Xb2/2)
         pvals2 <- log(y2 *logistic_tmp + (1-y2)* (1-logistic_tmp)) # dich_logistic
 
-
-        # Likelihood calculation
         pvals1 <- dnorm(y1, mean=Xb1, sd=sigma, log=TRUE) # cont_normal
 
 
@@ -204,30 +205,33 @@ FLXMRhyreg <- function(formula= . ~ . ,
       # function to use in mle, same as logLik but depending on stv and giving out the neg logL directly
       logLik2 <- function(stv){
 
+       # random_intercepts <- stv[grep("random_intercept", names(stv))]
 
+        # prepare data
         x1 <- x[type == type_cont,c(variables_cont,variables_both)]
         x2 <-  x[type == type_dich,c(variables_dich,variables_both)]
         y1 <- y[type == type_cont]
         y2 <-  y[type == type_dich]
 
+        # prepare stv and sigma and theta
         sigma <- exp(stv[is.element(names(stv),c("sigma"))][[1]])
         theta <- exp(stv[is.element(names(stv),c("theta"))][[1]])
         stv_cont <- stv[!is.element(names(stv),c("sigma","theta", variables_dich))]
         stv_dich <- stv[!is.element(names(stv),c("sigma","theta", variables_cont))]
 
 
+        # linear predictor
         # change for non-linear functions
         # use formula_orig
         Xb1 <- x1 %*% stv_cont[colnames(x1)] # [] sortiert die Werte von stv in der passenden Reiehenfolge zu x1
         Xb2 <- x2 %*% stv_dich[colnames(x2)]
 
-
         Xb2 <- Xb2*theta
 
+        # pvals and likelihood
         logistic_tmp <- 0.5 + 0.5*tanh(Xb2/2)
         pvals2 <- log(y2 *logistic_tmp + (1-y2)* (1-logistic_tmp)) # dich_logistic
 
-        # Likelihood calculation
         pvals1 <- dnorm(y1, mean=Xb1, sd=sigma, log=TRUE) # cont_normal
 
         # for box constraints, censored data
@@ -251,6 +255,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
         # what to do with NaN ? fixed by log(-Machine...)?
 
 
+        # multiply weights for use in EM algo
         pvals_w <- pvals * w
 
 
@@ -321,6 +326,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
 
       z@defineComponent(para = list(coef = fit_mle@coef[!is.element(names(fit_mle@coef),c("sigma","theta"))],
+                                    df = ncol(x)+1, # not changed yet
                                     sigma = fit_mle@coef[is.element(names(fit_mle@coef),c("sigma"))],
                                     theta = fit_mle@coef[is.element(names(fit_mle@coef),c("theta"))],
                                     fit_mle = fit_mle,
