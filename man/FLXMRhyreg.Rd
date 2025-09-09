@@ -72,11 +72,11 @@ rm(counter)
 
 
 x <- model.matrix(formula,simulated_data_norm)
-y <- simulated_data$y
+y <- simulated_data_norm$y
 w <- 1
 model <- FLXMRhyreg(formula = formula,
                     family=c("hyreg"),
-                    type =  simulate_data_norm$type,
+                    type =  simulated_data_norm$type,
                     stv = stv,
                     k = k,
                     type_cont = "TTO",

@@ -354,23 +354,21 @@ summary_hyreg2(modMO2)
 ########## TEST FOR HETEROSCEDASTICITY #############
 ####################################################
 
+# data
+TTOonly <- hyregdata[hyregdata$method == "TTO" & hyregdata$fb_flagged == 0 & hyregdata$state_id > 0,]
+DCEonly <- hyregdata[hyregdata$method == "DCE_A" & hyregdata$state_id < 197,]
+
+TTOonly <- TTOonly[1:250,]
+DCEonly <- DCEonly[1:150,]
+data <- rbind(TTOonly,DCEonly)
 
 # model
 formula <- value ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad3 +
   mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5 | id
 
-
-
-k <- 1
+k <- 2
 
 control = list(iter.max = 5000, verbose = 5)
-stv2 <- setNames(c(rep(0.2,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
-stv1 <- setNames(c(rep(0.1,20),1,1),c(colnames(data)[17:36],c("sigma","theta")))
-stv <- list(stv1,stv2) # not working yet (we get back only start values?)
-
-# if formula has an intercept, use this
-stvint <- setNames(c(rep(0.1,20),1,1,1),c(colnames(data)[17:36],c("sigma","theta","(Intercept)")))
-
 
 # for het
 formula_sigma <- value ~  mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad3 +
@@ -394,10 +392,7 @@ mod1 <- hyreg2_het(formula = formula,
                    opt_method = "L-BFGS-B",
                    control = control,
                    latent = "both",
-                   id_col = "id",
-                   # variables_cont = c("mo5","sc3"),
-                   # variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
-                   #  "mo4","sc4","ua4","pd4","ad4","ua5","pd5", "ad5")
+                   id_col = "id"
 )
 
 # if you get an Error like this:
@@ -436,4 +431,5 @@ hyb
 
 
 ### RESULT ###
-# we get the same results from hyreg2 and hyreg
+# we get the same results from hyreg2 and hyreg with k = 1
+# code is slow for k > 1

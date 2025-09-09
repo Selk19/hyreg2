@@ -35,8 +35,7 @@
 #'
 #' @author Kim Rand & Svenja Elkenkamp
 #' @examples
-#'
-#'formula <- y ~  -1 + x1 + x2 + x3 | id
+#'formula <- y ~  -1 + x1 + x2 + x3
 #'formula_sigma <- y ~  x1 + x2 + x3
 #'
 #'k <- 1
@@ -108,9 +107,15 @@ hyreg2_het <-function(formula,
   formula_parts <- strsplit(formula_string, "\\|")[[1]]
   formula_short <- as.formula(formula_parts[1])
 
+  # set formula_sigma if not provided
   if(is.null(formula_sigma)){
     formula_sigma <- formula_short
   }
+
+
+
+  ### ADAPT FOR stv_sigma ###
+  # NO CHECKA FOR stv_sigma included yet
 
   # no stv
   if(!is.list(stv)){
@@ -249,7 +254,8 @@ hyreg2_het <-function(formula,
   ### ESTIMATION ###
   if(latent == "both"){
 
-    model <- list(FLXMRhyreg_het( formula_sigma = formula_sigma,
+    model <- list(FLXMRhyreg_het( data = data,
+                              formula_sigma = formula_sigma,
                              type= type,
                              stv = stv,
                              stv_sigma = stv_sigma,
@@ -292,7 +298,8 @@ hyreg2_het <-function(formula,
 
     if(latent == "cont"){
       data_cont <- data[type == type_cont,]
-      model <- list(FLXMRhyreg(type= type[type == type_cont],
+      model <- list(FLXMRhyreg( data = data_cont,
+                                type= type[type == type_cont],
                                stv = stv,
                                type_cont = type_cont,
                                type_dich = type_dich,
@@ -323,7 +330,8 @@ hyreg2_het <-function(formula,
 
     if(latent == "dich"){
       data_dich <- data[type == type_dich,]
-      model <- list(FLXMRhyreg(type= type[type == type_dich],
+      model <- list(FLXMRhyreg( data = data_dich,
+                                type= type[type == type_dich],
                                stv = stv,
                                type_cont = type_cont,
                                type_dich = type_dich,

@@ -6,6 +6,8 @@
 \usage{
 FLXMRhyreg_het(
   formula = . ~ .,
+  formula_sigma = formula_sigma,
+  data,
   family = c("hyreg"),
   type = NULL,
   type_cont = NULL,
@@ -25,6 +27,10 @@ FLXMRhyreg_het(
 }
 \arguments{
 \item{formula}{Model formula}
+
+\item{formula_sigma}{formula for estimation of sigma to account for heteroscedasticity}
+
+\item{data}{dataset to be used}
 
 \item{family}{default = "hyreg"}
 
@@ -66,7 +72,35 @@ a model with hybrid likelihood
 Function used in flexmix M-Step to estimate hybrid model accounting for heteroscedastisity
 }
 \examples{
-Put Example here
+
+formula <- y ~  -1 + x1 + x2 + x3
+formula_sigma <- y ~ x1 + x2 + x3
+stv <- setNames(c(0.2,0,1,1),c(colnames(simulated_data_norm)[3:5],c("theta")))
+stv_sigma <- setNames(c(0.2,0.2,0.1,1),c(colnames(simulated_data_norm)[3:5],c("(Intercept)")))
+
+
+x <- model.matrix(formula,simulated_data_norm)
+y <- simulated_data_norm$y
+w <- 1
+model <- FLXMRhyreg_het(formula = formula,
+                     formula_sigma = formula_sigma,
+                    family=c("hyreg"),
+                    type =  simulated_data_norm$type,
+                    stv = stv,
+                    stv_sigma = stv_sigma,
+                    k = k,
+                    type_cont = "TTO",
+                    type_dich = "DCE_A",
+                    opt_method = "L-BFGS-B",
+                    control = list(iter.max = 1000, verbose = 4),
+                    offset = NULL,
+                    optimizer = "optim",
+                    variables_both =  names(stv)[!is.element(names(stv),c("theta"))],
+                    variables_cont = NULL,
+                    variables_dich = NULL,
+                    lower = -Inf,
+                    upper = Inf,
+)
 }
 \author{
 Kim Rand & Svenja Elkenkamp
