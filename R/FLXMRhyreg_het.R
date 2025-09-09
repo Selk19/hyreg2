@@ -38,61 +38,43 @@
 
 
 ### FLXMRhyreg ###
-# not completly working (refit is missing)
+
+#Error in validObject(.Object) :
+#  ungültiges Objekt der Klasse “FLXcomponent”:
+# invalid object for slot "df" in class "FLXcomponent": got class "NULL",
+# should be or extend class "numeric"
 
 
-# at the moment we get:
-# Error in postunscaled + FLXdeterminePostunscaled(model[[n]], components[[n]]) :
-# non-conformable arrays
-# change flexmix:::FLXdeterminePostunscaled ? and upload an adpted version?
-
-
-#### WITH Formula for sigma to account for heteroscedastisity ###
-# formula for sigma can only be the same as in formula estimated on only the TTO values
-# idea: use additional formula_sigma argument to be more flexible
-# stv_sigma must be named vector
-# names(stv_sigma) have to be same variable names as in formula/data but with _h at the ending
 
 FLXMRhyreg_het <- function(formula= . ~ .,
-                        #   formula_sigma = NULL,
-                       family=c("hyreg"),
-                       type = NULL,
-                       type_cont = NULL,
-                       type_dich = NULL,
-                       variables_both = NULL,
-                       variables_cont = NULL,
-                       variables_dich = NULL,
-                       stv = NULL, # has to include starting value for theta but not sigma
-                       stv_sigma = NULL,
-                       offset = NULL,
-                       opt_method = "BFGS",
-                       optimizer = "optim",
-                       lower = -Inf,
-                       upper = Inf,
-#                       non_linear = FALSE,
-#                       formula_orig = formula_orig,
-                       ...
+                           formula_sigma = formula_sigma,
+                           family=c("hyreg"),
+                           type = NULL,
+                           type_cont = NULL,
+                           type_dich = NULL,
+                           variables_both = NULL,
+                           variables_cont = NULL,
+                           variables_dich = NULL,
+                           stv = NULL, # has to include starting value for theta but not sigma
+                           stv_sigma = NULL,
+                           offset = NULL,
+                           opt_method = "BFGS",
+                           optimizer = "optim",
+                           lower = -Inf,
+                           upper = Inf,
+                           #                       non_linear = FALSE,
+                           #                       formula_orig = formula_orig,
+                           ...
 )
 {
- # rm(counter)
+  # rm(counter)
   family <- match.arg(family)
 
   # refit function has to depend on x,y,w.
 
   hyregrefit <- function(x, y, w) {
-    # use mle2?
-    fit <- bbmle::mle2() ## or use optim?
-
-    # in FLXMRglm they use:
-    #c(glm.fit(x, y, weights=w, offset=offset,
-    #         family=get(family, mode="function")()),
-    # list(call = sys.call(), offset = offset,
-    #      control = eval(formals(glm.fit)$control),
-    #      method = "weighted.glm.fit"))
-    #  fit$df.null <- sum(w) + fit$df.null - fit$df.residual - fit$rank
-    #  fit$df.residual <- sum(w) - fit$rank
-    #  fit$x <- x
-    #  fit
+    warning(paste0("Not defined", "Please try xreg2:::refit"))
+    return(NA)
   }
 
   z <- new("FLXMRglm", weighted=TRUE, formula=formula,
@@ -100,8 +82,8 @@ FLXMRhyreg_het <- function(formula= . ~ .,
            family="hyreg", refit=hyregrefit)
 
   z@preproc.y <- function(x){
-        if (ncol(x) > 1)
-          stop(paste("for the", family, "family y must be univariate"))
+    if (ncol(x) > 1)
+      stop(paste("for the", family, "family y must be univariate"))
     x
   }
 
@@ -131,10 +113,13 @@ FLXMRhyreg_het <- function(formula= . ~ .,
       logLik <- function(x, y, sigma = para$sigma, theta = para$theta, return_vector = TRUE, ...){
         #para$sigma must be a vector
 
+        #prepare sigma
+        xsigma <-  model.matrix(formula_sigma,data[type == type_cont,])
+        colnames(xsigma) <- paste0(colnames(xsigma),"_h")
+        sigma <- exp(xsigma %*% sigma[colnames(xsigma)])
 
-        # choose subset of x and y depending on type
-        # at the moment sigma formula can use only same dependet variables as formula itself
 
+        # prepare data
         # change for non-linear functions
         # use formula_orig
         x1 <- x[type == type_cont,c(variables_cont,variables_both)]
@@ -143,36 +128,20 @@ FLXMRhyreg_het <- function(formula= . ~ .,
         y2 <-  y[type == type_dich]
 
 
-        # if sigma uses Intercept include 1s
-        # intercept must be given on first position
-        # CHECK:
-        # hat stv_sigma Namen am Ende ein _h? Wenn Nein, dann Error Meldung entsprechend
-        if(!is.element("(Intercept)",colnames(x)) & is.element("(Intercept)_h",names(stv_sigma))){
-          sigma <- exp(cbind(rep(1,dim(x1)[1]),x1) %*% sigma) # sigma must be a vector now
-        }else{
-          sigma <- exp( x1[,unlist(strsplit(names(stv_sigma),"_h"))] %*% sigma)
-        }
-        # IDEA: use formula_sigma as input of function and then use model.matrix(formula_sigma,data) here ?
-
-
+        # linear predictor
         # change for non-linear functions
         Xb1 <- x1 %*% para$coef[colnames(x1)] # only cont and both variables
         Xb2 <- (x2 %*% para$coef[colnames(x2)]) * exp(theta)  # only dich and both variables
 
 
+        # pvals and likelihood
         logistic_tmp <- .5+.5*tanh(Xb2/2)
         pvals2 <- log(y2 *logistic_tmp + (1-y2)* (1-logistic_tmp)) # dich_logistic
 
-
-        # Likelihood calculation
         pvals1 <- dnorm(y1, mean=Xb1, sd=sigma, log=TRUE) # cont_normal
 
 
-
-        ### from xreg ###
-        ### for box constraints
-
-
+        # for box constraints
         #in xreg:
         if(upper != Inf ){
           censV <- y1 == upper
@@ -183,13 +152,6 @@ FLXMRhyreg_het <- function(formula= . ~ .,
           censV <- y1 == lower
           pvals1[which(censV)] <- log(pnorm((Xb1[censV]-(-Inf))/sigma[censV],0,1) - pnorm((Xb1[censV]-lower)/sigma,0,1))
         }
-
-        # if(upper != Inf){
-        #   censV <- y1 == upper # adapt for lower
-        #   pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = upper, sd = sigma[censV], lower.tail = T, log.p = T) -  # mean = 2 in xreg
-        #     pnorm(q =  Xb1[censV], mean = lower, sd = sigma[censV], lower.tail = T, log.p = T) # mean = Inf in xreg
-        #   # or do we have to use log.p = F and than log(pnorm() - pnorm())?
-        # }
 
 
         pvals <- c(pvals1,pvals2)
@@ -212,7 +174,7 @@ FLXMRhyreg_het <- function(formula= . ~ .,
                           #  stderror = para$stderror,
                           #  pvalue = para$pvalue,
                           fit_mle = para$fit_mle),
-                         # counter = counter),
+          # counter = counter),
           #minLik = para$minLik),
           logLik=logLik, predict=predict,
           df=para$df)
@@ -224,51 +186,42 @@ FLXMRhyreg_het <- function(formula= . ~ .,
 
       # function to use in mle, same as logLik but depending on stv and giving out the neg logL directly
       logLik2 <- function(stv){
-        # variables_cont, variables_both, variables_dich
-        # as charachter, names of variables to be fitted for only specific type of data
 
+        # prepare sigma
+        stv_sigma <- stv[is.element(names(stv),names(stv_sigma))]
+        stv <-  stv[!is.element(names(stv),names(stv_sigma))]
 
+        xsigma <-  model.matrix(formula_sigma,data[type == type_cont,])
+        colnames(xsigma) <- paste0(colnames(xsigma),"_h")
+        sigma <- exp(xsigma %*% stv_sigma[colnames(xsigma)])
+
+        # prepare data
         x1 <- x[type == type_cont,c(variables_cont,variables_both)]
         x2 <-  x[type == type_dich,c(variables_dich,variables_both)]
         y1 <- y[type == type_cont]
         y2 <-  y[type == type_dich]
 
 
-
-        # include vector of 1s for intercept ?
-        # if Intercept in stv_sigma but not in stv, than include ones
-        # names(stv_sigma) have to be same variable names as in formula but with _h at the ending
-
-
-        # CHECK:
-        # hat stv_sigma Namen am Ende ein _h? Wenn Nein, dann Error Meldung entsprechend
-        if(!is.element("(Intercept)",colnames(x)) & is.element("(Intercept)_h",names(stv_sigma))){
-          sigma <- exp( as.matrix(cbind(rep(1,dim(x1)[1]),x1)) %*% stv[is.element(names(stv),names(stv_sigma))]) # exp like in xreg?
-        }else{
-          sigma <- exp( x1[,unlist(strsplit(names(stv_sigma),"_h"))] %*% stv[is.element(names(stv),names(stv_sigma))])
-        }
-        # IDEA: use formula_sigma as input of function and then use model.matrix(formula_sigma,data) here ?
-
-
+        #prepare stv
         theta <- exp(stv[is.element(names(stv),c("theta"))][[1]])
-        stv_cont <- stv[!is.element(names(stv),c("sigma","theta", variables_dich,names(stv_sigma)))]
-        stv_dich <- stv[!is.element(names(stv),c("sigma","theta", variables_cont,names(stv_sigma)))]
+        stv_cont <- stv[!is.element(names(stv),c("sigma","theta", variables_dich))]
+        stv_dich <- stv[!is.element(names(stv),c("sigma","theta", variables_cont))]
 
+
+        # linear predictors
         # use formula_orig for non-linear functions
         Xb1 <- x1 %*% stv_cont[colnames(x1)] # hier könnte man ggf nur TTO spezifische Variablen einfließen lassen, Interaktionen etc beachten
         Xb2 <- x2 %*% stv_dich[colnames(x2)]
-
-
         Xb2 <- Xb2*theta
 
+
+        # pvals and Likelihood calculation
         logistic_tmp <- 0.5 + 0.5*tanh(Xb2/2)
         pvals2 <- log(y2 *logistic_tmp + (1-y2)* (1-logistic_tmp)) # dich_logistic
 
-        # Likelihood calculation
         pvals1 <- dnorm(y1, mean=Xb1, sd=sigma, log=TRUE) # cont_normal
 
         # for box constraints:
-
         #in xreg:
         if(upper != Inf ){
           censV <- y1 == upper
@@ -280,14 +233,6 @@ FLXMRhyreg_het <- function(formula= . ~ .,
           pvals1[which(censV)] <- log(pnorm((Xb1[censV]-(-Inf))/sigma[censV],0,1) - pnorm((Xb1[censV]-lower)/sigma,0,1))
         }
 
-        # if(upper != Inf){
-        #   censV <- y1 == upper # adapt for lower
-        #   pvals1[which(censV)] <- pnorm(q = Xb1[censV], mean = upper, sd = sigma[censV], lower.tail = T, log.p = T) -  # mean = 2 in xreg
-        #     pnorm(q =  Xb1[censV], mean = lower, sd = sigma[censV], lower.tail = T, log.p = T) # mean = Inf in xreg
-        #   # or do we have to use log.p = F and than log(pnorm() - pnorm())?
-        # }
-
-
 
         pvals <- c(pvals1,pvals2)
 
@@ -295,9 +240,8 @@ FLXMRhyreg_het <- function(formula= . ~ .,
         pvals[pvals == -Inf] <- log(.Machine$double.xmin) # or without log?
         pvals[pvals == Inf] <- log(.Machine$double.xmax)
 
-        # what to do with NaN
 
-
+        # use weights for EM algo
         pvals_w <- pvals * w
 
 
@@ -307,57 +251,77 @@ FLXMRhyreg_het <- function(formula= . ~ .,
       }
 
 
-       bbmle::parnames(logLik2) <- c(colnames(x),"theta",names(stv_sigma)) # set names of inputs for logLik2
-
-       if(!exists("counter")){
-         counter <<- 1
-
-         # use different stv for different components
-         # implement stv as lits? and ask if it is a list, then
-         # use stv[[counter]] as stv
-         # for the next iterations of EM its not requried since we use component$coef
-
-         if(class(stv) == "list"){
-           stv <- stv[[counter]]
-           stv_sigma <- stv_sigma[[counter]]
-         }
-         fit_mle <- bbmle::mle2(minuslogl = logLik2,
-                                start = c(stv,stv_sigma),
-                                optimizer = optimizer,
-                                method = opt_method,
-                                lower = lower,
-                                upper = upper)
-
-       }else{
-         if(counter < k){
-           counter <<- counter + 1
-
-           if(class(stv) == "list"){
-             stv <- stv[[counter]]
-             stv_sigma <- stv_sigma[[counter]]
-           }
-
-           fit_mle <- bbmle::mle2(minuslogl = logLik2,
-                                  start = c(stv,stv_sigma),
-                                  optimizer = optimizer,
-                                  method = opt_method,
-                                  lower = lower,
-                                  upper = upper)
+      # changes names of stv_sigma to be able to get estimates for it
+      names(stv_sigma) <- paste0(names(stv_sigma),"_h")
+      bbmle::parnames(logLik2) <- c(colnames(x),"theta",names(stv_sigma)) # set names of inputs for logLik2
 
 
-         }else{
-           stv_new <- setNames(c(component$coef,component$theta,component$sigma),c(colnames(x),"theta",names(stv_sigma)))
-           fit_mle <- bbmle::mle2(minuslogl = logLik2,
-                                  start = stv_new,
-                                  optimizer = optimizer,
-                                  method = opt_method,
-                                  lower = lower,
-                                  upper = upper)
-         }
-       }
+
+      ### MODEL ESTIMATION ###
+      if(!exists("counter")){
+        counter <<- 1
+
+
+        # use different stv for different components
+        # implement stv as lits? and ask if it is a list, then
+        # use stv[[counter]] as stv
+        # for the next iterations of EM its not requried since we use component$coef
+
+        stv_in <- stv # without sigma !
+        stv_sigma_in <- stv_sigma
+
+        if(is.list(stv)){
+          stv_in <- stv[[counter]]
+        }
+        if(is.list(stv_sigma)){
+          stv_sigma_in <- stv_sigma[[counter]]
+        }
+
+
+        fit_mle <- bbmle::mle2(minuslogl = logLik2,
+                               start = c(stv_in,stv_sigma_in),
+                               optimizer = optimizer,
+                               method = opt_method,
+                               lower = lower,
+                               upper = upper)
+
+      }else{
+        if(counter < k){
+          counter <<- counter + 1
+
+
+          stv_in <- stv # without sigma !
+          stv_sigma_in <- stv_sigma
+
+          if(is.list(stv)){
+            stv_in <- stv[[counter]]
+          }
+          if(is.list(stv_sigma)){
+            stv_sigma_in <- stv_sigma[[counter]]
+          }
+
+
+          fit_mle <- bbmle::mle2(minuslogl = logLik2,
+                                 start = c(stv,stv_sigma),
+                                 optimizer = optimizer,
+                                 method = opt_method,
+                                 lower = lower,
+                                 upper = upper)
+
+
+        }else{
+          stv_new <- setNames(c(component$coef,component$theta,component$sigma),c(colnames(x),"theta",names(stv_sigma)))
+          fit_mle <- bbmle::mle2(minuslogl = logLik2,
+                                 start = stv_new,
+                                 optimizer = optimizer,
+                                 method = opt_method,
+                                 lower = lower,
+                                 upper = upper)
+        }
+      }
 
       z@defineComponent(para = list(coef = fit_mle@coef[!is.element(names(fit_mle@coef),c(names(stv_sigma),"theta"))],
-                                    df = ncol(x)+1, # not changed yet
+                                    df = ncol(x) + 1, # wrong? how to change
                                     sigma = fit_mle@coef[is.element(names(fit_mle@coef),names(stv_sigma))],
                                     theta = fit_mle@coef[is.element(names(fit_mle@coef),c("theta"))],
                                     fit_mle = fit_mle,
