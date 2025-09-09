@@ -39,17 +39,20 @@ new_stv <- getstv(mod)
 
 ### use new_stv in new model ###
 
-#'mod <- hyreg2(formula = formula,
+formula <- y ~  -1 + x1 + x2 + x3 | id
+k <- 2
+hyflex_mod <- hyreg2(formula = formula,
                     data =  simulated_data_norm,
                     type =  simulated_data_norm$type,
                     stv = new_stv,
-                    k = 2,
+                    k = k,
                     type_cont = "TTO",
                     type_dich = "DCE_A",
                     opt_method = "L-BFGS-B",
                     control = control,
                     latent = "both",
                     id_col = "id"
+)
 }
 \author{
 Kim Rand & Svenja Elkenkamp

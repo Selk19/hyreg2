@@ -16,7 +16,7 @@
 #'            has to be a list of named vectores if different start values are assumed for the latent classes
 #'            has to include start values for sigma and theta as well
 #'            Using colnames(model.matrix(formula,data)) (formula without |) you can check, which variables need a stv value.
-#'  @param stv_sigma named vector with start values for sigma. Have to be the same variables as given in formula_sigma
+#' @param stv_sigma named vector with start values for sigma. Have to be the same variables as given in formula_sigma
 #' @param offset offset as in flexmix
 #' @param optimizer optimizer to be used in bbmle::mle2, default = "optim"
 #' @param opt_method optimization method to be used in optimizer, default = "BFGS"
@@ -88,7 +88,7 @@ hyreg2_het <-function(formula,
                   variables_both = NULL,
                   variables_dich = NULL,
                   variables_cont = NULL,
-                  non_linear = FALSE,
+               #   non_linear = FALSE,
                   # additional arguments for flexmix or optimizer ?
 
                   # MISSING:
@@ -244,10 +244,10 @@ hyreg2_het <-function(formula,
   # NOT IMPLEMENTED YET
 
   formula_orig <- formula
-  if(non_linear == TRUE){
-    # formula <- function to keep only names of data columns
-  }
-  # for linear functoins formula and formula_orig are the same
+  # if(non_linear == TRUE){
+  #   # formula <- function to keep only names of data columns
+  # }
+  # # for linear functoins formula and formula_orig are the same
 
 
 

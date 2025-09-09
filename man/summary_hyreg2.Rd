@@ -16,7 +16,7 @@ summary object of bbmle::mle2 model
 get model parameters of hyreg2 model
 }
 \examples{
-#'formula <- y ~  -1 + x1 + x2 + x3 | id
+formula <- y ~  -1 + x1 + x2 + x3 | id
 k <- 2
 stv <- setNames(c(0.2,0,1,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
 control = list(iter.max = 1000, verbose = 4)

@@ -24,7 +24,6 @@ hyreg2(
   variables_both = NULL,
   variables_dich = NULL,
   variables_cont = NULL,
-  non_linear = FALSE,
   ...
 )
 }

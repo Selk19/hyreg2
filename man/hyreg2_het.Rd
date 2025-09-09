@@ -26,7 +26,6 @@ hyreg2_het(
   variables_both = NULL,
   variables_dich = NULL,
   variables_cont = NULL,
-  non_linear = FALSE,
   ...
 )
 }
@@ -48,11 +47,12 @@ hyreg2_het(
 \item{control}{control vector for flexmix::flexmix}
 
 \item{stv}{named vector or list of named vactors containing start values,
-          has to be a vector if the same start values should be used for all latent classes,
-          has to be a list of named vectores if different start values are assumed for the latent classes
-          has to include start values for sigma and theta as well
-          Using colnames(model.matrix(formula,data)) (formula without |) you can check, which variables need a stv value.
-@param stv_sigma named vector with start values for sigma. Have to be the same variables as given in formula_sigma}
+has to be a vector if the same start values should be used for all latent classes,
+has to be a list of named vectores if different start values are assumed for the latent classes
+has to include start values for sigma and theta as well
+Using colnames(model.matrix(formula,data)) (formula without |) you can check, which variables need a stv value.}
+
+\item{stv_sigma}{named vector with start values for sigma. Have to be the same variables as given in formula_sigma}
 
 \item{offset}{offset as in flexmix}
 

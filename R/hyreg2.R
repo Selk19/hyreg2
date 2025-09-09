@@ -83,7 +83,7 @@ hyreg2 <-function(formula,
                   variables_both = NULL,
                   variables_dich = NULL,
                   variables_cont = NULL,
-                  non_linear = FALSE,
+              #    non_linear = FALSE,
                   # additional arguments for flexmix or optimizer ?
 
                   # MISSING:
@@ -230,9 +230,9 @@ hyreg2 <-function(formula,
   # NOT IMPLEMENTED YET
 
   formula_orig <- formula
-  if(non_linear == TRUE){
+#  if(non_linear == TRUE){
     # formula <- function to keep only names of data columns
-  }
+#  }
   # for linear functoins formula and formula_orig are the same
 
 
@@ -393,7 +393,7 @@ hyreg2 <-function(formula,
 #'
 #' @author Kim Rand & Svenja Elkenkamp
 #' @examples
-#' #'formula <- y ~  -1 + x1 + x2 + x3 | id
+#'formula <- y ~  -1 + x1 + x2 + x3 | id
 #'k <- 2
 #'stv <- setNames(c(0.2,0,1,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
 #'control = list(iter.max = 1000, verbose = 4)
@@ -467,17 +467,25 @@ summary_hyreg2 <- function(object){
 #'
 #'### use new_stv in new model ###
 #'
-#'#'mod <- hyreg2(formula = formula,
+
+# random numbers from normal dist
+#'formula <- y ~  -1 + x1 + x2 + x3 | id
+
+#'k <- 2
+
+#'hyflex_mod <- hyreg2(formula = formula,
 #'                     data =  simulated_data_norm,
 #'                     type =  simulated_data_norm$type,
 #'                     stv = new_stv,
-#'                     k = 2,
+#'                     k = k,
 #'                     type_cont = "TTO",
 #'                     type_dich = "DCE_A",
 #'                     opt_method = "L-BFGS-B",
 #'                     control = control,
 #'                     latent = "both",
 #'                     id_col = "id"
+#')
+
 #' @export
 
 getstv <- function(mod){
