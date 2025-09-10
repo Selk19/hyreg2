@@ -1,5 +1,5 @@
 
-#' FLXMRhyreg_het
+#' FLXMRhyreg_het: M-step driver to be used in flexmix accounting for heteroscedastisity
 #'
 #' @description Function used in flexmix M-Step to estimate hybrid model accounting for heteroscedastisity
 #'

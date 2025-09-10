@@ -2,7 +2,7 @@
 # Write R package
 # https://tinyheero.github.io/jekyll/update/2015/07/26/making-your-first-R-package.html
 
-#' FLXMRhyreg
+#' FLXMRhyreg: M-step driver to be used in flexmix
 #'
 #' @description Function used in flexmix M-Step to estimate hybrid model
 #'
