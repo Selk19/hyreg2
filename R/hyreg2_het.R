@@ -1,22 +1,22 @@
 
-#' hyreg2_het: function for model estimation for EQ5D valueset data accounting for heteroscasticity in TTO
+#' hyreg2_het: function for model estimation for EQ5D valueset data accounting for heteroscedasticity in TTO
 #'
 #' @description Estimation of hybrid model for EQ-5D data
 #'
-#' @param formula Model formula
+#' @param formula linear model formula
 #' @param formula_sigma formula for sigma estimation, if not provided formula is taken without |
 #' @param data a dataframe containing the data
 #' @param type a vector containing an indicator wheter that datapoint contains to TTO or DCE Data
-#' @param type_cont indicator for continous data
-#' @param type_dich indicator for dichotoums data
+#' @param type_cont indicator for continous data, part of type
+#' @param type_dich indicator for dichotoums data,  part of type
 #' @param k numeric, number of latent classes to be estimated via flexmix::flexmix
 #' @param control control vector for flexmix::flexmix
-#' @param stv named vector or list of named vactors containing start values,
+#' @param stv named vector or list of named vactors containing start values for all coefficients from formula,
 #'            has to be a vector if the same start values should be used for all latent classes,
 #'            has to be a list of named vectores if different start values are assumed for the latent classes
-#'            has to include start values for sigma and theta as well
+#'            has to include start values for sigma and theta as well and it is important to use the names "theta" and "sigma"
 #'            Using colnames(model.matrix(formula,data)) (formula without |) you can check, which variables need a stv value.
-#' @param stv_sigma named vector with start values for sigma. Have to be the same variables as given in formula_sigma
+#' @param stv_sigma named vector with start values for sigma. Have to be the same variables as given in formula_sigma. Should NOT end with _h
 #' @param offset offset as in flexmix
 #' @param optimizer optimizer to be used in bbmle::mle2, default = "optim"
 #' @param opt_method optimization method to be used in optimizer, default = "BFGS"
@@ -27,11 +27,27 @@
 #' @param classes_only logical, default FALSE, indicate if only classification should be done without estimating model parameters
 #'                    only possible for latent = "cont" or "dich"
 #' @param variables_both character vactor; variables to be fitted on TTO and DCE data, if not specified all variables from formula are used
-#' @param variables_cont character vactor; variables to be fitted only on TTO data
-#' @param variables_dich character vactor; variables to be fitted only on DCE data
+#' @param variables_cont character vactor; variables to be fitted only on TTO data, if provided variables_both and variables_dich have to be provided as well.
+#'                          Then all variables from stv have to be part in exactly one of the vectors variables_cont, variables_dich and variables_both.
+#'                          A vector can also be set to NULL while the others contain all variables
+#' @param variables_dich character vactor; variables to be fitted only on DCE data, if provided variables_both and variables_cont have to be provided as well.
+#'                          Then all variables from stv have to be part in exactly one of the vectors variables_cont, variables_dich and variables_both.
+#'                          A vector can also be set to NULL while the others contain all variables
 #' @param ... additional arguments for flexmix::flexmix or bbmle::mle2
 #'
-#' @return model of type flemix
+#' @return model of type flemix, coefficients named ..._h are coefficients for heteroscedasticity
+#'
+#' @details
+#' Using input latent = "both" means, that latent classes are estimated on both parts of the data: TTO and DCE.
+#' Using latent = "cont" the latent classes are estimated only on the TTO part and afterwards with these classes the combined likelihood of normal and binomial distribution
+#' is used to estimate the model parameters. Using latent = "dich" the latent classes are estimated only on the DCE partand afterwards with these classes the combined likelihood of normal and binomial distribution
+#' is used to estimate the model parameters. id_col has to be specified and only people with observations in both parts of the data are taken into account, hence it can happen that some
+#' ids are removed from the estimation.
+#'
+#'
+#' For datasets individuals with more than one observation it can be useful to estimate the latent classes for the individuals instead of for each datapoint;
+#' use | idcolumn in the formula.
+#'
 #'
 #' @author Svenja Elkenkamp & Kim Rand
 #' @examples
