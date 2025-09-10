@@ -403,9 +403,6 @@ mod1 <- hyreg2_het(formula = formula,
 # Error in names(object) <- nm : attempt to set an attribute on NULL
 # use rm(counter) and try again
 
-# using stv as list:
-# estimates are just the start values except sigma
-# why does this happen? optimizer seem not to work correct here
 
 
 ### SUMMARY ###
