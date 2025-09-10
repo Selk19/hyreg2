@@ -1,9 +1,9 @@
 Package: xreg2
 Type: Package
-Title: What the Package Does (Title Case)
+Title: An R package for EQ5D valuesets estimation including latent classes
 Version: 0.1.0
 Author: Kim Rand & Svenja Elkenkamp
-Maintainer: The package maintainer <yourself@somewhere.net>
+Maintainer: <krand@mathsinhealth.com> <svenja.elkenkamp@uni-bielefeld.de> 
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
 License: What license is it under?
