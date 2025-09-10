@@ -355,6 +355,7 @@ summary_hyreg2(modMO2)
 ####################################################
 
 # data
+library(EQ5Ddata)
 TTOonly <- hyregdata[hyregdata$method == "TTO" & hyregdata$fb_flagged == 0 & hyregdata$state_id > 0,]
 DCEonly <- hyregdata[hyregdata$method == "DCE_A" & hyregdata$state_id < 197,]
 
@@ -366,9 +367,9 @@ data <- rbind(TTOonly,DCEonly)
 formula <- value ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad3 +
   mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5 | id
 
-k <- 2
+k <- 1
 
-control = list(iter.max = 5000, verbose = 5)
+control = list(iter.max = 10000, verbose = 5)
 
 # for het
 formula_sigma <- value ~  mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad3 +
@@ -379,11 +380,11 @@ stv_sigma <- setNames(c(rep(0.1,20),1),c(colnames(data)[17:36],c("(Intercept)"))
 
 
 mod1 <- hyreg2_het(formula = formula,
-                   formula_sigma = formula_sigma,
+                  # formula_sigma = formula_sigma,
                    data = data,
                    type = data$method,
                    stv = stvs,
-                   stv_sigma = stv_sigma,
+                  # stv_sigma = stv_sigma,
                    #   upper = 2,
                    #   lower = 0,
                    k = k,
