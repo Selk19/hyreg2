@@ -27,7 +27,7 @@
 #'
 #' @return a model, that can be used in hyreg2 as input for parameter model or
 #'
-#' @author Kim Rand & Svenja Elkenkamp
+#' @author Svenja Elkenkamp & Kim Rand
 #' @examples
 #'
 #'formula <- y ~  -1 + x1 + x2 + x3

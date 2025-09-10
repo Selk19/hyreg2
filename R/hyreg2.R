@@ -33,7 +33,7 @@
 #'
 #' @return model of type flemix
 #'
-#' @author Kim Rand & Svenja Elkenkamp
+#' @author Svenja Elkenkamp & Kim Rand
 #' @examples
 #'
 #'formula <- y ~  -1 + x1 + x2 + x3 | id
