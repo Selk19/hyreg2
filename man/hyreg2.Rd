@@ -28,24 +28,24 @@ hyreg2(
 )
 }
 \arguments{
-\item{formula}{Model formula}
+\item{formula}{linear model formula}
 
 \item{data}{a dataframe containing the data}
 
 \item{type}{a vector containing an indicator wheter that datapoint contains to TTO or DCE Data}
 
-\item{type_cont}{indicator for continous data}
+\item{type_cont}{indicator for continous data, part of type}
 
-\item{type_dich}{indicator for dichotoums data}
+\item{type_dich}{indicator for dichotoums data, part of type}
 
 \item{k}{numeric, number of latent classes to be estimated via flexmix::flexmix}
 
 \item{control}{control vector for flexmix::flexmix}
 
-\item{stv}{named vector or list of named vactors containing start values,
+\item{stv}{named vector or list of named vactors containing start values for all coefficients from formula,
 has to be a vector if the same start values should be used for all latent classes,
 has to be a list of named vectores if different start values are assumed for the latent classes
-has to include start values for sigma and theta as well
+has to include start values for sigma and theta as well and it is important to use the names "theta" and "sigma"
 Using colnames(model.matrix(formula,data)) (formula without |) you can check, which variables need a stv value.}
 
 \item{offset}{offset as in flexmix}
@@ -67,9 +67,13 @@ only possible for latent = "cont" or "dich"}
 
 \item{variables_both}{character vactor; variables to be fitted on TTO and DCE data, if not specified all variables from formula are used}
 
-\item{variables_dich}{character vactor; variables to be fitted only on DCE data}
+\item{variables_dich}{character vactor; variables to be fitted only on DCE data, if provided variables_both and variables_cont have to be provided as well.
+Then all variables from stv have to be part in exactly one of the vectors variables_cont, variables_dich and variables_both.
+A vector can also be set to NULL while the others contain all variables}
 
-\item{variables_cont}{character vactor; variables to be fitted only on TTO data}
+\item{variables_cont}{character vactor; variables to be fitted only on TTO data, if provided variables_both and variables_dich have to be provided as well.
+Then all variables from stv have to be part in exactly one of the vectors variables_cont, variables_dich and variables_both.
+A vector can also be set to NULL while the others contain all variables}
 
 \item{...}{additional arguments for flexmix::flexmix or bbmle::mle2}
 }
@@ -78,6 +82,17 @@ model of type flemix
 }
 \description{
 Estimation of hybrid model for EQ-5D data, not implemnted for het yet
+}
+\details{
+Using input latent = "both" means, that latent classes are estimated on both parts of the data: TTO and DCE.
+Using latent = "cont" the latent classes are estimated only on the TTO part and afterwards with these classes the combined likelihood of normal and binomial distribution
+is used to estimate the model parameters. Using latent = "dich" the latent classes are estimated only on the DCE partand afterwards with these classes the combined likelihood of normal and binomial distribution
+is used to estimate the model parameters. id_col has to be specified and only people with observations in both parts of the data are taken into account, hence it can happen that some
+ids are removed from the estimation.
+
+
+For datasets individuals with more than one observation it can be useful to estimate the latent classes for the individuals instead of for each datapoint;
+use | idcolumn in the formula.
 }
 \examples{
 
@@ -102,5 +117,5 @@ mod <- hyreg2(formula = formula,
 summary_hyreg2(mod)
 }
 \author{
-Kim Rand & Svenja Elkenkamp
+Svenja Elkenkamp & Kim Rand
 }

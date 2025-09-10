@@ -103,5 +103,5 @@ model <- FLXMRhyreg_het(formula = formula,
 )
 }
 \author{
-Kim Rand & Svenja Elkenkamp
+Svenja Elkenkamp & Kim Rand
 }
