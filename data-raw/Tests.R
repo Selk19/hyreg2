@@ -181,7 +181,7 @@ hyb
 
 
 ####################################
-#### USING SIMULATED DATA (EQ5D) ###
+#### USING SIMULATED_DATA (EQ5D) ###
 ####################################
 
 ### with simulated_data ###
@@ -380,11 +380,11 @@ stv_sigma <- setNames(c(rep(0.1,20),1),c(colnames(data)[17:36],c("(Intercept)"))
 
 
 mod1 <- hyreg2_het(formula = formula,
-                  # formula_sigma = formula_sigma,
+                   formula_sigma = formula_sigma, # if not provided, same as formula is taken
                    data = data,
                    type = data$method,
                    stv = stvs,
-                  # stv_sigma = stv_sigma,
+                   stv_sigma = stv_sigma, # if not provided all variables from formula_sigma set to 0.1
                    #   upper = 2,
                    #   lower = 0,
                    k = k,
@@ -393,7 +393,10 @@ mod1 <- hyreg2_het(formula = formula,
                    opt_method = "L-BFGS-B",
                    control = control,
                    latent = "both",
-                   id_col = "id"
+                   id_col = "id",
+                  # variables_cont = c("mo5","sc5"),
+                 #  variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
+                  #  "mo4","sc4","ua4","pd4","ad4","ua5","pd5", "ad5")
 )
 
 # if you get an Error like this:
