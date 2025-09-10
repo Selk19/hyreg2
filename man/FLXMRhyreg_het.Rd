@@ -2,7 +2,7 @@
 % Please edit documentation in R/FLXMRhyreg_het.R
 \name{FLXMRhyreg_het}
 \alias{FLXMRhyreg_het}
-\title{FLXMRhyreg_het}
+\title{FLXMRhyreg_het: M-step driver to be used in flexmix accounting for heteroscedastisity}
 \usage{
 FLXMRhyreg_het(
   formula = . ~ .,

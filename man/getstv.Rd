@@ -7,10 +7,10 @@
 getstv(mod)
 }
 \arguments{
-\item{mod}{modeloutput from hyreg2(...k = 1, latent = "both", ...)}
+\item{mod}{modeloutput from hyreg2 oder hyreg2_het using k = 1 and latent = "both"}
 }
 \value{
-named vector
+named vector of parameter estimates from mod. Can be used as stv for additional model estimations
 }
 \description{
 function to export coefficent values and names from a model fitted with k = 1 and latent = "both".

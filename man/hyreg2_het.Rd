@@ -2,7 +2,7 @@
 % Please edit documentation in R/hyreg2_het.R
 \name{hyreg2_het}
 \alias{hyreg2_het}
-\title{hyreg2_het}
+\title{hyreg2_het: function for model estimation for EQ5D valueset data accounting for heteroscasticity in TTO}
 \usage{
 hyreg2_het(
   formula,
@@ -83,7 +83,7 @@ only possible for latent = "cont" or "dich"}
 model of type flemix
 }
 \description{
-Estimation of hybrid model for EQ-5D data, not implemnted for het yet
+Estimation of hybrid model for EQ-5D data
 }
 \examples{
 formula <- y ~  -1 + x1 + x2 + x3

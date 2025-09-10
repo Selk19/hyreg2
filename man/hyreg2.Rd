@@ -2,7 +2,7 @@
 % Please edit documentation in R/hyreg2.R
 \name{hyreg2}
 \alias{hyreg2}
-\title{hyreg2}
+\title{hyreg2: function for model estimation for EQ5D valueset data}
 \usage{
 hyreg2(
   formula,

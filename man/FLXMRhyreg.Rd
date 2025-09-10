@@ -2,7 +2,7 @@
 % Please edit documentation in R/FLXMRhyreg.R
 \name{FLXMRhyreg}
 \alias{FLXMRhyreg}
-\title{FLXMRhyreg}
+\title{FLXMRhyreg: M-step driver to be used in flexmix}
 \usage{
 FLXMRhyreg(
   formula = . ~ .,
