@@ -315,6 +315,9 @@ hyreg2 <-function(formula,
      mod <- flexmix::flexmix(formula = formula, data = data_cont, k = k, model = model, control = control)
      rm(counter, envir = .GlobalEnv)
 
+
+
+     # id_col must be something different than id if each observation should be classified
      data_cont$mod_comp <- mod@cluster
 
      data$roworder <- 1:nrow(data)

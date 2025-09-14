@@ -28,7 +28,7 @@ hyflex_mod <- hyreg2(formula = formula,
                      type_dich = "DCE_A",
                      opt_method = "L-BFGS-B",
                      control = control,
-                     latent = "both",
+                     latent = "cont",
                      id_col = "id"
 )
 
@@ -49,6 +49,8 @@ sum((proof$class == proof$mod_comp)/dim(proof)[1])
 # with latent == "dich" we get warning
 # In bbmle::mle2(minuslogl = logLik2, start = stv_new, optimizer = optimizer,  :
 #                  convergence failure: code=52 (ERROR: ABNORMAL_TERMINATION_IN_LNSRCH)
+
+
 
 
 
@@ -251,7 +253,7 @@ sum((proof$class == proof$mod_comp)/dim(proof)[1])
 
 #### Using simulated_data_mo ####
 
-formula <- y ~ -1 + mo2 + mo3 + mo4 +  mo5 | id
+formula <- y ~ -1 + mo2 + mo3 + mo4 +  mo5 |id
 
 
 k <- 2
