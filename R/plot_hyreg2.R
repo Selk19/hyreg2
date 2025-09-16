@@ -8,7 +8,7 @@
 #' @param data a dataframe, which was used to estimate the model
 #' @param model a flexmix model object estimtaed using hyreg2 or hyreg2_het
 #' @param id one character, indicator for the column holding the ids, this column must be part of the provided dataframe.
-#'          the parameter must be specified, if the provided model was estimated under controll for | id
+#'          the parameter must be specified, if the provided model was estimated under control for | id
 #'
 #'
 #' @return dataframe of two columns, first column named as provided id column or "observation" if id was not given as
@@ -65,10 +65,11 @@
 #' give_id(data = simulated_data_norm,
 #' model = hyflex_mod)
 #'
-#' @author Svenja Elkenkamp & Kim Rand
+#' @author Svenja Elkenkamp & John Grosser
 #' @export
 #'
 #'
+
 
 
 give_id <- function(data,
@@ -78,7 +79,7 @@ give_id <- function(data,
 
     if(!is.list(model)){
       if(!is.null(id)){
-        ids_comp <- data.frame(unique(data[,id]),model@cluster)
+        ids_comp <- data.frame(data[,id],model@cluster)
         colnames(ids_comp) <- c(id,"mod_comp")
       }else{
         data$mod_comp <- model@cluster
@@ -98,9 +99,6 @@ give_id <- function(data,
 
 
 
-
-
-
 #' plot_hyreg2: plot function to visualize the classification based on the model
 #'
 #' @description This function can be used to visualize the classification based on the model for different variables.
@@ -114,6 +112,8 @@ give_id <- function(data,
 #' @param id_df_model dataframe of two columns indicating which id belongs to which class,
 #'                  first column named id_col_data, second column named mod_comp.
 #'                  this variable can easily be filled using the output of give_id().
+#' @param type_to_plot list of two charachter elements. First: columnname of column containing indicator for type of data,
+#'                       Second: value of column type, that should be used for the plot
 #' @param colors charachter vector, colors to be used in ggplot, default is NULL - than colors are choosen automalically
 #'
 #'
@@ -147,17 +147,28 @@ give_id <- function(data,
 #'                     id_col = "id"
 #')
 
-#'# plotting the variables x2 against y
+#'# plotting the variables id against y
 #'plot_hyreg(data = simulated_data_norm,
-#'           x = "x2",
+#'           x = "id",
 #'           y = "y",
 #'           id_col_data = "id",
 #'           id_df_model = give_id(data = simulated_data_norm,
 #'                                 model = hyflex_mod,
 #'                                 id = "id"))
 #'
+#' # using only TTO data
+#'plot_hyreg(data = simulated_data_norm,
+#'           x = "id",
+#'           y = "y",
+#'           id_col_data = "id",
+#'           id_df_model = give_id(data = simulated_data_norm,
+#'                                 model = hyflex_mod,
+#'                                 id = "id"),
+#'            type_to_plot = list("type","TTO"))
 #'
-#'  ### model without control for id during | id ###
+#'
+#'
+#' ### model without control for id during | id ###
 #'formula <- y ~  -1 + x1 + x2 + x3
 #'k <- 2
 #'stv <- setNames(c(0.2,0.2,0.2,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
@@ -188,7 +199,7 @@ give_id <- function(data,
 #'                                 id = "observation"))
 #'
 #'
-#' @author Svenja Elkenkamp & Kim Rand
+#' @author Svenja Elkenkamp & John Grosser
 #' @importFrom ggplot2 ggplot
 #' @export
 #'
@@ -200,12 +211,17 @@ plot_hyreg <- function(data,
                        y,
                        id_col_data,
                        id_df_model,  # you can use give_id() to generate id_df
+                       type_to_plot = NULL, #list of two elements list("type","TTO")
                        colors = NULL # optional colour vector
 ){
 
 
   colnames(id_df_model) <- c(id_col_data,"mod_comp")
   data <- merge(data, id_df_model, by = id_col_data)
+
+  if(!is.null(type_to_plot)){
+    data <- data[(data[,type_to_plot[[1]]]) == type_to_plot[[2]],]
+  }
 
 library(ggplot2)
  p <-  ggplot2::ggplot(mapping =aes(x = data[,x], y = data[,y], color = as.character(data$mod_comp)))
@@ -225,6 +241,8 @@ library(ggplot2)
  return(p)
 
 }
+
+
 
 
 

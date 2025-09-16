@@ -1,13 +1,10 @@
 ### TEST PLOT ###
 
-
-
-
 ### TEST simulated_data_norm ###
 
 # true classes
 plot_hyreg(data = simulated_data_norm,
-           x = "x2",
+           x = "id",
            y = "y",
            id_col_data = "id",
            id_df_model = simulated_data_norm[,c("id","class")])
@@ -30,13 +27,12 @@ plot_hyreg(data = simulated_data_norm,
            id_df_model = simulated_data_norm[,c("id","class")])
 
 # model classification
-plot_hyreg(data = simulated_data_norm[simulated_data_norm$type == "TTO",],
-           x = "x2",
+plot_hyreg(data = simulated_data_norm,
+           x ="id",
            y = "y",
            id_col_data = "id",
-           id_df_model = give_id(data = simulated_data_norm[simulated_data_norm$type == "TTO",],
-                                 model = hyflex_mod,
-                                 id = "id"))
+           id_df_model = give_id(simulated_data_norm,hyflex_mod,"id"),
+           type_to_plot = list("type","DCE_A"))
 
 
 
@@ -112,16 +108,16 @@ simulated_data_mo$idn <- rownames(simulated_data_mo)
 
 # all ids
 plot_hyreg(simulated_data_mo,
-           "id",
+           "mo",
            "y",
-           "idn",
-           give_id(simulated_data_mo,modMO,"idn"))
+           "id",
+           give_id(simulated_data_mo,modMO,"id"))
 
 # only TTO ids
 plot_hyreg(simulated_data_mo[simulated_data_mo$type == "TTO",],
            "id",
            "y",
-           "idn",
-           give_id(simulated_data_mo,modMO,"idn")[simulated_data_mo$type == "TTO",])
+           "id",
+           give_id(simulated_data_mo,modMO,"id")[simulated_data_mo$type == "TTO",])
 
 
