@@ -4,7 +4,15 @@
 \alias{plot_hyreg}
 \title{plot_hyreg2: plot function to visualize the classification based on the model}
 \usage{
-plot_hyreg(data, x, y, id_col_data, id_df_model, colors = NULL)
+plot_hyreg(
+  data,
+  x,
+  y,
+  id_col_data,
+  id_df_model,
+  type_to_plot = NULL,
+  colors = NULL
+)
 }
 \arguments{
 \item{data}{a dataframe, which was used to estimate the model}
@@ -19,6 +27,9 @@ if model was estimated without | id, see details}
 \item{id_df_model}{dataframe of two columns indicating which id belongs to which class,
 first column named id_col_data, second column named mod_comp.
 this variable can easily be filled using the output of give_id().}
+
+\item{type_to_plot}{list of two charachter elements. First: columnname of column containing indicator for type of data,
+Second: value of column type, that should be used for the plot}
 
 \item{colors}{charachter vector, colors to be used in ggplot, default is NULL - than colors are choosen automalically}
 }
@@ -35,5 +46,5 @@ We recommend to create a new column "observation" in data using the rownames/obs
 and use this column as input for id_col_data in plot_hyreg2. For id_df_model you can use give_id(data,model,"observation")
 }
 \author{
-Svenja Elkenkamp & Kim Rand
+Svenja Elkenkamp & John Grosser
 }

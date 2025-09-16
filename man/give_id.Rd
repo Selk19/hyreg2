@@ -12,7 +12,7 @@ give_id(data, model, id = NULL)
 \item{model}{a flexmix model object estimtaed using hyreg2 or hyreg2_het}
 
 \item{id}{one character, indicator for the column holding the ids, this column must be part of the provided dataframe.
-the parameter must be specified, if the provided model was estimated under controll for | id}
+the parameter must be specified, if the provided model was estimated under control for | id}
 }
 \value{
 dataframe of two columns, first column named as provided id column or "observation" if id was not given as
@@ -26,5 +26,5 @@ This function can be used to decode the classified classes by the model and see,
 PUT DETAILS HERE
 }
 \author{
-Svenja Elkenkamp & Kim Rand
+Svenja Elkenkamp & John Grosser
 }

@@ -49,7 +49,7 @@
 #' use | idcolumn in the formula.
 #'
 #'
-#' @author Svenja Elkenkamp & Kim Rand
+#' @author Svenja Elkenkamp, Kim Rand & John Grosser
 #' @examples
 #'formula <- y ~  -1 + x1 + x2 + x3
 #'formula_sigma <- y ~  x1 + x2 + x3

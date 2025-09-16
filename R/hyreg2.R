@@ -46,7 +46,7 @@
 #' For datasets individuals with more than one observation it can be useful to estimate the latent classes for the individuals instead of for each datapoint;
 #' use | idcolumn in the formula.
 #'
-#' @author Svenja Elkenkamp & Kim Rand
+#' @author Svenja Elkenkamp, Kim Rand & John Grosser
 #' @examples
 #'
 #'formula <- y ~  -1 + x1 + x2 + x3 | id
