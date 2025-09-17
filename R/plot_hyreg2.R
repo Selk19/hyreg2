@@ -7,19 +7,19 @@
 #'
 #' @param data a dataframe, which was used to estimate the model
 #' @param model a flexmix model object estimtaed using hyreg2 or hyreg2_het
-#' @param id one character, indicator for the column holding the ids, this column must be part of the provided dataframe.
-#'          the parameter must be specified, if the provided model was estimated under control for | id
+#' @param id_col character string, name of grouping variable, which must be a column of the provided dataframe.
+#'          the parameter must be specified, if the provided model was estimated under control for groups
 #'
 #'
-#' @return dataframe of two columns, first column named as provided id column or "observation" if id was not given as
-#'          an input. second column named mod_comp indicating the assigned class for this id or observation
+#' @return dataframe of two columns, first column named as provided id_col  or "observation" if id_col was not given as
+#'          an input. second column named "mod_comp" indicating the assigned class for this group or observation
 #'
 #' @details PUT DETAILS HERE
 #'
-#' @example
+#' @examples
 #' # estimtae a model using simulated_data_rnorm
 #'
-#' ### using | id ####
+#' ### using grouping variable id ####
 #'formula <- y ~  -1 + x1 + x2 + x3 | id
 #'k <- 2
 #'stv <- setNames(c(0.2,0.2,0.2,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
@@ -41,10 +41,10 @@
 #' # use of function give_id
 #' give_id(data = simulated_data_norm,
 #' model = hyflex_mod,
-#' id = "id")
+#' id_col = "id")
 #'
 #'
-#'  ### model without control for id during | id ###
+#'  ### model without control for groups ###
 #'formula <- y ~  -1 + x1 + x2 + x3
 #'k <- 2
 #'stv <- setNames(c(0.2,0.2,0.2,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
@@ -74,13 +74,13 @@
 
 give_id <- function(data,
                     model,
-                    id = NULL) # id must be provided, if model was estimated using | id
+                    id_col = NULL) # id must be provided, if model was estimated using a grouping variable
   {
 
     if(!is.list(model)){
-      if(!is.null(id)){
-        ids_comp <- data.frame(data[,id],model@cluster)
-        colnames(ids_comp) <- c(id,"mod_comp")
+      if(!is.null(id_col)){
+        ids_comp <- data.frame(data[,id_col],model@cluster)
+        colnames(ids_comp) <- c(id_col,"mod_comp")
       }else{
         data$mod_comp <- model@cluster
         ids_comp <- data.frame(rownames(data),data[,"mod_comp"])
@@ -89,7 +89,7 @@ give_id <- function(data,
 
     }else{
       ids_comp <- model[[3]]
-      colnames(ids_comp) <- c(id,"mod_comp")
+      colnames(ids_comp) <- c(id_col,"mod_comp")
     }
 
     return(ids_comp)
@@ -104,16 +104,16 @@ give_id <- function(data,
 #' @description This function can be used to visualize the classification based on the model for different variables.
 #'              ggplot is used.
 #'
-#' @param data a dataframe, which was used to estimate the model
-#' @param x one charachter, column of data to be plotted in x-axis
-#' @param y one charachter, column of data to be plotted in y-axis
-#' @param id_col_data one charachter, column of data to identify the ids, same as was given in model.
-#'            if model was estimated without | id, see details
-#' @param id_df_model dataframe of two columns indicating which id belongs to which class,
-#'                  first column named id_col_data, second column named mod_comp.
-#'                  this variable can easily be filled using the output of give_id().
+#' @param data a dataframe, which was used to estimate the model during hyreg2 or hyreg2_het
+#' @param x charachter string, column of data to be plotted in x-axis
+#' @param y charachter string, column of data to be plotted in y-axis
+#' @param id_col charachter sting, grouping variable, same as was given in model.
+#'            if model was estimated without grouping see details
+#' @param id_df_model dataframe of two columns indicating which group belongs to which class,
+#'                  first column named as input id_col, second column named "mod_comp".
+#'                  this variable can easily be filled using the the give_id function, see details.
 #' @param type_to_plot list of two charachter elements. First: columnname of column containing indicator for type of data,
-#'                       Second: value of column type, that should be used for the plot
+#'                       Second: value of column type, that should be used for the plot, see details of hyreg inputs type and type_cont,type_dich
 #' @param colors charachter vector, colors to be used in ggplot, default is NULL - than colors are choosen automalically
 #'
 #'
@@ -121,11 +121,12 @@ give_id <- function(data,
 #' @return ggplot object visulizing x against y by classes from the model
 #'
 #' @details
-#' id_col_df has to be provided anyway, even if the model was estimated without | id.
-#' We recommend to create a new column "observation" in data using the rownames/observationnumbers as charachter values
-#' and use this column as input for id_col_data in plot_hyreg2. For id_df_model you can use give_id(data,model,"observation")
+#' id_col_df has to be provided anyway, even if the model was estimated without grouping variable.
+#' Since there might be no grouping varibale in the data, we recommend to create a new column "observation"
+#' in data using the rownames/observationnumbers as charachter values and use this column as
+#' input for id_col in plot_hyreg2, additionally you can then use id_df_model =  give_id(data,model,"observation")
 #'
-#' @example
+#' @examples
 #' # estimtate a model using simulated_data_rnorm
 #'
 #' ### using | id ####
@@ -148,19 +149,19 @@ give_id <- function(data,
 #')
 
 #'# plotting the variables id against y
-#'plot_hyreg(data = simulated_data_norm,
+#'plot_hyreg2(data = simulated_data_norm,
 #'           x = "id",
 #'           y = "y",
-#'           id_col_data = "id",
+#'           id_col = "id",
 #'           id_df_model = give_id(data = simulated_data_norm,
 #'                                 model = hyflex_mod,
 #'                                 id = "id"))
 #'
 #' # using only TTO data
-#'plot_hyreg(data = simulated_data_norm,
+#'plot_hyreg2(data = simulated_data_norm,
 #'           x = "id",
 #'           y = "y",
-#'           id_col_data = "id",
+#'           id_col = "id",
 #'           id_df_model = give_id(data = simulated_data_norm,
 #'                                 model = hyflex_mod,
 #'                                 id = "id"),
@@ -190,13 +191,13 @@ give_id <- function(data,
 #'
 #' simulated_data_norm_plot <- simulated_data_norm
 #' simulated_data_norm_plot$observation <- rownames(simulated_data_norm_plot)
-#'plot_hyreg(data = simulated_data_norm_plot,
+#'plot_hyreg2(data = simulated_data_norm_plot,
 #'           x = "x2",
 #'           y = "y",
-#'           id_col_data = "observation",
+#'           id_col = "observation",
 #'           id_df_model = give_id(data = simulated_data_norm_plot,
 #'                                 model = hyflex_mod,
-#'                                 id = "observation"))
+#'                                 id_col = "observation"))
 #'
 #'
 #' @author Svenja Elkenkamp & John Grosser
@@ -206,18 +207,18 @@ give_id <- function(data,
 #'
 
 # include colot option
-plot_hyreg <- function(data,
+plot_hyreg2 <- function(data,
                        x,
                        y,
-                       id_col_data,
+                       id_col,
                        id_df_model,  # you can use give_id() to generate id_df
                        type_to_plot = NULL, #list of two elements list("type","TTO")
                        colors = NULL # optional colour vector
 ){
 
 
-  colnames(id_df_model) <- c(id_col_data,"mod_comp")
-  data <- merge(data, id_df_model, by = id_col_data)
+  colnames(id_df_model) <- c(id_col,"mod_comp")
+  data <- merge(data, id_df_model, by = id_col)
 
   if(!is.null(type_to_plot)){
     data <- data[(data[,type_to_plot[[1]]]) == type_to_plot[[2]],]

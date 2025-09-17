@@ -23,7 +23,7 @@ FLXMRhyreg(
 )
 }
 \arguments{
-\item{formula}{Model formula}
+\item{formula}{model formula}
 
 \item{family}{default = "hyreg"}
 

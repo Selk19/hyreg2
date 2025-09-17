@@ -28,71 +28,118 @@ hyreg2(
 )
 }
 \arguments{
-\item{formula}{linear model formula}
+\item{formula}{linear model formula, using “| x” will include a grouping variable x, see details}
 
-\item{data}{a dataframe containing the data}
+\item{data}{a dataframe containing the data, see details}
 
-\item{type}{a vector containing an indicator wheter that datapoint contains to TTO or DCE Data}
+\item{type}{either the name of the column in data containing an indicator whether that datapoint (row)
+contains continuous or dichotomous data as character, or the whole vector containing the indicator.}
 
-\item{type_cont}{indicator for continous data, part of type}
+\item{type_cont}{value of type referring to continuous data}
 
-\item{type_dich}{indicator for dichotoums data, part of type}
+\item{type_dich}{value of type referring to dichotomous data}
 
 \item{k}{numeric, number of latent classes to be estimated via flexmix::flexmix}
 
 \item{control}{control vector for flexmix::flexmix}
 
-\item{stv}{named vector or list of named vactors containing start values for all coefficients from formula,
-has to be a vector if the same start values should be used for all latent classes,
-has to be a list of named vectores if different start values are assumed for the latent classes
-has to include start values for sigma and theta as well and it is important to use the names "theta" and "sigma"
-Using colnames(model.matrix(formula,data)) (formula without |) you can check, which variables need a stv value.}
+\item{stv}{named vector or list of named vectors containing start values for all coefficients
+formula, including sigma and theta, see details}
 
-\item{offset}{offset as in flexmix}
+\item{offset}{offset as in flexmix::flexmix}
 
 \item{opt_method}{optimization method to be used in optimizer, default = "BFGS"}
 
 \item{optimizer}{optimizer to be used in bbmle::mle2, default = "optim"}
 
-\item{lower}{opt_method must be set to "L-BFGS-B", lower bound for censored data}
+\item{lower}{default = -INF, lower bound for censored data. If this is used, opt_method must be
+set to "L-BFGS-B"}
 
-\item{upper}{opt_method must be set to "L-BFGS-B", upper bound for censored data}
+\item{upper}{default = INF, upper bound for censored data. If this is used, opt_method must be
+set to "L-BFGS-B",}
 
-\item{latent}{one of "both","cont" or "dich", see details}
+\item{latent}{data type to use in component identification, must be one of "both", "cont" or "dich",
+default = “both”,  see details}
 
-\item{id_col}{character, column name containing participant ids, needed if latent != "both}
+\item{id_col}{character, name of the grouping variable, only needed if latent != "both”, see details}
 
-\item{classes_only}{logical, default FALSE, indicate if only classification should be done without estimating model parameters
-only possible for latent = "cont" or "dich"}
+\item{classes_only}{logical, default FALSE, indicates whether the function should perform only
+classification, rather than both classification and model estimation, only possible for latent != "both",
+ see datails}
 
-\item{variables_both}{character vactor; variables to be fitted on TTO and DCE data, if not specified all variables from formula are used}
+\item{variables_both}{character vector; variables to be fitted on both continuous and dichotomous data.
+If not specified, all variables from formula are used. If provided and not all variables from formula
+are included, variables_cont and variables_dich must be provided as well, while one of them can be NULL,
+ see details.}
 
-\item{variables_dich}{character vactor; variables to be fitted only on DCE data, if provided variables_both and variables_cont have to be provided as well.
-Then all variables from stv have to be part in exactly one of the vectors variables_cont, variables_dich and variables_both.
-A vector can also be set to NULL while the others contain all variables}
+\item{variables_dich}{character vactor; variables to be fitted only on dichotomous data, if provided,
+variables_both and variables_cont must be provided as well.}
 
-\item{variables_cont}{character vactor; variables to be fitted only on TTO data, if provided variables_both and variables_dich have to be provided as well.
-Then all variables from stv have to be part in exactly one of the vectors variables_cont, variables_dich and variables_both.
-A vector can also be set to NULL while the others contain all variables}
+\item{variables_cont}{character vector; variables to be fitted only on continous data. If provided,
+variables_both and variables_dich must be provided as well.}
 
 \item{...}{additional arguments for flexmix::flexmix or bbmle::mle2}
 }
 \value{
-model of type flemix
+model object of type flexmix
 }
 \description{
-Estimation of hybrid model for EQ-5D data, not implemnted for het yet
+Estimation of hybrid model for EQ-5D data
 }
 \details{
-Using input latent = "both" means, that latent classes are estimated on both parts of the data: TTO and DCE.
-Using latent = "cont" the latent classes are estimated only on the TTO part and afterwards with these classes the combined likelihood of normal and binomial distribution
-is used to estimate the model parameters. Using latent = "dich" the latent classes are estimated only on the DCE partand afterwards with these classes the combined likelihood of normal and binomial distribution
-is used to estimate the model parameters. id_col has to be specified and only people with observations in both parts of the data are taken into account, hence it can happen that some
-ids are removed from the estimation.
+formula:  a typical R formula of the form y ~ x1 + x2 + … should be provided.
+Additionally, it is possible to include a grouping variable for repeated measures
+by using “| xg” where xg is the column containing the group-memberships.
+ Formula will look like this: y ~ x1 + x2 +… | xg.  In flexmix, this is called the concomitant
+ variable specification: the model is fit conditional on grouping, so that all observations with
+ the same group are treated as belonging together when computing likelihood contributions.
+ One possible grouping variable can e.g. be an id number to identify answers by the same participants.
+ We highly recommend using a grouping variable, since otherwise the algorithm tends to classify all
+ continuous data into one estimated class and all dichotomous data into the other.
 
 
-For datasets individuals with more than one observation it can be useful to estimate the latent classes for the individuals instead of for each datapoint;
-use | idcolumn in the formula.
+dataframe: a dataframe having the following columns:
+all independent and the dependet variable used in formula,
+one column for the grouping variable if grouping should be used,e.g. id numbers of participants with
+repeated measurements,
+one column indicating if the observations belongs to continuous or dichotomous data
+with the entries type_cont and type_dich, e.g. a column called "type" with the entries "TTO" for continous
+datapoints and "DCE" for dichotomous datapoints, type_cont will be "TTO" and type_dich will be "DCE" then.
+One row should match one observation (one datapoint).
+
+
+start values (stv): the given start values must be a named vector if the same start
+ values should be used for all latent classes. Otherwise a list of named vectors should be used
+ if different start values are assumed for each latent class. There has to be one entry in the list
+ for each latent class.  Each start value vector must include start values for sigma and theta.
+ Currently, it is necessary to use the names "sigma" and "theta" for these values. If users are unsure
+ for which variables start values must be provided, this can be checked by calling
+ colnames(model.matrix(formula,data)). Here, the formula should not include the grouping variable part.
+
+
+latent: in some situations, e.g. for controlling preference heterogeneity, it can be useful to
+estimate the latent classes only on one type of data and afterwards estimate the model parameters on all
+data. In such cases, input variable latent can be used to specify on which type of data the classification
+should be done. If “cont” or “dich” is used, the input parameter id_col must be specified and gives the name,
+i.e. a character string, of the grouping variable for classification. Some groups may be removed from the
+data, since they have only continuous or only dichotomous observations. Then in a first step,
+a model is estimated only on the continuous/ dichotomous data and the achieved classification is stored.
+In a next step model parameters are estimated on both types of data using this classification, i.e. in the
+second step, no classification is done but only estimating models with k = 1 on all types of data for the
+classes estimated in step one. Setting input variable classes_only on TRUE, the second step is left out and
+directly the estimated classes from step one are given as output.
+
+
+Variables_both, variables_cont, variables_dich: It is possible to specify partial coefficients,
+ which are used only on continuous or dichotomous data.
+ Example:  Suppose different models should be specified for continuous and dichotomous  data:
+ • Model continuous data: y ~  x1 + x3
+ • Model dichotomous data: y ~  x1 + x2
+ The formula input to hyreg2 must then include all parameters that occur in either model:
+  y ~ x1 + x2 + x3
+ The assignment of parameters to data types is then achieved via the input arguments variables_both, variables_cont, and variables_dich:
+  variables_both = “x1”, variables_cont = “x3” and  variables_dich = “x2”.
+ Every variable included in the provided formula (except the grouping variable ) must appear in exactly one of these vectors. One of the variables_ vectors can also be NULL, if no variables should be used only on this type of the data.
 }
 \examples{
 
@@ -104,7 +151,7 @@ control = list(iter.max = 1000, verbose = 4)
 rm(counter)
 mod <- hyreg2(formula = formula,
                     data =  simulated_data_norm,
-                    type =  simulated_data_norm$type,
+                    type =  simulated_data_norm$type, # also "type" would work
                     stv = stv,
                     k = k,
                     type_cont = "TTO",

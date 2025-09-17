@@ -6,7 +6,7 @@
 #'
 #' @description Function used in flexmix M-Step to estimate hybrid model
 #'
-#' @param formula Model formula
+#' @param formula model formula
 #' @param family default = "hyreg"
 #' @param type a vector containing an indicator wheter that datapoint contains to TTO or DCE Data
 #' @param type_cont indicator for continous data

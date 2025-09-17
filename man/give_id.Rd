@@ -4,19 +4,19 @@
 \alias{give_id}
 \title{give_id: function to decode which id or observation was classified to which class by the model}
 \usage{
-give_id(data, model, id = NULL)
+give_id(data, model, id_col = NULL)
 }
 \arguments{
 \item{data}{a dataframe, which was used to estimate the model}
 
 \item{model}{a flexmix model object estimtaed using hyreg2 or hyreg2_het}
 
-\item{id}{one character, indicator for the column holding the ids, this column must be part of the provided dataframe.
-the parameter must be specified, if the provided model was estimated under control for | id}
+\item{id_col}{character string, name of grouping variable, which must be a column of the provided dataframe.
+the parameter must be specified, if the provided model was estimated under control for groups}
 }
 \value{
-dataframe of two columns, first column named as provided id column or "observation" if id was not given as
-         an input. second column named mod_comp indicating the assigned class for this id or observation
+dataframe of two columns, first column named as provided id_col  or "observation" if id_col was not given as
+         an input. second column named "mod_comp" indicating the assigned class for this group or observation
 }
 \description{
 This function can be used to decode the classified classes by the model and see, which id ot observation
@@ -24,6 +24,55 @@ This function can be used to decode the classified classes by the model and see,
 }
 \details{
 PUT DETAILS HERE
+}
+\examples{
+# estimtae a model using simulated_data_rnorm
+
+### using grouping variable id ####
+formula <- y ~  -1 + x1 + x2 + x3 | id
+k <- 2
+stv <- setNames(c(0.2,0.2,0.2,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
+control <- list(iter.max = 1000, verbose = 4)
+
+hyflex_mod <- hyreg2(formula = formula,
+                    data =  simulated_data_norm,
+                    type =  simulated_data_norm$type,
+                    stv = stv,
+                    k = k,
+                    type_cont = "TTO",
+                    type_dich = "DCE_A",
+                    opt_method = "L-BFGS-B",
+                    control = control,
+                    latent = "cont",
+                    id_col = "id"
+)
+# use of function give_id
+give_id(data = simulated_data_norm,
+model = hyflex_mod,
+id_col = "id")
+
+
+ ### model without control for groups ###
+formula <- y ~  -1 + x1 + x2 + x3
+k <- 2
+stv <- setNames(c(0.2,0.2,0.2,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
+control <- list(iter.max = 1000, verbose = 4)
+
+hyflex_mod <- hyreg2(formula = formula,
+                    data =  simulated_data_norm,
+                    type =  simulated_data_norm$type,
+                    stv = stv,
+                    k = k,
+                    type_cont = "TTO",
+                    type_dich = "DCE_A",
+                    opt_method = "L-BFGS-B",
+                    control = control,
+                    latent = "both"
+)
+# use of function give_id
+give_id(data = simulated_data_norm,
+model = hyflex_mod)
+
 }
 \author{
 Svenja Elkenkamp & John Grosser
