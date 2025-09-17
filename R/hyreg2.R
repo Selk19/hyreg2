@@ -6,9 +6,9 @@
 #' @param formula linear model formula, using “| x” will include a grouping variable x, see details
 #' @param data a dataframe containing the data, see details
 #' @param type either the name of the column in data containing an indicator whether that datapoint (row)
-#'  contains continuous or dichotomous data as character, or the whole vector containing the indicator.
-#' @param type_cont value of type referring to continuous data
-#' @param type_dich value of type referring to dichotomous data
+#'  contains continuous or dichotomous data as character, or the whole vector containing the indicator, see details
+#' @param type_cont value of type referring to continuous data, see details
+#' @param type_dich value of type referring to dichotomous data, see details
 #' @param k numeric, number of latent classes to be estimated via flexmix::flexmix
 #' @param control control vector for flexmix::flexmix
 #' @param stv named vector or list of named vectors containing start values for all coefficients

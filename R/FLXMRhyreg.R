@@ -6,26 +6,32 @@
 #'
 #' @description Function used in flexmix M-Step to estimate hybrid model
 #'
-#' @param formula model formula
-#' @param family default = "hyreg"
-#' @param type a vector containing an indicator wheter that datapoint contains to TTO or DCE Data
-#' @param type_cont indicator for continous data
-#' @param type_dich indicator for dichotoums data
-#' @param variables_both character vactor; variables to be fitted on TTO and DCE data, if not specified all variables from formula are used
-#' @param variables_cont character vactor; variables to be fitted only on TTO data
-#' @param variables_dich character vactor; variables to be fitted only on DCE data
-#' @param stv named vector or list of named vactors containing start values,
-#'            has to be a vector if the same start values should be used for all latent classes,
-#'            has to be a list of named vectores if different start values are assumed for the latent classes
-#'            has to include start values for sigma and theta as well
-#' @param offset offset as in flexmix
+#' @param formula linear model formula
+#' @param family default = "hyreg", needed for flexmix::flexmix
+#' @param type vector containing the indicator whether that datapoint (row)
+#'  contains continuous or dichotomous data, see details of hyreg2::hyreg2
+#' @param type_cont value of type referring to continuous data, see details of hyreg2::hyreg2
+#' @param type_dich value of type referring to dichotomous data,  see details of hyreg2::hyreg2
+#' @param variables_both character vector; variables to be fitted on both continuous and dichotomous data.
+#'  If not specified, all variables from formula are used. If provided and not all variables from formula
+#'  are included, variables_cont and variables_dich must be provided as well, while one of them can be NULL,
+#'   see details of hyreg2::hyreg2
+#' @param variables_cont character vector; variables to be fitted only on continous data. If provided,
+#' variables_both and variables_dich must be provided as well.
+#' @param variables_dich character vactor; variables to be fitted only on dichotomous data, if provided,
+#'  variables_both and variables_cont must be provided as well.
+#' @param stv named vector or list of named vectors containing start values for all coefficients
+#'  formula, including sigma and theta, see details of hyreg2::hyreg2
+#' @param offset offset as in flexmix::flexmix
 #' @param optimizer optimizer to be used in bbmle::mle2, default = "optim"
 #' @param opt_method optimization method to be used in optimizer, default = "BFGS"
-#' @param lower opt_method must be set to "L-BFGS-B", lower bound for censored data
-#' @param upper opt_method must be set to "L-BFGS-B", upper bound for censored data
-#' @param ... additional arguments for flexmix or bbmle::mle2
+#' @param lower default = -INF, lower bound for censored data. If this is used, opt_method must be
+#'  set to "L-BFGS-B"
+#' @param upper default = INF, upper bound for censored data. If this is used, opt_method must be
+#'  set to "L-BFGS-B",
+#' @param ... additional arguments for flexmix::flexmix or bbmle::mle2
 #'
-#' @return a model, that can be used in hyreg2 as input for parameter model or
+#' @return a model object, that can be used in hyreg2 as input for parameter model in flexmix::flexmix
 #'
 #' @author Svenja Elkenkamp & Kim Rand
 #' @examples
@@ -95,7 +101,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
   # refit function has to depend on x,y,w.
   hyregrefit <- function(x, y, w) {
-    warning(paste0("Not defined", "Please try xreg2:::refit"))
+    warning(paste0("Not defined", "Please try hyreg2:::refit"))
     return(NA)
   }
 
@@ -161,12 +167,12 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
         # for censored data
         #in xreg:
-        if(upper != Inf ){
+        if(upper != Inf ){ # maybe set to NULL?
           censV <- y1 == upper
           pvals1[which(censV)] <- log(pnorm((Xb1[censV]-upper)/sigma,0,1) - pnorm((Xb1[censV]-Inf)/sigma,0,1))
         }
 
-        if(lower != -Inf ){
+        if(lower != -Inf ){ # maybe set to NULL?
           censV <- y1 == lower
           pvals1[which(censV)] <- log(pnorm((Xb1[censV]-(-Inf))/sigma,0,1) - pnorm((Xb1[censV]-lower)/sigma,0,1))
         }
@@ -283,13 +289,14 @@ FLXMRhyreg <- function(formula= . ~ . ,
           stv_in <- stv
         }
 
-        fit_mle <- bbmle::mle2(minuslogl = logLik2,
-                               start = stv_in,
-                               optimizer = optimizer,
-                               method = opt_method,
-                               # control?,
-                               lower = -Inf, # or upper and lower from input??
-                               upper = Inf)
+            fit_mle <- bbmle::mle2(minuslogl = logLik2,
+                                        start = stv_in,
+                                        optimizer = optimizer,
+                                        method = opt_method,
+                                        # control?,
+                                        lower = -Inf, # or upper and lower from input??
+                                        upper = Inf)
+
 
 
       }else{
@@ -307,7 +314,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
                                  optimizer = optimizer,
                                  method = opt_method,
                                  # control?,
-                                 lower = -Inf, # or upper and lower from input??
+                                 lower = -Inf, # or upper and lower from input?? # depending on method?
                                  upper = Inf)
 
 

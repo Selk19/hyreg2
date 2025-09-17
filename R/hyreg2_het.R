@@ -45,7 +45,7 @@
 #' @details
 #'
 #' estimation of sigma:
-#' text here
+#' TEXT HERE
 #'
 #' formula:  a typical R formula of the form y ~ x1 + x2 + … should be provided.
 #' Additionally, it is possible to include a grouping variable for repeated measures
