@@ -1,11 +1,10 @@
-Package: xreg2
+Package: hyreg2
 Type: Package
-Title: An R package for EQ5D valuesets estimation including latent classes
+Title: An R package to estimate latent class models for combined likelihoods of continous and dichotomus data
 Version: 0.1.0
 Author: Svenja Elkenkamp, Kim Rand and John Grosser
 Maintainer:  <svenja.elkenkamp@uni-bielefeld.de> 
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: Using this package EQ-5D valuesets estimation can be done using latent classes.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true

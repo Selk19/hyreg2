@@ -2,11 +2,11 @@
 
 export(FLXMRhyreg)
 export(FLXMRhyreg_het)
-export(getstv)
+export(get_stv)
 export(give_id)
 export(hyreg2)
 export(hyreg2_het)
-export(plot_hyreg)
+export(plot_hyreg2)
 export(summary_hyreg2)
 importFrom(bbmle,mle2)
 importFrom(bbmle,summary)
