@@ -76,12 +76,6 @@
 
 ### FLXMRhyreg ###
 
-#Error in validObject(.Object) :
-#  ungültiges Objekt der Klasse “FLXcomponent”:
-# invalid object for slot "df" in class "FLXcomponent": got class "NULL",
-# should be or extend class "numeric"
-
-
 
 FLXMRhyreg_het <- function(formula= . ~ .,
                            formula_sigma = formula_sigma,

@@ -36,7 +36,7 @@
 #'  variables_both and variables_cont must be provided as well.
 #' @param ... additional arguments for flexmix::flexmix or bbmle::mle2
 #'
-#' @return model object of type flexmix
+#' @return model object of type flexmix or list of model objects of type flexmix
 #'
 #' @details
 #' formula:  a typical R formula of the form y ~ x1 + x2 + … should be provided.
@@ -46,13 +46,13 @@
 #'  variable specification: the model is fit conditional on grouping, so that all observations with
 #'  the same group are treated as belonging together when computing likelihood contributions.
 #'  One possible grouping variable can e.g. be an id number to identify answers by the same participants.
-#'  We highly recommend using a grouping variable, since otherwise the algorithm tends to classify all
+#'  We highly recommend using a grouping variable, since otherwise for k = 2 the algorithm tends to classify all
 #'  continuous data into one estimated class and all dichotomous data into the other.
 #'
 #'
-#' dataframe: a dataframe having the following columns:
-#' all independent and the dependet variable used in formula,
-#' one column for the grouping variable if grouping should be used,e.g. id numbers of participants with
+#' data: a dataframe having the following columns:
+#' all independent (x) and the dependet variable (y) used in formula,
+#' one column for the grouping variable (xg) if grouping should be used,e.g. id numbers of participants with
 #' repeated measurements,
 #' one column indicating if the observations belongs to continuous or dichotomous data
 #' with the entries type_cont and type_dich, e.g. a column called "type" with the entries "TTO" for continous
@@ -78,7 +78,10 @@
 #' a model is estimated only on the continuous/ dichotomous data and the achieved classification is stored.
 #' In a next step model parameters are estimated on both types of data using this classification, i.e. in the
 #' second step, no classification is done but only estimating models with k = 1 on all types of data for the
-#' classes estimated in step one. Setting input variable classes_only on TRUE, the second step is left out and
+#' classes estimated in step one. The output object of hyreg2 in this case is a list of k models.
+#' Additionally, at position k+1 of the list, a data frame containing the corresponding classifications
+#' from the first step is returned. Each element k in the list contains the estimated parameters for one of
+#' the latent classes.  Setting input variable classes_only on TRUE, the second step is left out and
 #' directly the estimated classes from step one are given as output.
 #'
 #'
