@@ -23,41 +23,47 @@ FLXMRhyreg(
 )
 }
 \arguments{
-\item{formula}{model formula}
+\item{formula}{linear model formula}
 
-\item{family}{default = "hyreg"}
+\item{family}{default = "hyreg", needed for flexmix::flexmix}
 
-\item{type}{a vector containing an indicator wheter that datapoint contains to TTO or DCE Data}
+\item{type}{vector containing the indicator whether that datapoint (row)
+contains continuous or dichotomous data, see details of hyreg2::hyreg2}
 
-\item{type_cont}{indicator for continous data}
+\item{type_cont}{value of type referring to continuous data, see details of hyreg2::hyreg2}
 
-\item{type_dich}{indicator for dichotoums data}
+\item{type_dich}{value of type referring to dichotomous data,  see details of hyreg2::hyreg2}
 
-\item{variables_both}{character vactor; variables to be fitted on TTO and DCE data, if not specified all variables from formula are used}
+\item{variables_both}{character vector; variables to be fitted on both continuous and dichotomous data.
+If not specified, all variables from formula are used. If provided and not all variables from formula
+are included, variables_cont and variables_dich must be provided as well, while one of them can be NULL,
+ see details of hyreg2::hyreg2}
 
-\item{variables_cont}{character vactor; variables to be fitted only on TTO data}
+\item{variables_cont}{character vector; variables to be fitted only on continous data. If provided,
+variables_both and variables_dich must be provided as well.}
 
-\item{variables_dich}{character vactor; variables to be fitted only on DCE data}
+\item{variables_dich}{character vactor; variables to be fitted only on dichotomous data, if provided,
+variables_both and variables_cont must be provided as well.}
 
-\item{stv}{named vector or list of named vactors containing start values,
-has to be a vector if the same start values should be used for all latent classes,
-has to be a list of named vectores if different start values are assumed for the latent classes
-has to include start values for sigma and theta as well}
+\item{stv}{named vector or list of named vectors containing start values for all coefficients
+formula, including sigma and theta, see details of hyreg2::hyreg2}
 
-\item{offset}{offset as in flexmix}
+\item{offset}{offset as in flexmix::flexmix}
 
 \item{opt_method}{optimization method to be used in optimizer, default = "BFGS"}
 
 \item{optimizer}{optimizer to be used in bbmle::mle2, default = "optim"}
 
-\item{lower}{opt_method must be set to "L-BFGS-B", lower bound for censored data}
+\item{lower}{default = -INF, lower bound for censored data. If this is used, opt_method must be
+set to "L-BFGS-B"}
 
-\item{upper}{opt_method must be set to "L-BFGS-B", upper bound for censored data}
+\item{upper}{default = INF, upper bound for censored data. If this is used, opt_method must be
+set to "L-BFGS-B",}
 
-\item{...}{additional arguments for flexmix or bbmle::mle2}
+\item{...}{additional arguments for flexmix::flexmix or bbmle::mle2}
 }
 \value{
-a model, that can be used in hyreg2 as input for parameter model or
+a model object, that can be used in hyreg2 as input for parameter model in flexmix::flexmix
 }
 \description{
 Function used in flexmix M-Step to estimate hybrid model

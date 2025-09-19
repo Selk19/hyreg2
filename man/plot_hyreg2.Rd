@@ -44,10 +44,11 @@ This function can be used to visualize the classification based on the model for
 id_col_df has to be provided anyway, even if the model was estimated without grouping variable.
 Since there might be no grouping varibale in the data, we recommend to create a new column "observation"
 in data using the rownames/observationnumbers as charachter values and use this column as
-input for id_col in plot_hyreg2, additionally you can then use id_df_model =  give_id(data,model,"observation")
+input for id_col in plot_hyreg2, additionally you can then use id_df_model =  give_id(data,model,"observation"),
+see example below.
 }
 \examples{
-# estimtate a model using simulated_data_rnorm
+# estimate a model using simulated_data_rnorm
 
 ### using | id ####
 formula <- y ~  -1 + x1 + x2 + x3 | id

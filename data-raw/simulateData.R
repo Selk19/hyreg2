@@ -54,6 +54,29 @@ simulated_data1 <- rbind(data_tto, data_dce)
 
 
 
+# partial formulas for dce and tto
+# beta_tto <- beta[c(1,2)]
+# beta_dce <- beta[c(1,3)]
+#
+# # simulate matrix
+# x_tto <- matrix(rnorm(n_samples_tto * length(beta_tto)), ncol = length(beta_tto))
+# x_dce <- matrix(rnorm(n_samples_dce * length(beta_dce)), ncol = length(beta_dce))
+#
+# # Xb (linear predictor following formula xb = x1*beta1 + x2*beta2 + x3*beta3)
+# Xb_tto <- x_tto %*% beta_tto
+# Xb_dce <- (x_dce %*% beta_dce) * theta
+# #Xb_dce <- (x_dce[1] %*% beta_dce[which(is.element(beta_dce,beta_tto))]) * theta +  # theta only for variables_both, not dynamical see x_dce
+# #  (x_dce[2] %*% beta_dce[which(!is.element(beta_dce,beta_tto))])
+#
+# # generate y
+# y_tto <- rnorm(n_samples_tto, mean = Xb_tto, sd = sigma)  # continuous outcomes
+# logistic_tmp <- 0.5 + 0.5 * tanh(Xb_dce / 2)
+# y_dce <- rbinom(n_samples_dce, size = 1, prob = logistic_tmp)  # binary outcomes
+#
+# simulated_data1$y_partial <- c(y_tto,y_dce)
+
+
+
 ### COMP 2 ###
 # Set parameters
 set.seed(37)
@@ -98,6 +121,25 @@ data_dce <- data.frame(
 
 simulated_data2 <- rbind(data_tto, data_dce)
 
+# partial formulas for dce and tto
+# beta_tto <- beta[c(1,2)]
+# beta_dce <- beta[c(1,3)]
+#
+# # simulate matrix
+# x_tto <- matrix(rnorm(n_samples_tto * length(beta_tto)), ncol = length(beta_tto))
+# x_dce <- matrix(rnorm(n_samples_dce * length(beta_dce)), ncol = length(beta_dce))
+#
+# Xb_tto <- x_tto %*% beta_tto
+# Xb_dce <- (x_dce %*% beta_dce) * theta
+# #Xb_dce <- (x_dce[1] %*% beta_dce[which(is.element(beta_dce,beta_tto))]) * theta + # theta only for variables_both, not dynamical see x_dce
+# #  (x_dce[2] %*% beta_dce[which(!is.element(beta_dce,beta_tto))])
+#
+# # generate y
+# y_tto <- rnorm(n_samples_tto, mean = Xb_tto, sd = sigma)  # continuous outcomes
+# logistic_tmp <- 0.5 + 0.5 * tanh(Xb_dce / 2)
+# y_dce <- rbinom(n_samples_dce, size = 1, prob = logistic_tmp)  # binary outcomes
+#
+# simulated_data2$y_partial <- c(y_tto,y_dce)
 
 
 

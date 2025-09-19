@@ -5,7 +5,6 @@
 #' FLXMRhyreg: M-step driver to be used in flexmix
 #'
 #' @description Function used in flexmix M-Step to estimate hybrid model
-#'
 #' @param formula linear model formula
 #' @param family default = "hyreg", needed for flexmix::flexmix
 #' @param type vector containing the indicator whether that datapoint (row)
@@ -156,6 +155,10 @@ FLXMRhyreg <- function(formula= . ~ . ,
         Xb1 <- x1 %*% para$coef[colnames(x1)] # only cont and both variables
         Xb2 <- (x2 %*% para$coef[colnames(x2)]) * exp(theta)  # only dich and both variables
 
+      #  Xb2 <- (x2[variables_both] %*% para$coef[variables_both]) * exp(theta) +
+      #         (x2[variables_dich] %*% para$coef[variables_dich])  # theta only for variables_both
+
+
 
         # pvals and likelihood
         logistic_tmp <- .5+.5*tanh(Xb2/2)
@@ -233,6 +236,9 @@ FLXMRhyreg <- function(formula= . ~ . ,
         Xb2 <- x2 %*% stv_dich[colnames(x2)]
 
         Xb2 <- Xb2*theta
+
+        # Xb2 <- (x2[variables_both] %*% stv_dich[variables_both]) * exp(theta) +
+        #  (x2[variables_dich] %*% stv_dich[variables_dich])  # only dich and both variables, theta only for variables_both
 
         # pvals and likelihood
         logistic_tmp <- 0.5 + 0.5*tanh(Xb2/2)

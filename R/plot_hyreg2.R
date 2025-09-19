@@ -227,12 +227,12 @@ plot_hyreg2 <- function(data,
 
 library(ggplot2)
  p <-  ggplot2::ggplot(mapping =aes(x = data[,x], y = data[,y], color = as.character(data$mod_comp)))
- p <- p + geom_point(size = 3, alpha = 0.7)
+ p <- p + geom_point(size = 1, alpha = 0.7)
  p <- p +  labs( title = "classification",
           x = paste0(x),
           y = paste0(y),
           color = "Class")
- p <- p + geom_jitter(width = 0.2, height = 0, size = 2, alpha = 0.7) # verschieben der Punkte leicht zur Seite
+ p <- p + geom_jitter(width = 0.1, height = 0, size = 1, alpha = 0.2) # verschieben der Punkte leicht zur Seite
  p <- p + theme_minimal()
 
   # colours

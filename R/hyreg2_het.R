@@ -18,13 +18,11 @@
 #' @param stv_sigma named vector with start values for sigma estimation.
 #'  Have to be the same variables as given in formula_sigma. Should NOT end with _h, see details
 #' @param offset offset as in flexmix::flexmix
-#' @param optimizer optimizer to be used in bbmle::mle2, default = "optim"
-#' @param opt_method optimization method to be used in optimizer, default = "BFGS"
-#' @param lower default = -INF, lower bound for censored data. If this is used, opt_method must be
-#'  set to "L-BFGS-B"
-#' @param upper default = INF, upper bound for censored data. If this is used, opt_method must be
-#'  set to "L-BFGS-B",
-#' @param latent data type to use in component identification, must be one of "both", "cont" or "dich",
+#' @param optimizer charachter,optimizer to be used in bbmle::mle2, default = "optim"
+#' @param opt_method charachter, optimization method to be used in optimizer, default = "BFGS"
+#' @param lower numeric, lower bound for censored data, default = INF. If this is used, opt_method must be set to "L-BFGS-B",
+#' @param upper numeric, upper bound for censored data, default = INF. If this is used, opt_method must be set to "L-BFGS-B",
+#' @param latent charachter,data type to use in component identification, must be one of "both", "cont" or "dich",
 #'  default = “both”,  see details
 #' @param id_col character, name of the grouping variable, only needed if latent != "both”, see details
 #' @param classes_only logical, default FALSE, indicates whether the function should perform only
@@ -77,7 +75,7 @@
 #'  colnames(model.matrix(formula,data)). Here, the formula should not include the grouping variable part.
 #'
 #'
-#' latent: in some situations, e.g. for controlling preference heterogeneity, it can be useful to
+#' latent, id_col, classes_only: in some situations, e.g. for controlling preference heterogeneity, it can be useful to
 #' estimate the latent classes only on one type of data and afterwards estimate the model parameters on all
 #' data. In such cases, input variable latent can be used to specify on which type of data the classification
 #' should be done. If “cont” or “dich” is used, the input parameter id_col must be specified and gives the name,
