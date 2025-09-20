@@ -347,7 +347,7 @@ hyreg2 <-function(formula,
 
    if(any(idcount$Freq == 0)){
      miss <- idcount[idcount$Freq == 0,"id"]
-     warning(paste0( "IDs ",paste(miss, collapse = ", "), " were removed, since they were only part in one type of data"))
+     warning(paste0( id_col ,paste(miss, collapse = ", "), " were removed, since they were only part in one type of data"))
    }
 
    # FIRST STEP: GET LATENT CLASSES

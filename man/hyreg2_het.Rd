@@ -32,7 +32,7 @@ hyreg2_het(
 \arguments{
 \item{formula}{linear model formula, using “| x” will include a grouping variable x, see details}
 
-\item{formula_sigma}{formula for sigma estimation, if not provided formula is taken without grouping
+\item{formula_sigma}{linear formula for sigma estimation, if not provided formula is taken without grouping
 variable, see details}
 
 \item{data}{a dataframe containing the data, see details}
@@ -52,7 +52,7 @@ contains continuous or dichotomous data as character, or the whole vector contai
 formula, including sigma and theta, see details}
 
 \item{stv_sigma}{named vector with start values for sigma estimation.
-Have to be the same variables as given in formula_sigma. Should NOT end with _h, see details}
+Have to be the same variables as given in formula_sigma, see details}
 
 \item{offset}{offset as in flexmix::flexmix}
 
@@ -93,54 +93,77 @@ model object of type flemix, coefficients named ..._h are coefficients for heter
 Estimation of hybrid model for EQ-5D data
 }
 \details{
-estimation of sigma:
-TEXT HERE
-
-formula:  a typical R formula of the form y ~ x1 + x2 + … should be provided.
-Additionally, it is possible to include a grouping variable for repeated measures
-by using “| xg” where xg is the column containing the group-memberships.
- Formula will look like this: y ~ x1 + x2 +… | xg.  In flexmix, this is called the concomitant
- variable specification: the model is fit conditional on grouping, so that all observations with
- the same group are treated as belonging together when computing likelihood contributions.
- One possible grouping variable can e.g. be an id number to identify answers by the same participants.
- We highly recommend using a grouping variable, since otherwise for k = 2 the algorithm tends to classify all
- continuous data into one estimated class and all dichotomous data into the other.
+formula: a typical R formula of the form y ~ x1 + x2 + … should be provided.
+Additionally, it is possible to include a grouping variable for repeated measures by using
+“| xg” where xg is the column containing the group-memberships. The resulting formula will look
+like this:  y ~ x1 + x2 +… | xg.  In flexmix, this is called the concomitant variable specification:
+the  model is fit conditional on grouping, so that all observations with the same group are treated
+as belonging together when computing likelihood contributions. One possible grouping variable can be
+an id number to identify answers by the same participants. We highly recommend using a grouping variable,
+ since otherwise the algorithm for k = 2 tends to classify all continuous data into one estimated class
+and all dichotomous data into the other.
 
 
-data: a dataframe having the following columns:
-all independent (x) and the dependet variable (y) used in formula,
-one column for the grouping variable (xg) if grouping should be used,e.g. id numbers of participants with
-repeated measurements,
-one column indicating if the observations belongs to continuous or dichotomous data
-with the entries type_cont and type_dich, e.g. a column called "type" with the entries "TTO" for continous
-datapoints and "DCE" for dichotomous datapoints, type_cont will be "TTO" and type_dich will be "DCE" then.
-One row should match one observation (one datapoint).
+data: a dataframe having the following columns: all independent variables (x)
+ and the dependent variable y used in formula, one column for the grouping variable xg if grouping
+ should be used, e.g. id numbers of participants with repeated measurements, one column indicating
+ if the observations belongs to continuous or dichotomous data with the entries type_cont
+  and type_dich (e.g., for a column called "type" with the entries "TTO" for continuous datapoints
+   and "DCE" for dichotomous datapoints, type_cont will be "TTO" and type_dich will be "DCE").
+   One row should match one observation (one datapoint).
 
 
-start values (stv): the given start values must be a named vector if the same start
- values should be used for all latent classes. Otherwise a list of named vectors should be used
- if different start values are assumed for each latent class. There has to be one entry in the list
- for each latent class.  Each start value vector must include start values for sigma and theta.
- Currently, it is necessary to use the names "sigma" and "theta" for these values. If users are unsure
- for which variables start values must be provided, this can be checked by calling
- colnames(model.matrix(formula,data)). Here, the formula should not include the grouping variable part.
+start values (stv): if the same start values are to be used for all latent classes,
+the given start values must be a named vector. Otherwise (if different start values are assumed for
+ each latent class), a list of named vectors should be used . In this case, there must be one entry
+  in the list for each latent class.  Each start value vector must include start values for sigma and
+  theta. Currently, it is necessary to use the names "sigma" and "theta" for these values.
+  If users are unsure for which variables start values must be provided, this can be checked by
+   calling colnames(model.matrix(formula,data)). In this call, the formula should not include the
+   grouping variable.
 
 
-latent, id_col, classes_only: in some situations, e.g. for controlling preference heterogeneity, it can be useful to
-estimate the latent classes only on one type of data and afterwards estimate the model parameters on all
-data. In such cases, input variable latent can be used to specify on which type of data the classification
-should be done. If “cont” or “dich” is used, the input parameter id_col must be specified and gives the name,
-i.e. a character string, of the grouping variable for classification. Some groups may be removed from the
-data, since they have only continuous or only dichotomous observations. Then in a first step,
-a model is estimated only on the continuous/ dichotomous data and the achieved classification is stored.
-In a next step model parameters are estimated on both types of data using this classification, i.e. in the
-second step, no classification is done but only estimating models with k = 1 on all types of data for the
-classes estimated in step one. The output object of hyreg2 in this case is a list of k models.
-Additionally, at position k+1 of the list, a data frame containing the corresponding classifications
-from the first step is returned. Each element k in the list contains the estimated parameters for one of
-the latent classes.  Setting input variable classes_only on TRUE, the second step is left out and
-directly the estimated classes from step one are given as output.
 
+formula_sigma, stv_sigma:  estimation of sigma
+To account for heteroscedasticity in the data an additional formula formula_sigma and an additional vector of
+starting values for this formula (stv_sigma) can be specified. The provided formula_sigma must be linear and the
+vector stv_sigma must contain start values for all parameters used in the formula. If neither
+ formula_sigma nor stv_sigma are provided, the same inputs as for formula (without controlling for groups)
+ and stv (without sigma) are used.  The parameters to be estimated using formula_sigma do not need special
+ names; they simply refer to the relevant columns of data. Their estimates can be identified in the model
+ output by the ending  "_h"
+It is important to note that the start values stv for the overall model parameters (from formula) are not allowed to
+include sigma (in contrast to hyreg2, where sigma must always be specified).
+
+latent, id_col, classes_only: in some situations, it can be useful to identify the latent classes on
+only one type of data while estimating the model parameters on both types of data. In such cases,
+the input variable latent can be used to specify on which type of data the classification should be done.
+ If “cont” or “dich” is used, the input parameter id_col must be specified and gives the name,
+ i.e. a character string, of the grouping variable for classification. Some groups may be removed from
+ the data, since they have only continuous or only dichotomous observations. Then in a first step,
+ a model is estimated only on the continuous/dichotomous data and the achieved classification is stored.
+ In a next step, model parameters are estimated separately for each identified class on both types of data
+ using this classification. The output object of hyreg2 in this case is a list of k models.
+ Additionally, at position k+1 of the list, a data frame containing the corresponding classifications
+ from the first step is returned. Each element k in the list contains the estimated parameters for one
+ of the latent classes. When setting the input variable classes_only to TRUE, the second step is left
+ out and the estimated classes from step one are given as output.
+
+
+Variables_both, variables_cont, variables_dich: It is possible to specify partial coefficients,
+ which are used only on continuous or dichotomous data.
+ Example:  Suppose different models should be specified for continuous and dichotomous  data:
+ • Model continuous data: y ~  x1 + x3
+ • Model dichotomous data: y ~  x1 + x2
+ The formula input to hyreg2 must then include all parameters that occur in either model:
+  y ~ x1 + x2 + x3
+ The assignment of parameters to data types is then achieved via the input arguments variables_both,
+  variables_cont, and variables_dich:
+ variables_both = “x1”,
+ variables_cont = “x3” and
+ variables_dich = “x2”.
+ Every variable included in the provided formula (except the grouping variable ) must appear in exactly
+  one of these vectors. One of the variables_ vectors can also be NULL, if no variables should be used only on this type of the data.
 
 Variables_both, variables_cont, variables_dich: It is possible to specify partial coefficients,
  which are used only on continuous or dichotomous data.
