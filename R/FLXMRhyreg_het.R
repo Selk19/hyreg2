@@ -1,36 +1,34 @@
 
-#' FLXMRhyreg_het: M-step driver to be used in flexmix accounting for heteroscedastisity
+#' M-step driver to be used in flexmix accounting for heteroscedastisity
 #'
 #' @description Function used in flexmix M-Step to estimate hybrid model accounting for heteroscedastisity
 #'
-#' @param formula linear model formula
-#' @param family default = "hyreg", needed for flexmix::flexmix
-#' @param formula_sigma formula for estimation of sigma to account for heteroscedasticity, see details hyreg2::hyreg2_het
-#' @param type vector containing the indicator whether that datapoint (row)
-#'  contains continuous or dichotomous data, see details of hyreg2::hyreg2_het
-#' @param type_cont value of type referring to continuous data, see details of hyreg2::hyreg2_het
-#' @param type_dich value of type referring to dichotomous data,  see details of hyreg2::hyreg2_het
-#' @param variables_both character vector; variables to be fitted on both continuous and dichotomous data.
-#'  If not specified, all variables from formula are used. If provided and not all variables from formula
-#'  are included, variables_cont and variables_dich must be provided as well, while one of them can be NULL,
-#'   see details of hyreg2::hyreg2_het
-#' @param variables_cont character vector; variables to be fitted only on continous data. If provided,
-#' variables_both and variables_dich must be provided as well.
-#' @param variables_dich character vactor; variables to be fitted only on dichotomous data, if provided,
-#'  variables_both and variables_cont must be provided as well.
-#' @param stv named vector or list of named vectors containing start values for all coefficients
-#'  formula, including sigma and theta, see details of hyreg2::hyreg2_het
-#' @param stv_sigma vector containing start values for sigma estimates, see details hyreg2::hyreg2_het
-#' @param offset offset as in flexmix::flexmix
-#' @param optimizer optimizer to be used in bbmle::mle2, default = "optim"
-#' @param opt_method optimization method to be used in optimizer, default = "BFGS"
-#' @param lower default = -INF, lower bound for censored data. If this is used, opt_method must be
-#'  set to "L-BFGS-B"
-#' @param upper default = INF, upper bound for censored data. If this is used, opt_method must be
-#'  set to "L-BFGS-B",
-#' @param ... additional arguments for flexmix::flexmix or bbmle::mle2
+#' @param data a `data.frame` containing the data, see Details of [hyreg2_het]
+#' @param formula linear model `formula`
+#' @param family default `"hyreg"`, needed for [flexmix::flexmix()]
+#' @param formula_sigma `formula` for estimation of `sigma` to account for heteroscedasticity, see Details [hyreg2_het]
+#' @param type `character` vector containing the indicator whether that datapoint (row)
+#'  contains continuous or dichotomous data, see Details of [hyreg2_het]
+#' @param type_cont value of `type` referring to continuous `data`, see Details of [hyreg2_het]
+#' @param type_dich value of `type` referring to dichotomous `data`, see Details of [hyreg2_het]
+#' @param variables_both `character` vector; variables to be fitted on both continuous and dichotomous data.
+#'   see Details of [hyreg2_het]
+#' @param variables_cont `character` vector; variables to be fitted only on continous data. see Details of [hyreg2_het]
+#' @param variables_dich character vactor; variables to be fitted only on dichotomous data. see Details of [hyreg2_het]
+#' @param stv `named vector` or `list` of named vectors containing start values for all coefficients from
+#'  `formula`, including `theta`, see Details of [hyreg2::hyreg2_het]
+#' @param stv_sigma `named vector` with start values for sigma estimation.
+#'  Have to be the same variables as given in `formula_sigma`, see Details of [hyreg2_het]
+#' @param offset offset as in [flexmix::flexmix()], default `NULL`
+#' @param optimizer `character`, optimizer to be used in [bbmle::mle2()], default `"optim"`
+#' @param opt_method `character`, optimization method to be used in `optimizer`, default `"BFGS"`
+#' @param lower  lower bound for censored data. If this is used, `opt_method` must be
+#'  set to `"L-BFGS-B"`, default `-INF`,
+#' @param upper  upper bound for censored data. If this is used, `opt_method` must be
+#'  set to `"L-BFGS-B"`,default `INF`
+#' @param ... additional arguments for [flexmix::flexmix()] or [bbmle::mle2()]
 #'
-#' @return a model object, that can be used in hyreg2_het as input for parameter model in flexmix::flexmix
+#' @return a `model` object, that can be used in [hyreg2_het] as input for parameter `model` in [flexmix::flexmix()]
 #'
 #'
 #' @author Kim Rand & Svenja Elkenkamp
@@ -48,7 +46,8 @@
 #' y <- simulated_data_norm$y
 #' w <- 1
 
-#'model <- FLXMRhyreg_het(formula = formula,
+#'model <- FLXMRhyreg_het( data = simulated_data_norm,
+#'                      formula = formula,
 #'                      formula_sigma = formula_sigma,
 #'                     family=c("hyreg"),
 #'                     type =  simulated_data_norm$type,
@@ -77,9 +76,9 @@
 ### FLXMRhyreg ###
 
 
-FLXMRhyreg_het <- function(formula= . ~ .,
+FLXMRhyreg_het <- function(data,
+                           formula= . ~ .,
                            formula_sigma = formula_sigma,
-                           data,
                            family=c("hyreg"),
                            type = NULL,
                            type_cont = NULL,

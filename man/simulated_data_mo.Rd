@@ -5,22 +5,24 @@
 \alias{simulated_data_mo}
 \title{simulated_data_mo}
 \format{
-## `simulated_data_mo`
+\subsection{\code{simulated_data_mo}}{
+
 A simulated data frame with 480 rows and 9 columns, following a combination of normal and binomial distribution
 \describe{
-  \item{type}{type of data}
-  \item{y}{result of the model y = -1 + mo2 + mo3 + mo4 + mo5}
-  \item{mo2, mo3, mo4, mo5}{dummy variables}
-  \item{class}{original class of the data point}
-  \item{id}{id number of observations to simulated different persons}
-  \item{y_cens}{column y censored at 0 (lower boundary)}
-  ...
+\item{type}{type of data}
+\item{y}{result of the model y = -1 + mo2 + mo3 + mo4 + mo5}
+\item{mo2, mo3, mo4, mo5}{dummy variables}
+\item{class}{original class of the data point}
+\item{id}{id number of observations to simulated different persons}
+\item{y_cens}{column y censored at 0 (lower boundary)}
+...
+}
 }
 }
 \source{
 {simulated with true parameter values:
- Class 1: sigma  = XXX, theta = XXX and c(mo2,mo3,mo4,mo5) = c(XXX)
- Class 2: sigma  = XXX, theta = XXX and c(mo2,mo3,mo4,mo5) = c(XXX)}
+Class 1: sigma  = XXX, theta = XXX and c(mo2,mo3,mo4,mo5) = c(XXX)
+Class 2: sigma  = XXX, theta = XXX and c(mo2,mo3,mo4,mo5) = c(XXX)}
 }
 \usage{
 simulated_data_mo

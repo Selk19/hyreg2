@@ -2,33 +2,33 @@
 # Write R package
 # https://tinyheero.github.io/jekyll/update/2015/07/26/making-your-first-R-package.html
 
-#' FLXMRhyreg: M-step driver to be used in flexmix
+#' M-step driver to be used in flexmix
 #'
 #' @description Function used in flexmix M-Step to estimate hybrid model
-#' @param formula linear model formula
-#' @param family default = "hyreg", needed for flexmix::flexmix
-#' @param type vector containing the indicator whether that datapoint (row)
-#'  contains continuous or dichotomous data, see details of hyreg2::hyreg2
-#' @param type_cont value of type referring to continuous data, see details of hyreg2::hyreg2
-#' @param type_dich value of type referring to dichotomous data,  see details of hyreg2::hyreg2
-#' @param variables_both character vector; variables to be fitted on both continuous and dichotomous data.
-#'  If not specified, all variables from formula are used. If provided and not all variables from formula
-#'  are included, variables_cont and variables_dich must be provided as well, while one of them can be NULL,
-#'   see details of hyreg2::hyreg2
-#' @param variables_cont character vector; variables to be fitted only on continous data. If provided,
-#' variables_both and variables_dich must be provided as well.
-#' @param variables_dich character vactor; variables to be fitted only on dichotomous data, if provided,
-#'  variables_both and variables_cont must be provided as well.
-#' @param stv named vector or list of named vectors containing start values for all coefficients
-#'  formula, including sigma and theta, see details of hyreg2::hyreg2
-#' @param offset offset as in flexmix::flexmix
-#' @param optimizer optimizer to be used in bbmle::mle2, default = "optim"
-#' @param opt_method optimization method to be used in optimizer, default = "BFGS"
-#' @param lower default = -INF, lower bound for censored data. If this is used, opt_method must be
-#'  set to "L-BFGS-B"
-#' @param upper default = INF, upper bound for censored data. If this is used, opt_method must be
-#'  set to "L-BFGS-B",
-#' @param ... additional arguments for flexmix::flexmix or bbmle::mle2
+#'
+#' @param formula linear model `formula`
+#' @param family default `"hyreg"`, needed for [flexmix::flexmix()]
+#' @param type `character` vector containing the indicator whether that datapoint (row)
+#'  contains continuous or dichotomous data, see Details of [hyreg2]
+#' @param type_cont value of `type` referring to continuous `data`, see Details of [hyreg2]
+#' @param type_dich value of `type` referring to dichotomous `data`, see Details of [hyreg2]
+#' @param variables_both `character` vector; variables to be fitted on both continuous and dichotomous data.
+#'   see Details of [hyreg2]
+#' @param variables_cont `character` vector; variables to be fitted only on continous data. see Details of [hyreg2]
+#' @param variables_dich character vactor; variables to be fitted only on dichotomous data. see Details of [hyreg2]
+#' @param stv `named vector` or `list` of named vectors containing start values for all coefficients from
+#'  `formula`, including `theta`, see Details of [hyreg2::hyreg2]
+#' @param offset offset as in [flexmix::flexmix()], default `NULL`
+#' @param optimizer `character`, optimizer to be used in [bbmle::mle2()], default `"optim"`
+#' @param opt_method `character`, optimization method to be used in `optimizer`, default `"BFGS"`
+#' @param lower  lower bound for censored data. If this is used, `opt_method` must be
+#'  set to `"L-BFGS-B"`, default `-INF`,
+#' @param upper  upper bound for censored data. If this is used, `opt_method` must be
+#'  set to `"L-BFGS-B"`,default `INF`
+#' @param ... additional arguments for [flexmix::flexmix()] or [bbmle::mle2()]
+#'
+#' @return a `model` object, that can be used in [hyreg2] as input for parameter `model` in [flexmix::flexmix()]
+#'
 #'
 #' @return a model object, that can be used in hyreg2 as input for parameter model in flexmix::flexmix
 #'
@@ -165,7 +165,6 @@ FLXMRhyreg <- function(formula= . ~ . ,
         pvals2 <- log(y2 *logistic_tmp + (1-y2)* (1-logistic_tmp)) # dich_logistic
 
         pvals1 <- dnorm(y1, mean=Xb1, sd=sigma, log=TRUE) # cont_normal
-
 
 
         # for censored data

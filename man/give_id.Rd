@@ -2,28 +2,25 @@
 % Please edit documentation in R/plot_hyreg2.R
 \name{give_id}
 \alias{give_id}
-\title{give_id: function to decode which id or observation was classified to which class by the model}
+\title{function to decode which group or observation was classified to which class by the model}
 \usage{
 give_id(data, model, id_col = NULL)
 }
 \arguments{
-\item{data}{a dataframe, which was used to estimate the model}
+\item{data}{a \code{dataframe}, which was used to estimate the \code{model}}
 
-\item{model}{a flexmix model object estimtaed using hyreg2 or hyreg2_het}
+\item{model}{a flexmix \code{model}object estimated using \code{\link[=hyreg2]{hyreg2()}} or \code{\link[=hyreg2_het]{hyreg2_het()}}}
 
-\item{id_col}{character string, name of grouping variable, which must be a column of the provided dataframe.
-the parameter must be specified, if the provided model was estimated under control for groups}
+\item{id_col}{\code{character} string, name of grouping variable, which must be a column of the provided \code{data}.
+the parameter must be specified, if the provided \code{model} was estimated under control for \code{groups}}
 }
 \value{
-dataframe of two columns, first column named as provided id_col  or "observation" if id_col was not given as
-         an input. second column named "mod_comp" indicating the assigned class for this group or observation
+\code{dataframe} of two columns, first column named as provided \code{id_col}  or \code{"observation"} if \code{id_col} was not given as
+an input. second column named \code{"mod_comp"} indicating the assigned class for this group or observation
 }
 \description{
-This function can be used to decode the classified classes by the model and see, which id ot observation
-             was signed to which class
-}
-\details{
-PUT DETAILS HERE
+This function can be used to decode the classified classes by the model generates using \code{hyreg2} or \code{hyreg2_het} and see,
+which group or observation was signed to which class
 }
 \examples{
 # estimtae a model using simulated_data_rnorm

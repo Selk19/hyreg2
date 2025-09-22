@@ -1,20 +1,19 @@
 
 
-#' give_id: function to decode which id or observation was classified to which class by the model
+#' function to decode which group or observation was classified to which class by the model
 #'
-#' @description This function can be used to decode the classified classes by the model and see, which id ot observation
-#'              was signed to which class
+#' @description This function can be used to decode the classified classes by the model generates using `hyreg2` or `hyreg2_het` and see,
+#'  which group or observation was signed to which class
 #'
-#' @param data a dataframe, which was used to estimate the model
-#' @param model a flexmix model object estimtaed using hyreg2 or hyreg2_het
-#' @param id_col character string, name of grouping variable, which must be a column of the provided dataframe.
-#'          the parameter must be specified, if the provided model was estimated under control for groups
+#' @param data a `dataframe`, which was used to estimate the `model`
+#' @param model a flexmix `model`object estimated using [hyreg2()] or [hyreg2_het()]
+#' @param id_col `character` string, name of grouping variable, which must be a column of the provided `data`.
+#'          the parameter must be specified, if the provided `model` was estimated under control for `groups`
 #'
 #'
-#' @return dataframe of two columns, first column named as provided id_col  or "observation" if id_col was not given as
-#'          an input. second column named "mod_comp" indicating the assigned class for this group or observation
+#' @return `dataframe` of two columns, first column named as provided `id_col`  or `"observation"` if `id_col` was not given as
+#'          an input. second column named `"mod_comp"` indicating the assigned class for this group or observation
 #'
-#' @details PUT DETAILS HERE
 #'
 #' @examples
 #' # estimtae a model using simulated_data_rnorm
@@ -99,33 +98,33 @@ give_id <- function(data,
 
 
 
-#' plot_hyreg2: plot function to visualize the classification based on the model
+#' plot function to visualize the classification based on the model estimated using `hyreg2` or `hyreg2_het`
 #'
 #' @description This function can be used to visualize the classification based on the model for different variables.
-#'              ggplot is used.
+#'              [ggplot2::ggplot()] is used.
 #'
-#' @param data a dataframe, which was used to estimate the model during hyreg2 or hyreg2_het
-#' @param x charachter string, column of data to be plotted in x-axis
-#' @param y charachter string, column of data to be plotted in y-axis
-#' @param id_col charachter sting, grouping variable, same as was given in model.
-#'            if model was estimated without grouping see details
-#' @param id_df_model dataframe of two columns indicating which group belongs to which class,
-#'                  first column named as input id_col, second column named "mod_comp".
-#'                  this variable can easily be filled using the the give_id function, see details.
-#' @param type_to_plot list of two charachter elements. First: columnname of column containing indicator for type of data,
-#'                       Second: value of column type, that should be used for the plot, see details of hyreg inputs type and type_cont,type_dich
-#' @param colors charachter vector, colors to be used in ggplot, default is NULL - than colors are choosen automalically
+#' @param data a `dataframe`, which was used to estimate the `model` using [hyreg2()] or [hyreg2_het()]
+#' @param x `charachter` string, column of `data` to be plotted in x-axis
+#' @param y `charachter` string, column of `data` to be plotted in y-axis
+#' @param id_col `charachter` sting, grouping variable, same as was given in `model`.
+#'            if model was estimated without grouping, see Details
+#' @param id_df_model `dataframe` of two columns indicating which group belongs to which class,
+#'                  first column named as input `id_col`, second column named `"mod_comp"`.
+#'                  this input can be generated using the [give_id()] function, see Details.
+#' @param type_to_plot `list` of two `charachter` elements. First: `columnname` of column containing indicator for `type` of `data`,
+#'                       Second: `value` of column `type`, that should be used for the plot, see details of [hyreg2()] inputs `type` and `type_cont`,`type_dich`
+#' @param colors `charachter` vector, colors to be used in `ggplot`, default `NULL` - than colors are choosen automatically
 #'
 #'
 #'
-#' @return ggplot object visulizing x against y by classes from the model
+#' @return `ggplot` object visualizing x against y by classes from the model
 #'
 #' @details
-#' id_col_df has to be provided anyway, even if the model was estimated without grouping variable.
-#' Since there might be no grouping varibale in the data, we recommend to create a new column "observation"
-#' in data using the rownames/observationnumbers as charachter values and use this column as
-#' input for id_col in plot_hyreg2, additionally you can then use id_df_model =  give_id(data,model,"observation"),
-#' see example below.
+#' `id_col_df` has to be provided anyway, even if the model was estimated without grouping variable.
+#' Since there might be no grouping varibale in the `data`, we recommend to create a new column called `"observation"`
+#' in data using the `rownames`/`observationnumbers` as `charachter` values and use this column as
+#' input for `id_col` in `plot_hyreg2`, additionally you can then use `id_df_model` =  `give_id(data,model,"observation")`,
+#' see example
 #'
 #' @examples
 #' # estimate a model using simulated_data_rnorm
@@ -225,19 +224,21 @@ plot_hyreg2 <- function(data,
     data <- data[(data[,type_to_plot[[1]]]) == type_to_plot[[2]],]
   }
 
-library(ggplot2)
- p <-  ggplot2::ggplot(mapping =aes(x = data[,x], y = data[,y], color = as.character(data$mod_comp)))
- p <- p + geom_point(size = 1, alpha = 0.7)
- p <- p +  labs( title = "classification",
+# https://ggplot2.tidyverse.org/articles/ggplot2-in-packages.html
+#require("ggplot2")
+
+ p <-  ggplot2::ggplot(mapping = ggplot2::aes(x = data[,x], y = data[,y], color = as.character(data$mod_comp)))
+ p <- p + ggplot2::geom_point(size = 1, alpha = 0.7)
+ p <- p +  ggplot2::labs( title = "classification",
           x = paste0(x),
           y = paste0(y),
           color = "Class")
- p <- p + geom_jitter(width = 0.1, height = 0, size = 1) #alpha = 0.2) # verschieben der Punkte leicht zur Seite
- p <- p + theme_minimal()
+ p <- p + ggplot2::geom_jitter(width = 0.1, height = 0, size = 1) #alpha = 0.2) # verschieben der Punkte leicht zur Seite
+ p <- p + ggplot2::theme_minimal()
 
   # colours
   if (!is.null(colors)) {
-    p <- p + scale_color_manual(values = colors)
+    p <- p + ggplot2::scale_color_manual(values = colors)
   }
 
  return(p)

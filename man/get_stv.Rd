@@ -2,22 +2,22 @@
 % Please edit documentation in R/hyreg2.R
 \name{get_stv}
 \alias{get_stv}
-\title{get_stv}
+\title{extract parameter estimates as named vector}
 \usage{
 get_stv(mod, comp = "Comp.1")
 }
 \arguments{
-\item{mod}{modeloutput from hyreg2 oder hyreg2_het. If latent was "cont" oder "dich" only one part of the output list can be used.
-write modeloutput[[z]], where z is the component you want to extract}
+\item{mod}{\code{model}output from \link{hyreg2} oder \link{hyreg2_het}. If \code{latent} was \code{"cont"} or \code{"dich"} only one element of the output list can be used.}
 
-\item{comp}{charachter, default = "Comp.1". "Comp.x" indicating values from which model component (x) should be exported}
+\item{comp}{\code{charachter}, default \code{"Comp.1"}. \code{"Comp.x"} indicating values from which model \code{component} (\code{x}) should be exported}
 }
 \value{
-named vector of parameter estimates from mod. Can be used as stv for additional model estimations
+\verb{named vector} of parameter estimates from \code{mod}. Can be used as \code{stv} for additional model estimations using
+\code{hyreg2} or \code{hyreg2_het}
 }
 \description{
-function to export coefficent values and names from a model fitted with k = 1 and latent = "both".
-These values can be used as stv for a new model with k > 1
+function to export coefficient values and names from a \code{model} fitted with \code{hyreg2} or \code{hyreg2_het}
+These values can be used as \code{stv} for a new model with \code{k > 1}
 }
 \examples{
 formula <- y ~  -1 + x1 + x2 + x3 | id

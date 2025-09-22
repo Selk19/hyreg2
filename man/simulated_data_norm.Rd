@@ -5,22 +5,24 @@
 \alias{simulated_data_norm}
 \title{simulated_data_norm}
 \format{
-## `simulated_data_norm`
+\subsection{\code{simulated_data_norm}}{
+
 A simulated data frame with 600 rows and 8 columns, following a combination of normal and binomial distribution
 \describe{
-  \item{type}{type of data}
-  \item{y}{result of the model y = x1 + x2 + x3}
-  \item{x1, x2, x3}{random numbers from rnorm}
-  \item{class}{original class of the data point}
-  \item{id}{id number of observations to simulated different persons}
-  \item{y_cens}{column y censored at 3}
-  ...
+\item{type}{type of data}
+\item{y}{result of the model y = x1 + x2 + x3}
+\item{x1, x2, x3}{random numbers from rnorm}
+\item{class}{original class of the data point}
+\item{id}{id number of observations to simulated different persons}
+\item{y_cens}{column y censored at 3}
+...
+}
 }
 }
 \source{
 {simulated with true parameter values:
- Class 1: sigma  = 1.0, theta = 5 and c(x1,x2,x3) = c(0.5, -0.3, 0.8)
- Class 2: sigma  = 0.5, theta = 2 and c(x1,x2,x3) = c(1.4, 2.3, -0.2)}
+Class 1: sigma  = 1.0, theta = 5 and c(x1,x2,x3) = c(0.5, -0.3, 0.8)
+Class 2: sigma  = 0.5, theta = 2 and c(x1,x2,x3) = c(1.4, 2.3, -0.2)}
 }
 \usage{
 simulated_data_norm

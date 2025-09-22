@@ -1,11 +1,18 @@
 Package: hyreg2
 Type: Package
-Title: An R package to estimate latent class models for combined likelihoods of continous and dichotomus data
-Version: 0.1.0
+Title: Estimate latent class models for combined likelihoods of continuous and dichotomous data
+Version: 1.0.0
 Author: Svenja Elkenkamp, Kim Rand and John Grosser
-Maintainer:  <svenja.elkenkamp@uni-bielefeld.de> 
-Description: Using this package EQ-5D valuesets estimation can be done using latent classes.
-License: What license is it under?
+Maintainer: <svenja.elkenkamp@uni-bielefeld.de> 
+Description: Using this package EQ-5D valueset estimations can be done using latent classes.
+      It allows users to address preference heterogeneity and use a data-driven subgrouping of participants while estimating EQ-5D value sets. 
+      The code for estimating models is based on the R package `flexmix`. The EM-algorithm is implemented in `flexmix` and offers the opportunity for 
+      uses to write their own `M-step-drivers` (Leisch 2004). This opportunity was used to create an M-step-driver for the hybrid model likelihood as described by 
+      Oppe und van Hout 2010 and Ramos-Goñi et al. 2016. The optimization is done using the `mle2` function from package `bbmle` .
+      The package supports both uncensored and censored data.Furthermore, heteroscedasticity can be taken into account using the `hyreg2_het` function. 
+      It is also possible to control for different covariates on the continuous and dichotomous parts of the data and start values to be used can differ
+      between the expected latent classes. 
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.1
@@ -18,3 +25,4 @@ Suggests:
 Config/testthat/edition: 3
 Depends: 
     R (>= 2.10)
+Roxygen: list(markdown = TRUE)
