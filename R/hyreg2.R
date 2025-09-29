@@ -58,20 +58,20 @@
 #'  and the dependent variable y used in `formula`, one column for the grouping variable xg if grouping
 #'  should be used, e.g. id numbers of participants with repeated measurements, one column indicating
 #'  if the observations belongs to continuous or dichotomous data with the entries `type_cont`
-#'   and `type_dich` (e.g., for a column called `"type"` with the entries "TTO" for continuous datapoints
-#'    and "DCE" for dichotomous datapoints, `type_cont` will be "TTO" and `type_dich` will be "DCE").
-#'    One row should match one observation (one datapoint).
+#'  and `type_dich` (e.g., for a column called `"type"` with the entries "TTO" for continuous datapoints
+#'  and "DCE" for dichotomous datapoints, `type_cont` will be "TTO" and `type_dich` will be "DCE").
+#'  One row should match one observation (one datapoint).
 #'
 #'
 #' @section start values (stv):
 #' if the same start values `stv` are to be used for all latent classes,
 #' the given start values must be a `named vector`. Otherwise (if different start values are assumed for
 #'  each latent class), a `list` of named vectors should be used . In this case, there must be one entry
-#'   in the list for each latent class.  Each start value vector must include start values for sigma and
-#'   theta. Currently, it is necessary to use the names `"sigma"` and `"theta"` for these values.
-#'   If users are unsure for which variables start values must be provided, this can be checked by
-#'    calling `colnames(model.matrix(formula,data))`. In this call, the `formula` should not include the
-#'    grouping variable.
+#'  in the list for each latent class.  Each start value vector must include start values for sigma and
+#'  theta. Currently, it is necessary to use the names `"sigma"` and `"theta"` for these values.
+#'  If users are unsure for which variables start values must be provided, this can be checked by
+#'  calling `colnames(model.matrix(formula,data))`. In this call, the `formula` should not include the
+#'  grouping variable.
 #'
 #'
 #' @section latent, id_col, classes_only:
@@ -158,12 +158,8 @@ hyreg2 <-function(formula,
                   variables_cont = NULL,
               #    non_linear = FALSE,
                   # additional arguments for flexmix or optimizer ?
-
                   # MISSING:
                   # non linear regression not implemented yet
-                  #   Xb in FLXMRhyreg must be computed differently for that
-                  # FLXMRhyreg_het is not implemnted here, maybe better write new function hyreg2_het?
-
                   ...){
 
   dotarg <- list(...)
@@ -185,33 +181,33 @@ hyreg2 <-function(formula,
   # no stv
   if(!is.list(stv)){
     if(is.null(stv)){
-      warning(paste0("No stv provided. Set all stv from data to 0.1 and sigma = 1 and theta = 1"))
+      warning(paste0("Argument stv not provided. Setting all start values from formula to 0.1 and start values for sigma and theta to 1."))
       stv <- setNames(c(rep(0.1,dim(model.matrix(formula_short,data))[2]),1,1), c(colnames(model.matrix(formula_short,data)),c("sigma","theta")))
     }else{
 
       # one or more stv missing
       if(any(!is.element(colnames(model.matrix(formula_short,data)),names(stv)))){
         miss <- colnames(model.matrix(formula_short,data))[!is.element(colnames(model.matrix(formula_short,data)),names(stv))]
-        stop(paste0("start values missing for ", paste(miss, collapse = ", ") ," Please provide stv values for all relevant variables."
+        stop(paste0("Start value(s) missing for ", paste(miss, collapse = ", ") ,". Please provide start values for all relevant formula variables."
         ))
       }
 
       # theta missing
       if(!is.element("theta",names(stv))){
         stv <- c(stv,setNames(1,"theta"))
-        warning(paste0("No stv for theta provided, set to 1"))
+        warning(paste0("Start value missing for theta, setting to 1."))
       }
 
       # sigma missing
       if(!is.element("sigma",names(stv))){
         stv <- c(stv,setNames(1,"sigma"))
-        warning(paste0("No stv for sigma provided, set to 1"))
+        warning(paste0("Start value missing for sigma, setting to 1."))
       }
 
       # stv for variables not in formula given, d.h. zu viele angegeben
       if(any(!is.element(names(stv), c(colnames(model.matrix(formula_short,data)),"theta","sigma")))){
         much <- names(stv)[!is.element(names(stv), c(colnames(model.matrix(formula_short,data)),"theta","sigma"))]
-        stop(paste0("Too many stv provided. ",paste(much, collapse = ", "), " is/are no variable in formula and does not need a stv"))
+        stop(paste0("Start values provided for variables not in formula: ",paste(much, collapse = ", ")))
       }
       #  check order in FLXMRhyreg
     }
@@ -224,41 +220,40 @@ hyreg2 <-function(formula,
         # one or more stv missing
         if(any(!is.element(colnames(model.matrix(formula_short,data)),names(stv[[i]])))){
           miss <- colnames(model.matrix(formula_short,data))[!is.element(colnames(model.matrix(formula_short,data)),names(stv[[i]]))]
-          stop(paste0("start values missing for ", paste(miss, collapse = ", ") ," Please provide stv values for all relevant variables."
+          stop(paste0("Start value(s) missing for ", paste(miss, collapse = ", ") ,". Please provide start values for all relevant formula variables."
           ))
         }
 
         # theta missing
         if(!is.element("theta",names(stv[[i]]))){
           stv[[i]] <- c(stv[[i]],setNames(1,"theta"))
-          warning(paste0("No stv for theta provided, set to 1"))
+          warning(paste0("Start value missing for theta, setting to 1."))
         }
 
         # sigma missing
         if(!is.element("sigma",names(stv[[i]]))){
           stv[[i]] <- c(stv[[i]],setNames(1,"sigma"))
-          warning(paste0("No stv for sigma provided, set to 1"))
+          warning(paste0("Start value missing for sigma, setting to 1."))
         }
 
         # stv for variables not in formula given, d.h. zu viele angegeben
         if(any(!is.element(names(stv[[i]]), c(colnames(model.matrix(formula_short,data)),"theta","sigma")))){
           much <- names(stv[[i]])[!is.element(names(stv[[i]]), c(colnames(model.matrix(formula_short,data)),"theta","sigma"))]
-          stop(paste0("Too many stv provided. ",paste(much, collapse = ", "), " is/are no variable in formula and does not need a stv"))
+          stop(paste0("Start values provided for variables not in formula: ",paste(much, collapse = ", ")))
         }
-
       }
     }
 
 
   ### TYPE Check ###
   if(is.null(type) | is.null(type_dich) | is.null(type_cont)){
-    stop(paste0("inputs for type, type_dich and typ_cont needed"))
+    stop(paste0("Argument(s) type, type_dich and/or typ_cont not provided."))
   }else{
     if(!is.element(type_dich,unique(type))){
-      warning(paste0("Provided type_dich is not part of type"))
+      warning(paste0("Invalid type_dich: provided name not present in values of type"))
     }
     if(!is.element(type_cont,unique(type))){
-      warning(paste0("Provided type_cont is not part of type"))
+      warning(paste0("Invalid type_cont: provided name not present in values of type"))
     }
   }
 
@@ -272,12 +267,12 @@ hyreg2 <-function(formula,
       if(any(!is.element(names(stv)[!is.element(names(stv),c("sigma","theta"))],
                          c(variables_both,variables_dich,variables_cont)))){
         # check if all variables are included
-        stop(paste0("all variables from stv have to be part of exactly one of the vectors variables_both, variables_dich or variables_cont"))
+        stop(paste0("All variables named in stv must be contained in exactly one of: (1) variables_both, (2) variables_dich or (3) variables_cont."))
         # alternative: do not provide any of the vectors
         # than all relevant variables are set to variables_both automatically
       }
       if(any(table(c(variables_both,variables_cont,variables_dich))>1)){
-        stop(paste0("variables can only be part in one of the vectors variables_both, variables_dich and variables_cont"))
+        stop(paste0("All variables named in stv must be contained in exactly one of: (1) variables_both, (2) variables_dich or (3) variables_cont."))
       }
     }
 
@@ -293,20 +288,18 @@ hyreg2 <-function(formula,
       if(any(!is.element(names(stv[[1]])[!is.element(names(stv[[1]]),c("sigma","theta"))],
                          c(variables_both,variables_dich,variables_cont)))){
         # check if all variables are included
-        stop(paste0("all variables from stv have to be part of exactly one of the vectors variables_both, variables_dich or variables_cont"))
+        stop(paste0("All variables named in stv must be contained in exactly one of: (1) variables_both, (2) variables_dich or (3) variables_cont."))
         # alternative: do not provide any of the vectors
         # than all relevant variables are set to variables_both automatically
       }
       if(any(table(c(variables_both,variables_cont,variables_dich))>1)){
-        stop(paste0("variables can only be part in one of the vectors variables_both, variables_dich and variables_cont"))
+        stop(paste0("All variables named in stv must be contained in exactly one of: (1) variables_both, (2) variables_dich or (3) variables_cont."))
       }
     }
   }
 
 
   ### NON LINEAR FUNCTIONS ###
-  # NOT IMPLEMENTED YET
-
   formula_orig <- formula
 #  if(non_linear == TRUE){
     # formula <- function to keep only names of data columns
@@ -355,7 +348,7 @@ hyreg2 <-function(formula,
 
    if(any(idcount$Freq == 0)){
      miss <- idcount[idcount$Freq == 0,"id"]
-     warning(paste0( id_col ,paste(miss, collapse = ", "), " were removed, since they were only part in one type of data"))
+     warning(paste0(id_col ,paste(miss, collapse = ", "), " were removed, since they had only continuous or only dichotomous observations."))
    }
 
    # FIRST STEP: GET LATENT CLASSES
@@ -437,7 +430,7 @@ hyreg2 <-function(formula,
    mod_list <- lapply(data_list, function(xy){
      if(is.null(xy)){
       mod <- NULL
-      warning( paste("one or more components are empty. Set mod to NULL"))
+      warning( paste("One or more components are empty. Setting mod to NULL."))
      }else{
        model <- list(FLXMRhyreg(type= type[data$mod_comp == unique(xy$mod_comp)],
                                 #type = type,

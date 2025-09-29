@@ -7,9 +7,9 @@ Maintainer: <svenja.elkenkamp@uni-bielefeld.de>
 Description: Using this package EQ-5D valueset estimations can be done using latent classes.
       It allows users to address preference heterogeneity and use a data-driven subgrouping of participants while estimating EQ-5D value sets. 
       The code for estimating models is based on the R package `flexmix`. The EM-algorithm is implemented in `flexmix` and offers the opportunity for 
-      uses to write their own `M-step-drivers` (Leisch 2004). This opportunity was used to create an M-step-driver for the hybrid model likelihood as described by 
-      Oppe und van Hout 2010 and Ramos-Goñi et al. 2016. The optimization is done using the `mle2` function from package `bbmle` .
-      The package supports both uncensored and censored data.Furthermore, heteroscedasticity can be taken into account using the `hyreg2_het` function. 
+      users to write their own `M-step-drivers` (Leisch 2004). This opportunity was used to create an M-step-driver for the hybrid model likelihood as described by 
+      Oppe and van Hout (2010) and Ramos-Goñi et al. (2016). The optimization is done using the `mle2` function from package `bbmle` .
+      The package supports both uncensored and censored data. Furthermore, heteroscedasticity can be taken into account using the `hyreg2_het` function. 
       It is also possible to control for different covariates on the continuous and dichotomous parts of the data and start values to be used can differ
       between the expected latent classes. 
 License: MIT + file LICENSE

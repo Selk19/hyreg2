@@ -32,8 +32,8 @@ hyreg2_het(
 \arguments{
 \item{formula}{linear model \code{formula}. Using \verb{|x} will include a grouping variable \code{x}. see Details.}
 
-\item{formula_sigma}{linear \code{formula} for \verb{sigma estimation}, if not provided \code{formula} is taken without grouping
-variable, see Details}
+\item{formula_sigma}{linear \code{formula} linear formula for sigma estimation. If \code{formula_sigma} is not provided,
+\code{formula} (excluding any grouping variables) is used by default, see Details}
 
 \item{data}{a \code{data.frame} containing the data. see Details.}
 
@@ -52,8 +52,8 @@ see Details.}
 \item{stv}{\verb{named vector} or \code{list} of named vectors containing start values for all coefficients
 formula, including sigma and theta, see Details}
 
-\item{stv_sigma}{\verb{named vector} with start values for sigma estimation.
-Have to be the same variables as given in \code{formula_sigma}, see Details}
+\item{stv_sigma}{\verb{named vector} with start values for sigma estimation. Names must correspond to the variables
+as given in \code{formula_sigma}, see Details}
 
 \item{offset}{offset as in \code{\link[flexmix:flexmix]{flexmix::flexmix()}}}
 
@@ -134,15 +134,15 @@ grouping variable.
 
 \section{formula_sigma, stv_sigma}{
 
-To account for heteroscedasticity in the data an additional formula \code{formula_sigma} and an additional vector of
-starting values for this formula (\code{stv_sigma}) can be specified. The provided \code{formula_sigma} must be linear and the
-vector \code{stv_sigma} must contain start values for all parameters used in the formula. If neither
-\code{formula_sigma} nor \code{stv_sigma} are provided, the same inputs as for \code{formula} (without controlling for groups)
-and \code{stv} (without \code{sigma}) are used.  The parameters to be estimated using \code{formula_sigma} do not need special
-names; they simply refer to the relevant columns of \code{data}. Their estimates can be identified in the model
-output by the ending  \verb{_h}.
-It is important to note that the start values \code{stv} for the overall model parameters (from \code{formula}) are not allowed to
-include \code{sigma} (in contrast to \link{hyreg2}, where \code{sigma} must always be specified).
+To account for heteroscedasticity in the data, an additional formula \code{formula_sigma} and an additional
+vector of starting values for this formula (\code{stv_sigma}) can be specified.
+The provided \code{formula_sigma} must be linear and the vector \code{stv_sigma} must contain start values for
+all parameters used in the formula. If neither \code{formula_sigma} nor \code{stv_sigma} are provided, the same
+inputs as for \code{formula} (without controlling for groups) and \code{stv} (without sigma) are used.
+The estimates for \code{sigma} can be identified in the model output by the ending \code{"_h"}. It is important to note
+that, when using \code{hyreg2_het}, neither \code{stv} nor \code{stv_sigma} are allowed to include \code{sigma},
+because \code{sigma} is estimated with its own formula (in contrast to \code{hyreg2}, where \code{sigma} must always be
+specified in \code{stv}).
 }
 
 \section{latent, id_col, classes_only}{
