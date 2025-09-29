@@ -31,7 +31,7 @@
 #' @return a `model` object, that can be used in [hyreg2_het] as input for parameter `model` in [flexmix::flexmix()]
 #'
 #'
-#' @author Kim Rand & Svenja Elkenkamp
+#' @author Svenja Elkenkamp and Kim Rand
 #' @examples
 #'
 #' formula <- y ~  -1 + x1 + x2 + x3

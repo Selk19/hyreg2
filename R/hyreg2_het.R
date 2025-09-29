@@ -123,7 +123,7 @@
 
 
 #'
-#' @author Svenja Elkenkamp & Kim Rand, John Grosser
+#' @author Svenja Elkenkamp, Kim Rand and John Grosser
 #' @examples
 #'
 #'formula <- y ~  -1 + x1 + x2 + x3

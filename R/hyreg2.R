@@ -106,7 +106,7 @@
 #'* Every variable included in the provided `formula` (except the grouping variable ) must appear in exactly
 #'   one of these vectors. One of the `variables_` vectors can also be `NULL`, if no variables should be used only on this type of the data.
 
-#' @author Svenja Elkenkamp & Kim Rand, John Grosser
+#' @author Svenja Elkenkamp, Kim Rand and John Grosser
 #' @examples
 #'
 #'formula <- y ~  -1 + x1 + x2 + x3 | id
@@ -468,7 +468,7 @@ hyreg2 <-function(formula,
 #' @param object `modelobject` generated with [hyreg2()] or [hyreg2_het()]
 #' @return `summary` object of [bbmle::mle2()] model
 #'
-#' @author Kim Rand & Svenja Elkenkamp
+#' @author Svenja Elkenkamp
 #' @examples
 #'
 #'formula <- y ~  -1 + x1 + x2 + x3 | id
@@ -521,7 +521,7 @@ summary_hyreg2 <- function(object){
 #' @return `named vector` of parameter estimates from `mod`. Can be used as `stv` for additional model estimations using
 #' `hyreg2` or `hyreg2_het`
 #'
-#' @author Kim Rand & Svenja Elkenkamp
+#' @author Svenja Elkenkamp
 #' @examples
 #'formula <- y ~  -1 + x1 + x2 + x3 | id
 #'

@@ -1,10 +1,10 @@
 Package: hyreg2
 Type: Package
-Title: Estimate latent class models for combined likelihoods of continuous and dichotomous data
+Title: Estimate latent classes for EQ-5D value set estimation using continuous and dichotomous data
 Version: 1.0.0
 Author: Svenja Elkenkamp, Kim Rand and John Grosser
 Maintainer: <svenja.elkenkamp@uni-bielefeld.de> 
-Description: Using this package EQ-5D valueset estimations can be done using latent classes.
+Description: Using this package EQ-5D value set estimations can be done using LCA.
       It allows users to address preference heterogeneity and use a data-driven subgrouping of participants while estimating EQ-5D value sets. 
       The code for estimating models is based on the R package `flexmix`. The EM-algorithm is implemented in `flexmix` and offers the opportunity for 
       users to write their own `M-step-drivers` (Leisch 2004). This opportunity was used to create an M-step-driver for the hybrid model likelihood as described by 
