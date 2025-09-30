@@ -16,11 +16,11 @@
 #'
 #'
 #' @examples
-#' # estimtae a model using simulated_data_rnorm
+#' # estimate a model using simulated_data_rnorm
 #'
 #' ### using grouping variable id ####
 #'formula <- y ~  -1 + x1 + x2 + x3 | id
-#'k <- 2
+#'k <- 1
 #'stv <- setNames(c(0.2,0.2,0.2,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
 #'control <- list(iter.max = 1000, verbose = 4)
 #'
@@ -33,7 +33,7 @@
 #'                     type_dich = "DCE_A",
 #'                     opt_method = "L-BFGS-B",
 #'                     control = control,
-#'                     latent = "cont",
+#'                     latent = "both",
 #'                     id_col = "id"
 #')
 
@@ -43,26 +43,6 @@
 #' id_col = "id")
 #'
 #'
-#'  ### model without control for groups ###
-#'formula <- y ~  -1 + x1 + x2 + x3
-#'k <- 2
-#'stv <- setNames(c(0.2,0.2,0.2,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
-#'control <- list(iter.max = 1000, verbose = 4)
-#'
-#'hyflex_mod <- hyreg2(formula = formula,
-#'                     data =  simulated_data_norm,
-#'                     type =  simulated_data_norm$type,
-#'                     stv = stv,
-#'                     k = k,
-#'                     type_cont = "TTO",
-#'                     type_dich = "DCE_A",
-#'                     opt_method = "L-BFGS-B",
-#'                     control = control,
-#'                     latent = "both"
-#')
-#' # use of function give_id
-#' give_id(data = simulated_data_norm,
-#' model = hyflex_mod)
 #'
 #' @author Svenja Elkenkamp & John Grosser
 #' @export
@@ -87,7 +67,7 @@ give_id <- function(data,
       }
 
     }else{
-      ids_comp <- model[[3]]
+      ids_comp <- model[[length(model)]]
       colnames(ids_comp) <- c(id_col,"mod_comp")
     }
 
@@ -129,7 +109,6 @@ give_id <- function(data,
 #' @examples
 #' # estimate a model using simulated_data_rnorm
 #'
-#' ### using | id ####
 #'formula <- y ~  -1 + x1 + x2 + x3 | id
 #'k <- 2
 #'stv <- setNames(c(0.2,0.2,0.2,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
@@ -157,48 +136,7 @@ give_id <- function(data,
 #'                                 model = hyflex_mod,
 #'                                 id = "id"))
 #'
-#' # using only TTO data
-#'plot_hyreg2(data = simulated_data_norm,
-#'           x = "id",
-#'           y = "y",
-#'           id_col = "id",
-#'           id_df_model = give_id(data = simulated_data_norm,
-#'                                 model = hyflex_mod,
-#'                                 id = "id"),
-#'            type_to_plot = list("type","TTO"))
-#'
-#'
-#'
-#' ### model without control for id during | id ###
-#'formula <- y ~  -1 + x1 + x2 + x3
-#'k <- 2
-#'stv <- setNames(c(0.2,0.2,0.2,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
-#'control <- list(iter.max = 1000, verbose = 4)
-#'
-#'hyflex_mod <- hyreg2(formula = formula,
-#'                     data =  simulated_data_norm,
-#'                     type =  simulated_data_norm$type,
-#'                     stv = stv,
-#'                     k = k,
-#'                     type_cont = "TTO",
-#'                     type_dich = "DCE_A",
-#'                     opt_method = "L-BFGS-B",
-#'                     control = control,
-#'                     latent = "both"
-#')
-#'
-#'# plotting the variables x2 against y
-#'
-#' simulated_data_norm_plot <- simulated_data_norm
-#' simulated_data_norm_plot$observation <- rownames(simulated_data_norm_plot)
-#'plot_hyreg2(data = simulated_data_norm_plot,
-#'           x = "x2",
-#'           y = "y",
-#'           id_col = "observation",
-#'           id_df_model = give_id(data = simulated_data_norm_plot,
-#'                                 model = hyflex_mod,
-#'                                 id_col = "observation"))
-#'
+
 #'
 #' @author Svenja Elkenkamp & John Grosser
 #' @importFrom ggplot2 ggplot

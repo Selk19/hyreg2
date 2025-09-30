@@ -23,11 +23,11 @@ This function can be used to decode the classified classes by the model generate
 which group or observation was signed to which class
 }
 \examples{
-# estimtae a model using simulated_data_rnorm
+# estimate a model using simulated_data_rnorm
 
 ### using grouping variable id ####
 formula <- y ~  -1 + x1 + x2 + x3 | id
-k <- 2
+k <- 1
 stv <- setNames(c(0.2,0.2,0.2,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
 control <- list(iter.max = 1000, verbose = 4)
 
@@ -40,7 +40,7 @@ hyflex_mod <- hyreg2(formula = formula,
                     type_dich = "DCE_A",
                     opt_method = "L-BFGS-B",
                     control = control,
-                    latent = "cont",
+                    latent = "both",
                     id_col = "id"
 )
 # use of function give_id
@@ -49,26 +49,6 @@ model = hyflex_mod,
 id_col = "id")
 
 
- ### model without control for groups ###
-formula <- y ~  -1 + x1 + x2 + x3
-k <- 2
-stv <- setNames(c(0.2,0.2,0.2,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
-control <- list(iter.max = 1000, verbose = 4)
-
-hyflex_mod <- hyreg2(formula = formula,
-                    data =  simulated_data_norm,
-                    type =  simulated_data_norm$type,
-                    stv = stv,
-                    k = k,
-                    type_cont = "TTO",
-                    type_dich = "DCE_A",
-                    opt_method = "L-BFGS-B",
-                    control = control,
-                    latent = "both"
-)
-# use of function give_id
-give_id(data = simulated_data_norm,
-model = hyflex_mod)
 
 }
 \author{

@@ -480,7 +480,7 @@ hyreg2 <-function(formula,
 #' @examples
 #'
 #'formula <- y ~  -1 + x1 + x2 + x3 | id
-#'k <- 2
+#'k <- 1
 #'stv <- setNames(c(0.2,0,1,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
 #'control = list(iter.max = 1000, verbose = 4)
 
@@ -553,26 +553,7 @@ summary_hyreg2 <- function(object){
 #')
 #'new_stv <- get_stv(mod)
 #'
-#'### use new_stv in new model ###
-#'
-
-# random numbers from normal dist
-#'formula <- y ~  -1 + x1 + x2 + x3 | id
-
-#'k <- 2
-
-#'hyflex_mod <- hyreg2(formula = formula,
-#'                     data =  simulated_data_norm,
-#'                     type =  simulated_data_norm$type,
-#'                     stv = new_stv,
-#'                     k = k,
-#'                     type_cont = "TTO",
-#'                     type_dich = "DCE_A",
-#'                     opt_method = "L-BFGS-B",
-#'                     control = control,
-#'                     latent = "both",
-#'                     id_col = "id"
-#')
+#' # these new_stv can be used in an other estimation using hyreg2 as stv
 
 #' @export
 
