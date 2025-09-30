@@ -191,6 +191,8 @@ hyreg2_het <-function(formula,
   if(is.character(type) & length(type) == 1 ){
     type <- data[,type]
   }
+  # assign k to k in package environment to be used during M-step driver
+  assign("k", k, envir=the)
 
   # prepare formula handling
   formula_string <- paste(deparse(formula), collapse = "")
@@ -403,14 +405,14 @@ hyreg2_het <-function(formula,
                              opt_method = opt_method,
                              optimizer = optimizer,
                              lower = lower,
-                             upper = upper,
-                             non_linear = non_linear))
+                             upper = upper))
+                            # non_linear = non_linear))
     #formula_orig = formula
 
 
 
     fit <- flexmix::flexmix(formula = formula, data = data, k = k, model = model, control = control)
-    rm(counter, envir = .GlobalEnv) # counter will be created during the M-step driver
+    rm(counter, envir = the) # counter will be created during the M-step driver
 
     return(fit)
 
@@ -449,12 +451,12 @@ hyreg2_het <-function(formula,
                                optimizer = optimizer,
                                lower = lower,
                                upper = upper,
-                               non_linear = non_linear,
+                            #   non_linear = non_linear,
                                formula_orig = formula_orig))
 
 
       mod <- flexmix::flexmix(formula = formula, data = data_cont, k = k, model = model, control = control)
-      rm(counter, envir = .GlobalEnv)
+      rm(counter, envir = the)
 
       data_cont$mod_comp <- mod@cluster
 
@@ -481,12 +483,12 @@ hyreg2_het <-function(formula,
                                optimizer = optimizer,
                                lower = lower,
                                upper = upper,
-                               non_linear = non_linear,
+                             #  non_linear = non_linear,
                                formula_orig = formula_orig))
 
 
       mod <- flexmix::flexmix(formula = formula, data = data_dich, k = k, model = model, control = control)
-      rm(counter, envir = .GlobalEnv) # counter will be created during the M-step driver
+      rm(counter, envir = the) # counter will be created during the M-step driver
 
       data_dich$mod_comp <- mod@cluster
 
@@ -494,7 +496,6 @@ hyreg2_het <-function(formula,
       data <- merge(data, unique(data_dich[,c(id_col,"mod_comp")]), by = id_col)
       data <- data[order(data$roworder), ]
 
-      # später auch ausgeben können, welche ID zu welcher Klasse zugeordnet wurde
       id_classes <- data_dich[,c(id_col,"mod_comp")]
     }
 
@@ -504,6 +505,9 @@ hyreg2_het <-function(formula,
     }
 
     # SECOND STEP: GET MODEL ESTIMATES
+    # assign 1 to k in package environment to be used during M-step driver
+    assign("k", 1, envir=the)
+
     data_list <- list()
     for(i in unique(mod@cluster)){
       data_list[[i]] <- data[data$mod_comp == i,]
@@ -527,11 +531,11 @@ hyreg2_het <-function(formula,
                                  optimizer = optimizer,
                                  lower = lower,
                                  upper = upper,
-                                 non_linear = non_linear,
+                              #   non_linear = non_linear,
                                  formula_orig = formula_orig))
 
         mod <- flexmix::flexmix(formula = formula, data = xy, k = 1, model = model, control = control)
-        rm(counter, envir = .GlobalEnv) # counter will be created during the M-step driver
+        rm(counter, envir = the) # counter will be created during the M-step driver
       }
       return(mod)
     })
@@ -539,5 +543,6 @@ hyreg2_het <-function(formula,
     mod_list$id_classes <- unique(id_classes)
     return(mod_list)
   }
+  rm(k, envir = the)
 }
 

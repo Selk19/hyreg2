@@ -38,5 +38,5 @@ summary_hyreg2(mod)
 
 }
 \author{
-Kim Rand & Svenja Elkenkamp
+Svenja Elkenkamp
 }

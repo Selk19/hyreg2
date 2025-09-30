@@ -92,7 +92,6 @@ model <- FLXMRhyreg_het( data = simulated_data_norm,
                     type =  simulated_data_norm$type,
                     stv = stv,
                     stv_sigma = stv_sigma,
-                    k = k,
                     type_cont = "TTO",
                     type_dich = "DCE_A",
                     opt_method = "L-BFGS-B",
@@ -107,5 +106,5 @@ model <- FLXMRhyreg_het( data = simulated_data_norm,
 )
 }
 \author{
-Kim Rand & Svenja Elkenkamp
+Svenja Elkenkamp and Kim Rand
 }

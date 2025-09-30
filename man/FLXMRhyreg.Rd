@@ -69,9 +69,8 @@ Function used in flexmix M-Step to estimate hybrid model
 \examples{
 
 formula <- y ~  -1 + x1 + x2 + x3
-k <- 2
+the$k <- 2
 stv <- setNames(c(0.2,0,1,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
-rm(counter)
 
 
 
@@ -82,7 +81,6 @@ model <- FLXMRhyreg(formula = formula,
                     family=c("hyreg"),
                     type =  simulated_data_norm$type,
                     stv = stv,
-                    k = k,
                     type_cont = "TTO",
                     type_dich = "DCE_A",
                     opt_method = "L-BFGS-B",
@@ -97,5 +95,5 @@ model <- FLXMRhyreg(formula = formula,
 )
 }
 \author{
-Svenja Elkenkamp & Kim Rand
+Svenja Elkenkamp and Kim Rand
 }

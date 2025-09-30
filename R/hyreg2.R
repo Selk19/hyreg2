@@ -156,7 +156,7 @@ hyreg2 <-function(formula,
                   variables_both = NULL,
                   variables_dich = NULL,
                   variables_cont = NULL,
-              #    non_linear = FALSE,
+               #   non_linear = FALSE,
                   # additional arguments for flexmix or optimizer ?
                   # MISSING:
                   # non linear regression not implemented yet
@@ -168,6 +168,8 @@ hyreg2 <-function(formula,
     type <- data[,type]
   }
 
+  # assign k to k in package environment to be used during M-step driver
+  assign("k", k, envir=the)
 
   # prepare formula handling
   formula_string <- paste(deparse(formula), collapse = "")
@@ -321,14 +323,14 @@ hyreg2 <-function(formula,
                             opt_method = opt_method,
                             optimizer = optimizer,
                             lower = lower,
-                            upper = upper,
-                            non_linear = non_linear))
+                            upper = upper))
+                            #non_linear = non_linear))
                             #formula_orig = formula
 
 
 
    fit <- flexmix::flexmix(formula = formula, data = data, k = k, model = model, control = control)
-   rm(counter, envir = .GlobalEnv) # counter will be created during the M-step driver
+   rm(counter, envir = the) # counter will be created during the M-step driver
 
    return(fit)
 
@@ -365,12 +367,12 @@ hyreg2 <-function(formula,
                               optimizer = optimizer,
                               lower = lower,
                               upper = upper,
-                              non_linear = non_linear,
+                            #  non_linear = non_linear,
                               formula_orig = formula_orig))
 
 
      mod <- flexmix::flexmix(formula = formula, data = data_cont, k = k, model = model, control = control)
-     rm(counter, envir = .GlobalEnv)
+     rm(counter, envir = the)
 
 
 
@@ -381,11 +383,10 @@ hyreg2 <-function(formula,
      data <- merge(data, unique(data_cont[,c(id_col,"mod_comp")]), by = id_col)
      data <- data[order(data$roworder), ]
 
-     # später auch ausgeben können, welche ID zu welcher Klasse zugeordnet wurde
      id_classes <- data_cont[,c(id_col,"mod_comp")]
 
    }
-   # SECOND STEP: GET MODEL ESTIMATES
+
    if(latent == "dich"){
      data_dich <- data[type == type_dich,]
      model <- list(FLXMRhyreg(type= type[type == type_dich],
@@ -399,12 +400,12 @@ hyreg2 <-function(formula,
                               optimizer = optimizer,
                               lower = lower,
                               upper = upper,
-                              non_linear = non_linear,
+                            #  non_linear = non_linear,
                               formula_orig = formula_orig))
 
 
      mod <- flexmix::flexmix(formula = formula, data = data_dich, k = k, model = model, control = control)
-     rm(counter, envir = .GlobalEnv) # counter will be created during the M-step driver
+     rm(counter, envir = the) # counter will be created during the M-step driver
 
      data_dich$mod_comp <- mod@cluster
 
@@ -420,6 +421,12 @@ hyreg2 <-function(formula,
    if(classes_only == TRUE){
      return(id_classes)
    }
+
+
+# SECOND STEP: GET MODEL ESTIMATES
+
+   # assign 1 to k in package environment to be used during M-step driver
+   assign("k", 1, envir=the)
 
    data_list <- list()
    for(i in unique(mod@cluster)){
@@ -444,11 +451,11 @@ hyreg2 <-function(formula,
                                 optimizer = optimizer,
                                 lower = lower,
                                 upper = upper,
-                                non_linear = non_linear,
+                              #  non_linear = non_linear,
                                 formula_orig = formula_orig))
 
        mod <- flexmix::flexmix(formula = formula, data = xy, k = 1, model = model, control = control)
-       rm(counter, envir = .GlobalEnv) # counter will be created during the M-step driver
+       rm(counter, envir = the) # counter will be created during the M-step driver
      }
      return(mod)
    })
@@ -456,6 +463,7 @@ hyreg2 <-function(formula,
    mod_list$id_classes <- unique(id_classes)
    return(mod_list)
  }
+  rm(k, envir = the)
 }
 
 

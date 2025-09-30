@@ -33,12 +33,15 @@
 #' @return a model object, that can be used in hyreg2 as input for parameter model in flexmix::flexmix
 #'
 #' @author Svenja Elkenkamp and Kim Rand
+#'
+#' @importFrom methods new
+#' @importFrom stats as.formula dnorm model.matrix pnorm setNames
+#'
 #' @examples
 #'
 #'formula <- y ~  -1 + x1 + x2 + x3
-#'k <- 2
+#'the$k <- 2
 #'stv <- setNames(c(0.2,0,1,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
-#'rm(counter)
 #'
 #'
 #'
@@ -50,7 +53,6 @@
 #'                     family=c("hyreg"),
 #'                     type =  simulated_data_norm$type,
 #'                     stv = stv,
-#'                     k = k,
 #'                     type_cont = "TTO",
 #'                     type_dich = "DCE_A",
 #'                     opt_method = "L-BFGS-B",
@@ -200,7 +202,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
                         #  stderror = para$stderror,
                         #  pvalue = para$pvalue,
           fit_mle = para$fit_mle),
-        #  counter = counter), # Error: unzulässiger Name für Slot der Klasse “FLXcomponent”; fit_mle
+        #  the$counter = the$counter), # Error: unzulässiger Name für Slot der Klasse “FLXcomponent”; fit_mle
           #minLik = para$minLik),
           logLik=logLik, predict=predict,
           df=para$df)
@@ -208,6 +210,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
 
     z@fit <- function(x, y, w, component, ...){
+
 
 
       # function to use in mle, same as logLik but depending on stv and giving out the neg logL directly
@@ -277,19 +280,15 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
 
       bbmle::parnames(logLik2) <- c(colnames(x),"sigma","theta") # set names of inputs for logLik2
-      # maybe use names(stv) instead of colnames(x) ?
 
-      if(!exists("counter")){
 
-        counter <<- 1
+      if(!exists("counter", envir = the)){
 
-        # use different stv for different components
-        # implement stv as lits? and ask if it is a list, then
-        # use stv[[counter]] as stv
-        # for the next iterations of EM its not requried since we use component$coef
+        the$counter <- 1
+
 
         if(is.list(stv)){
-          stv_in <- stv[[counter]]
+          stv_in <- stv[[the$counter]]
         }else{
           stv_in <- stv
         }
@@ -305,11 +304,11 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
 
       }else{
-        if(counter < k){
-          counter <<- counter + 1
+        if(the$counter < the$k){
+          the$counter <- the$counter + 1
 
           if(is.list(stv)){
-            stv_in <- stv[[counter]]
+            stv_in <- stv[[the$counter]]
           }else{
             stv_in <- stv
           }
@@ -342,7 +341,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
                                     sigma = fit_mle@coef[is.element(names(fit_mle@coef),c("sigma"))],
                                     theta = fit_mle@coef[is.element(names(fit_mle@coef),c("theta"))],
                                     fit_mle = fit_mle,
-                                  #  counter = counter,
+                                  #  the$counter = the$counter,
                                    # stderror = summary(fit_mle)@coef[,2],  # trying to get slot "coef" from an object (class "summaryDefault") that is not an S4 object
                                   #  pvalue = summary(fit_mle)@coef[,4],
                                     minLik = fit_mle@min)

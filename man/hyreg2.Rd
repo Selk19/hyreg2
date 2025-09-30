@@ -184,5 +184,5 @@ mod <- hyreg2(formula = formula,
 summary_hyreg2(mod)
 }
 \author{
-Svenja Elkenkamp & Kim Rand, John Grosser
+Svenja Elkenkamp, Kim Rand and John Grosser
 }

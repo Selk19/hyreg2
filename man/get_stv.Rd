@@ -58,5 +58,5 @@ hyflex_mod <- hyreg2(formula = formula,
 )
 }
 \author{
-Kim Rand & Svenja Elkenkamp
+Svenja Elkenkamp
 }

@@ -30,6 +30,8 @@
 #'
 #' @return a `model` object, that can be used in [hyreg2_het] as input for parameter `model` in [flexmix::flexmix()]
 #'
+#' @importFrom methods new
+#' @importFrom stats as.formula dnorm model.matrix pnorm setNames
 #'
 #' @author Svenja Elkenkamp and Kim Rand
 #' @examples
@@ -53,7 +55,6 @@
 #'                     type =  simulated_data_norm$type,
 #'                     stv = stv,
 #'                     stv_sigma = stv_sigma,
-#'                     k = k,
 #'                     type_cont = "TTO",
 #'                     type_dich = "DCE_A",
 #'                     opt_method = "L-BFGS-B",
@@ -139,8 +140,8 @@ FLXMRhyreg_het <- function(data,
         p
       }
 
-      #
-      #
+
+
       logLik <- function(x, y, sigma = para$sigma, theta = para$theta, return_vector = TRUE, ...){
         #para$sigma must be a vector
 
@@ -173,7 +174,6 @@ FLXMRhyreg_het <- function(data,
 
 
         # for box constraints
-        #in xreg:
         if(upper != Inf ){
           censV <- y1 == upper
           pvals1[which(censV)] <- log(pnorm((Xb1[censV]-upper)/sigma[censV],0,1) - pnorm((Xb1[censV]-Inf)/sigma,0,1))
@@ -289,23 +289,19 @@ FLXMRhyreg_het <- function(data,
 
 
       ### MODEL ESTIMATION ###
-      if(!exists("counter")){
-        counter <<- 1
+      if(!exists("counter", envir = the)){
+        the$counter <- 1
 
 
-        # use different stv for different components
-        # implement stv as lits? and ask if it is a list, then
-        # use stv[[counter]] as stv
-        # for the next iterations of EM its not requried since we use component$coef
 
         stv_in <- stv # without sigma !
         stv_sigma_in <- stv_sigma
 
         if(is.list(stv)){
-          stv_in <- stv[[counter]]
+          stv_in <- stv[[the$counter]]
         }
         if(is.list(stv_sigma)){
-          stv_sigma_in <- stv_sigma[[counter]]
+          stv_sigma_in <- stv_sigma[[the$counter]]
         }
 
 
@@ -317,18 +313,18 @@ FLXMRhyreg_het <- function(data,
                                upper = upper)
 
       }else{
-        if(counter < k){
-          counter <<- counter + 1
+        if(the$counter < the$k){
+          the$counter <<- the$counter + 1
 
 
           stv_in <- stv # without sigma !
           stv_sigma_in <- stv_sigma
 
           if(is.list(stv)){
-            stv_in <- stv[[counter]]
+            stv_in <- stv[[the$counter]]
           }
           if(is.list(stv_sigma)){
-            stv_sigma_in <- stv_sigma[[counter]]
+            stv_sigma_in <- stv_sigma[[the$counter]]
           }
 
 
@@ -356,7 +352,7 @@ FLXMRhyreg_het <- function(data,
                                     sigma = fit_mle@coef[is.element(names(fit_mle@coef),names(stv_sigma))],
                                     theta = fit_mle@coef[is.element(names(fit_mle@coef),c("theta"))],
                                     fit_mle = fit_mle,
-                                    # counter = counter,
+                                    # counter = the$counter,
                                     # stderror = summary(fit_mle)@coef[,2],  # trying to get slot "coef" from an object (class "summaryDefault") that is not an S4 object
                                     #  pvalue = summary(fit_mle)@coef[,4],
                                     minLik = fit_mle@min)

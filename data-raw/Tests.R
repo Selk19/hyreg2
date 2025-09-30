@@ -19,7 +19,6 @@ k <- 2
 stv <- setNames(c(0.2,0.2,0.2,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
 control = list(iter.max = 1000, verbose = 4)
 
-rm(counter)
 
 hyflex_mod <- hyreg2(formula = formula,
                      data =  simulated_data_norm,
@@ -280,8 +279,8 @@ TTOonly <- hyregdata[hyregdata$method == "TTO" & hyregdata$fb_flagged == 0 & hyr
 DCEonly <- hyregdata[hyregdata$method == "DCE_A" & hyregdata$state_id < 197,]
 
 # use only subdataset for faster estimations
-#TTOonly <- TTOonly[1:250,]
-#DCEonly <- DCEonly[1:150,]
+TTOonly <- TTOonly[1:250,]
+DCEonly <- DCEonly[1:150,]
 
 data <- rbind(TTOonly,DCEonly)
 
