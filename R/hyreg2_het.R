@@ -528,7 +528,7 @@ hyreg2_het <-function(formula,
         warning( paste("One or more components are empty. Setting mod to NULL"))
       }else{
         model <- list(FLXMRhyreg_het(type= type[data$mod_comp == unique(xy$mod_comp)],
-                                 #type = type,
+                                     data = xy,
                                  stv = stv, # stv can be a list
                                  stv_sigma = stv_sigma,
                                  formula_sigma = formula_sigma,
