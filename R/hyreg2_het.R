@@ -443,9 +443,11 @@ hyreg2_het <-function(formula,
     # FIRST STEP: GET LATENT CLASSES
     if(latent == "cont"){
       data_cont <- data[type == type_cont,]
-      model <- list(FLXMRhyreg( data = data_cont,
+      model <- list(FLXMRhyreg_het( data = data_cont,
                                 type= type[type == type_cont],
                                stv = stv,
+                               stv_sigma = stv_sigma,
+                               formula_sigma = formula_sigma,
                                type_cont = type_cont,
                                type_dich = type_dich,
                                variables_both = variables_both,
@@ -475,9 +477,11 @@ hyreg2_het <-function(formula,
 
     if(latent == "dich"){
       data_dich <- data[type == type_dich,]
-      model <- list(FLXMRhyreg( data = data_dich,
+      model <- list(FLXMRhyreg_het( data = data_dich,
                                 type= type[type == type_dich],
                                stv = stv,
+                               stv_sigma = stv_sigma,
+                               formula_sigma = formula_sigma,
                                type_cont = type_cont,
                                type_dich = type_dich,
                                variables_both = variables_both,
@@ -523,9 +527,11 @@ hyreg2_het <-function(formula,
         mod <- NULL
         warning( paste("One or more components are empty. Setting mod to NULL"))
       }else{
-        model <- list(FLXMRhyreg(type= type[data$mod_comp == unique(xy$mod_comp)],
+        model <- list(FLXMRhyreg_het(type= type[data$mod_comp == unique(xy$mod_comp)],
                                  #type = type,
                                  stv = stv, # stv can be a list
+                                 stv_sigma = stv_sigma,
+                                 formula_sigma = formula_sigma,
                                  type_cont = type_cont,
                                  type_dich = type_dich,
                                  variables_both = variables_both,
