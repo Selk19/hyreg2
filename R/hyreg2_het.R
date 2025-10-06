@@ -193,6 +193,10 @@ hyreg2_het <-function(formula,
   }
   # assign k to k in package environment to be used during M-step driver
   assign("k", k, envir=the)
+  if(exists("counter", envir = the)){
+    rm("counter", envir = the)
+  }
+
 
   # prepare formula handling
   formula_string <- paste(deparse(formula), collapse = "")

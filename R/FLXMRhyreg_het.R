@@ -314,7 +314,7 @@ FLXMRhyreg_het <- function(data,
 
       }else{
         if(the$counter < the$k){
-          the$counter <<- the$counter + 1
+          the$counter <- the$counter + 1
 
 
           stv_in <- stv # without sigma !
