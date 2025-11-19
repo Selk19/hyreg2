@@ -12,6 +12,7 @@ library(hyreg2)
 
 
 # random numbers from normal dist
+#formula <- y ~  -1 + exp(  x1 + x2 + x3) | id
 formula <- y ~  -1 + x1 + x2 + x3 | id
 
 k <- 2
@@ -31,6 +32,7 @@ hyflex_mod <- hyreg2(formula = formula,
                      control = control,
                      latent = "cont",
                      id_col = "id"
+                    # non_linear = TRUE
 )
 
 
@@ -288,7 +290,7 @@ data <- rbind(TTOonly,DCEonly)
 formula <- value ~ -1 + mo2 + sc2 + ua2 + pd2 + ad2 + mo3 + sc3 + ua3 + pd3 + ad3 +
   mo4 + sc4 + ua4 + pd4 + ad4 + mo5 + sc5 + ua5 + pd5 + ad5 | id
 
-k <- 1
+k <- 2
 
 control = list(iter.max = 10000, verbose = 5)
 
@@ -313,7 +315,7 @@ mod1 <- hyreg2_het(formula = formula,
                    type_dich = "DCE_A",
                    opt_method = "L-BFGS-B",
                    control = control,
-                   latent = "both",
+                   latent = "cont",
                    id_col = "id",
                   # variables_cont = c("mo5","sc5"),
                  #  variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",

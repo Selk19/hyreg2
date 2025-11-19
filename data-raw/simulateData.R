@@ -1,6 +1,4 @@
 ## code to prepare `simulateData` dataset goes here
-#usethis::use_data(simulateData, overwrite = TRUE)
-
 
 
 # these datasets can be used in the examples and the Tests file to test the functions
@@ -22,9 +20,12 @@ beta <- c(0.5, -0.3, 0.8)  # true coef for beta
 x_tto <- matrix(rnorm(n_samples_tto * length(beta)), ncol = length(beta))
 x_dce <- matrix(rnorm(n_samples_dce * length(beta)), ncol = length(beta))
 
-# Xb (linear predictor following formula xb = x1*beta1 + x2*beta2 + x3*beta3)
+
+### LINEAR ###
+#Xb (linear predictor following formula xb = x1*beta1 + x2*beta2 + x3*beta3)
 Xb_tto <- x_tto %*% beta
 Xb_dce <- (x_dce %*% beta) * theta
+
 
 # generate y
 y_tto <- rnorm(n_samples_tto, mean = Xb_tto, sd = sigma)  # continuous outcomes
@@ -32,10 +33,32 @@ logistic_tmp <- 0.5 + 0.5 * tanh(Xb_dce / 2)
 y_dce <- rbinom(n_samples_dce, size = 1, prob = logistic_tmp)  # binary outcomes
 
 
+
+
+### NON-LINEAR ###
+formula <- y ~ 1/exp(x1 * X1 + x2 * X2 )
+x_tto_non <- data.frame(x1 = x_tto[,1], x2 = x_tto[,2], x3 = x_tto[,3])
+x_dce_non <- data.frame(x1 = x_dce[,1], x2 = x_dce[,2], x3 = x_dce[,3])
+beta_non <- setNames(beta[1:3], c("X1","X2","X3"))
+
+Xb_tto_non <- eval_formula_non(formula, x_tto_non, beta_non)
+Xb_dce_non <- ( eval_formula_non(formula, x_dce_non, beta_non)) * theta
+
+
+# generate y_non
+y_tto_non <- rnorm(n_samples_tto, mean = Xb_tto_non, sd = sigma)  # continuous outcomes
+logistic_tmp_non <- 0.5 + 0.5 * tanh(Xb_dce_non / 2)
+y_dce_non <- rbinom(n_samples_dce, size = 1, prob = logistic_tmp_non)  # binary outcomes
+
+
+
+
+
 ### dataset ###
 data_tto <- data.frame(
   type = rep("TTO", n_samples_tto),
   y = y_tto,
+  y_non = y_tto_non,
   x1 = x_tto[, 1],
   x2 = x_tto[, 2],
   x3 = x_tto[, 3]
@@ -44,6 +67,7 @@ data_tto <- data.frame(
 data_dce <- data.frame(
   type = rep("DCE_A", n_samples_dce),
   y = y_dce,
+  y_non = y_dce_non,
   x1 = x_dce[, 1],
   x2 = x_dce[, 2],
   x3 = x_dce[, 3]
@@ -52,28 +76,6 @@ data_dce <- data.frame(
 
 simulated_data1 <- rbind(data_tto, data_dce)
 
-
-
-# partial formulas for dce and tto
-# beta_tto <- beta[c(1,2)]
-# beta_dce <- beta[c(1,3)]
-#
-# # simulate matrix
-# x_tto <- matrix(rnorm(n_samples_tto * length(beta_tto)), ncol = length(beta_tto))
-# x_dce <- matrix(rnorm(n_samples_dce * length(beta_dce)), ncol = length(beta_dce))
-#
-# # Xb (linear predictor following formula xb = x1*beta1 + x2*beta2 + x3*beta3)
-# Xb_tto <- x_tto %*% beta_tto
-# Xb_dce <- (x_dce %*% beta_dce) * theta
-# #Xb_dce <- (x_dce[1] %*% beta_dce[which(is.element(beta_dce,beta_tto))]) * theta +  # theta only for variables_both, not dynamical see x_dce
-# #  (x_dce[2] %*% beta_dce[which(!is.element(beta_dce,beta_tto))])
-#
-# # generate y
-# y_tto <- rnorm(n_samples_tto, mean = Xb_tto, sd = sigma)  # continuous outcomes
-# logistic_tmp <- 0.5 + 0.5 * tanh(Xb_dce / 2)
-# y_dce <- rbinom(n_samples_dce, size = 1, prob = logistic_tmp)  # binary outcomes
-#
-# simulated_data1$y_partial <- c(y_tto,y_dce)
 
 
 
@@ -91,9 +93,12 @@ beta <- c(1.4, 2.3, -0.2)  # true coef for beta
 x_tto <- matrix(rnorm(n_samples_tto * length(beta)), ncol = length(beta))
 x_dce <- matrix(rnorm(n_samples_dce * length(beta)), ncol = length(beta))
 
+
+### LINEAR ###
 #  Xb (linear predictor following formula xb = x1*beta1 + x2*beta2 + x3*beta3)
 Xb_tto <- x_tto %*% beta
 Xb_dce <- (x_dce %*% beta) * theta
+
 
 # generate y
 y_tto <- rnorm(n_samples_tto, mean = Xb_tto, sd = sigma)  # continuous outcomes
@@ -101,45 +106,47 @@ logistic_tmp <- 0.5 + 0.5 * tanh(Xb_dce / 2)
 y_dce <- rbinom(n_samples_dce, size = 1, prob = logistic_tmp)  # binary outcomes
 
 
+
+### NON-LINEAR ###
+formula <- y ~ 1/exp(x1 * X1 + x2 * X2 )
+x_tto_non <- data.frame(x1 = x_tto[,1], x2 = x_tto[,2], x3 = x_tto[,3])
+x_dce_non <- data.frame(x1 = x_dce[,1], x2 = x_dce[,2], x3 = x_dce[,3])
+beta_non <- setNames(beta[1:3], c("X1","X2","X3"))
+
+Xb_tto_non <- eval_formula_non(formula, x_tto_non, beta_non)
+Xb_dce_non <- ( eval_formula_non(formula, x_dce_non, beta_non)) * theta
+
+
+# generate y_non
+y_tto_non <- rnorm(n_samples_tto, mean = Xb_tto_non, sd = sigma)  # continuous outcomes
+logistic_tmp_non <- 0.5 + 0.5 * tanh(Xb_dce_non / 2)
+y_dce_non <- rbinom(n_samples_dce, size = 1, prob = logistic_tmp_non)  # binary outcomes
+
+
+
+
+
 ### dataset ###
-data_tto <- data.frame(
-  type = rep("TTO", n_samples_tto),
-  y = y_tto,
-  x1 = x_tto[, 1],
-  x2 = x_tto[, 2],
-  x3 = x_tto[, 3]
-)
+  data_tto <- data.frame(
+    type = rep("TTO", n_samples_tto),
+    y = y_tto,
+    y_non = y_tto_non,
+    x1 = x_tto[, 1],
+    x2 = x_tto[, 2],
+    x3 = x_tto[, 3]
+  )
 
-data_dce <- data.frame(
-  type = rep("DCE_A", n_samples_dce),
-  y = y_dce,
-  x1 = x_dce[, 1],
-  x2 = x_dce[, 2],
-  x3 = x_dce[, 3]
-)
-
+  data_dce <- data.frame(
+    type = rep("DCE_A", n_samples_dce),
+    y = y_dce,
+    y_non = y_dce_non,
+    x1 = x_dce[, 1],
+    x2 = x_dce[, 2],
+    x3 = x_dce[, 3]
+  )
 
 simulated_data2 <- rbind(data_tto, data_dce)
 
-# partial formulas for dce and tto
-# beta_tto <- beta[c(1,2)]
-# beta_dce <- beta[c(1,3)]
-#
-# # simulate matrix
-# x_tto <- matrix(rnorm(n_samples_tto * length(beta_tto)), ncol = length(beta_tto))
-# x_dce <- matrix(rnorm(n_samples_dce * length(beta_dce)), ncol = length(beta_dce))
-#
-# Xb_tto <- x_tto %*% beta_tto
-# Xb_dce <- (x_dce %*% beta_dce) * theta
-# #Xb_dce <- (x_dce[1] %*% beta_dce[which(is.element(beta_dce,beta_tto))]) * theta + # theta only for variables_both, not dynamical see x_dce
-# #  (x_dce[2] %*% beta_dce[which(!is.element(beta_dce,beta_tto))])
-#
-# # generate y
-# y_tto <- rnorm(n_samples_tto, mean = Xb_tto, sd = sigma)  # continuous outcomes
-# logistic_tmp <- 0.5 + 0.5 * tanh(Xb_dce / 2)
-# y_dce <- rbinom(n_samples_dce, size = 1, prob = logistic_tmp)  # binary outcomes
-#
-# simulated_data2$y_partial <- c(y_tto,y_dce)
 
 
 
@@ -156,7 +163,6 @@ simulated_data_norm<- rbind(simulated_data1,simulated_data2)
 
 rm(simulated_data1)
 rm(simulated_data2)
-
 
 
 
