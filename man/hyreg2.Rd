@@ -24,11 +24,12 @@ hyreg2(
   variables_both = NULL,
   variables_dich = NULL,
   variables_cont = NULL,
+  non_linear = FALSE,
   ...
 )
 }
 \arguments{
-\item{formula}{linear model \code{formula}. Using \verb{|x} will include a grouping variable \code{x}. see Details.}
+\item{formula}{model \code{formula}, can be linear or non-linear. Using \verb{|x} will include a grouping variable \code{x}. see Details.}
 
 \item{data}{a \code{data.frame} containing the data. see Details.}
 
@@ -72,7 +73,8 @@ are included, \code{variables_cont} and \code{variables_dich} must be provided a
 see Details.}
 
 \item{variables_dich}{\code{character} vector; variables to be fitted only on dichotomous data, if provided,
-\code{variables_both} and \code{variables_cont} must be provided as well.}
+\code{variables_both} and \code{variables_cont} must be provided as well.
+@param non_linear \code{logical}; is the provided \code{formula} non-linear? default \code{FALSE}}
 
 \item{variables_cont}{\code{character} vector; variables to be fitted only on continous data. If provided,
 \code{variables_both} and \code{variables_dich} must be provided as well.}
@@ -90,7 +92,9 @@ see details of different inputs listed below
 }
 \section{formula}{
 
-a typical R formula of the form \verb{y ~ x1 + x2 + …} should be provided.
+a typical R formula of the form \verb{y ~ x1 + x2 + …} can be provided as well as a non-linear formula
+including variables and parameters (as also used in \code{nls}) e.g. \code{y ~ 1/exp(x1 * beta1 + x2 * beta2)},
+where \code{beta} are the parameters to be estimated. Using a non-linear formula, \code{non-linear} must be set \code{TRUE}.
 Additionally, it is possible to include a grouping variable for repeated measures by using
 \verb{“| xg”} where \code{xg} is the column containing the group-memberships. The resulting formula will look
 like this:  \verb{y ~ x1 + x2 +… | xg}.  In \code{flexmix}, this is called the concomitant variable specification:

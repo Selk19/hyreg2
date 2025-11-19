@@ -19,11 +19,12 @@ FLXMRhyreg(
   optimizer = "optim",
   lower = -Inf,
   upper = Inf,
+  non_linear = FALSE,
   ...
 )
 }
 \arguments{
-\item{formula}{linear model \code{formula}}
+\item{formula}{model \code{formula}, automatically provided by \code{hyreg2} and \code{\link[flexmix:flexmix]{flexmix::flexmix()}}}
 
 \item{family}{default \code{"hyreg"}, needed for \code{\link[flexmix:flexmix]{flexmix::flexmix()}}}
 
@@ -55,6 +56,8 @@ set to \code{"L-BFGS-B"}, default \code{-INF},}
 
 \item{upper}{upper bound for censored data. If this is used, \code{opt_method} must be
 set to \code{"L-BFGS-B"},default \code{INF}}
+
+\item{non_linear}{\code{logical}; is the provided \code{formula} non-linear? default \code{FALSE}}
 
 \item{...}{additional arguments for \code{\link[flexmix:flexmix]{flexmix::flexmix()}} or \code{\link[bbmle:mle2]{bbmle::mle2()}}}
 }
