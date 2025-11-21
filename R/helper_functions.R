@@ -59,9 +59,9 @@ eval_formula_non <- function(formula, data, stv, form_back = F){
   rhs <- formula[[3]]
   int <- is.element("INTERCEPT",all.vars(formula[[3]])) # intercept check
 
-  if(int & !is.element("(Intercept)", colnames(data))){
-    data$"(Intercept)" <- rep(1,dim(data)[1])
-  }
+  # if(int & !is.element("(Intercept)", colnames(data))){
+  #   data$"(Intercept)" <- rep(1,dim(data)[1])
+  # }
 
   form_wght <- replace_vars(rhs, stv)
 
@@ -70,7 +70,7 @@ eval_formula_non <- function(formula, data, stv, form_back = F){
 
   # check for intercept
   if(int){
-    intercept_val <- stv["(Intercept)"]
+    intercept_val <- stv["INTERCEPT"]
     if(is.na(intercept_val)){
       intercept_val <- 0
     }

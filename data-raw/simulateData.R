@@ -41,8 +41,8 @@ x_tto_non <- data.frame(x1 = x_tto[,1], x2 = x_tto[,2], x3 = x_tto[,3])
 x_dce_non <- data.frame(x1 = x_dce[,1], x2 = x_dce[,2], x3 = x_dce[,3])
 beta_non <- setNames(beta[1:3], c("X1","X2","X3"))
 
-Xb_tto_non <- eval_formula_non(formula, x_tto_non, beta_non)
-Xb_dce_non <- ( eval_formula_non(formula, x_dce_non, beta_non)) * theta
+Xb_tto_non <- hyreg2:::eval_formula_non(formula, x_tto_non, beta_non)
+Xb_dce_non <- ( hyreg2:::eval_formula_non(formula, x_dce_non, beta_non)) * theta
 
 
 # generate y_non
@@ -113,8 +113,8 @@ x_tto_non <- data.frame(x1 = x_tto[,1], x2 = x_tto[,2], x3 = x_tto[,3])
 x_dce_non <- data.frame(x1 = x_dce[,1], x2 = x_dce[,2], x3 = x_dce[,3])
 beta_non <- setNames(beta[1:3], c("X1","X2","X3"))
 
-Xb_tto_non <- eval_formula_non(formula, x_tto_non, beta_non)
-Xb_dce_non <- ( eval_formula_non(formula, x_dce_non, beta_non)) * theta
+Xb_tto_non <- hyreg2:::eval_formula_non(formula, x_tto_non, beta_non)
+Xb_dce_non <- ( hyreg2:::eval_formula_non(formula, x_dce_non, beta_non)) * theta
 
 
 # generate y_non
@@ -159,6 +159,9 @@ simulated_data2$id <- c(101:200, 101:200, 101:200)
 
 
 simulated_data_norm<- rbind(simulated_data1,simulated_data2)
+
+# order simulated_data_norm
+simulated_data_norm <- simulated_data_norm[,c(1,2,4:8,3)]
 
 
 rm(simulated_data1)
@@ -610,6 +613,6 @@ for(i in 1:length(simulated_data$y)){
 
 
 ### EXPORT ####
-#usethis::use_data(simulated_data_norm, overwrite = TRUE)
-#usethis::use_data(simulated_data_mo, overwrite = TRUE)
-#usethis::use_data(simulated_data, overwrite = TRUE)
+usethis::use_data(simulated_data_norm, overwrite = TRUE)
+usethis::use_data(simulated_data_mo, overwrite = TRUE)
+usethis::use_data(simulated_data, overwrite = TRUE)

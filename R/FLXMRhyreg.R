@@ -194,13 +194,12 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
 
         # for censored data
-        #in xreg:
-        if(upper != Inf ){ # maybe set to NULL?
+        if(upper != Inf ){
           censV <- y1 == upper
           pvals1[which(censV)] <- log(pnorm((Xb1[censV]-upper)/sigma,0,1) - pnorm((Xb1[censV]-Inf)/sigma,0,1))
         }
 
-        if(lower != -Inf ){ # maybe set to NULL?
+        if(lower != -Inf ){
           censV <- y1 == lower
           pvals1[which(censV)] <- log(pnorm((Xb1[censV]-(-Inf))/sigma,0,1) - pnorm((Xb1[censV]-lower)/sigma,0,1))
         }
@@ -223,11 +222,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
           parameters=list(coef=para$coef,
                           sigma=para$sigma,
                           theta = para$theta,
-                          #  stderror = para$stderror,
-                          #  pvalue = para$pvalue,
                           fit_mle = para$fit_mle),
-          #  the$counter = the$counter), # Error: unzulässiger Name für Slot der Klasse “FLXcomponent”; fit_mle
-          #minLik = para$minLik),
           logLik=logLik, predict=predict,
           df=para$df)
     }
@@ -259,7 +254,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
           x1 <- x[type == type_cont,c(variables_cont,variables_both)]
           x2 <-  x[type == type_dich,c(variables_dich,variables_both)]
 
-          Xb1 <- x1 %*% stv_cont[colnames(x1)] # [] sortiert die Werte von stv in der passenden Reiehenfolge zu x1
+          Xb1 <- x1 %*% stv_cont[colnames(x1)]
           Xb2 <- x2 %*% stv_dich[colnames(x2)]
 
           Xb2 <- Xb2*theta
@@ -289,8 +284,8 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
         pvals1 <- dnorm(y1, mean=Xb1, sd=sigma, log=TRUE) # cont_normal
 
+
         # for box constraints, censored data
-        #in xreg:
         if(upper != Inf ){
           censV <- y1 == upper
           pvals1[which(censV)] <- log(pnorm((Xb1[censV]-upper)/sigma,0,1) - pnorm((Xb1[censV]-Inf)/sigma,0,1))
@@ -307,25 +302,23 @@ FLXMRhyreg <- function(formula= . ~ . ,
         pvals[pvals == -Inf] <- log(.Machine$double.xmin)
         pvals[pvals == Inf] <- log(.Machine$double.xmax)
 
-        # what to do with NaN ? fixed by log(-Machine...)?
 
 
         # multiply weights for use in EM algo
         pvals_w <- pvals * w
 
 
-        return(-sum(pvals_w))   # look up Leisch: FlexMix: A General Framework for Finite Mixture
-        #                  Models and Latent Class Regression in R, p. 3
-        # w must be posterior class probabilities for each observation, pvals is already the log?
+        return(-sum(pvals_w))
       }
 
+      # set names of inputs for logLik2
       if(isFALSE(non_linear)){
-        bbmle::parnames(logLik2) <- c(colnames(x),"sigma","theta") # set names of inputs for logLik2
+        bbmle::parnames(logLik2) <- c(colnames(x),"sigma","theta")
       }else{
         if(is.list(stv)){
-          bbmle::parnames(logLik2) <- c(names(the$stv[[1]])) # set names of inputs for logLik2
+          bbmle::parnames(logLik2) <- c(names(the$stv[[1]]))
         }else{
-          bbmle::parnames(logLik2) <- c(names(the$stv)) # set names of inputs for logLik2
+          bbmle::parnames(logLik2) <- c(names(the$stv))
         }
       }
 
@@ -397,9 +390,6 @@ FLXMRhyreg <- function(formula= . ~ . ,
                                     sigma = fit_mle@coef[is.element(names(fit_mle@coef),c("sigma"))],
                                     theta = fit_mle@coef[is.element(names(fit_mle@coef),c("theta"))],
                                     fit_mle = fit_mle,
-                                    #  the$counter = the$counter,
-                                    # stderror = summary(fit_mle)@coef[,2],  # trying to get slot "coef" from an object (class "summaryDefault") that is not an S4 object
-                                    #  pvalue = summary(fit_mle)@coef[,4],
                                     minLik = fit_mle@min)
       )
     }

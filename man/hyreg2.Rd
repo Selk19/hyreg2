@@ -94,7 +94,8 @@ see details of different inputs listed below
 
 a typical R formula of the form \verb{y ~ x1 + x2 + …} can be provided as well as a non-linear formula
 including variables and parameters (as also used in \code{nls}) e.g. \code{y ~ 1/exp(x1 * beta1 + x2 * beta2)},
-where \code{beta} are the parameters to be estimated. Using a non-linear formula, \code{non-linear} must be set \code{TRUE}.
+where \code{beta} are the parameters to be estimated. If an intercept should be estimated in a non-linear formula,
+this must be explicitly given and named "INTERCEPT". Using a non-linear formula, \code{non-linear} must be set \code{TRUE}.
 Additionally, it is possible to include a grouping variable for repeated measures by using
 \verb{“| xg”} where \code{xg} is the column containing the group-memberships. The resulting formula will look
 like this:  \verb{y ~ x1 + x2 +… | xg}.  In \code{flexmix}, this is called the concomitant variable specification:
@@ -123,7 +124,7 @@ the given start values must be a \verb{named vector}. Otherwise (if different st
 each latent class), a \code{list} of named vectors should be used . In this case, there must be one entry
 in the list for each latent class.  Each start value vector must include start values for sigma and
 theta. Currently, it is necessary to use the names \code{"sigma"} and \code{"theta"} for these values.
-If users are unsure for which variables start values must be provided, this can be checked by
+If users are unsure for which variables start values must be provided (in the linear formula case), this can be checked by
 calling \code{colnames(model.matrix(formula,data))}. In this call, the \code{formula} should not include the
 grouping variable.
 }
@@ -133,7 +134,8 @@ grouping variable.
 in some situations, it can be useful to identify the latent classes on
 only one \code{type} of data while estimating the model parameters on both \code{types} of data. In such cases,
 the input variable \code{latent} can be used to specify on which type of data the classification should be done.
-If \verb{“cont”} or \verb{“dich”} is used, the input parameter \code{id_col} must be specified and gives the name,
+If \verb{“cont”} or \verb{“dich”} is used, \code{formula} must contain a grouping variable and additionally the
+input parameter \code{id_col} must be specified and gives the name,
 i.e. a \verb{character string}, of the grouping variable for classification. Some groups may be removed from
 the data, since they have only continuous or only dichotomous observations. Then in a first step,
 a model is estimated only on the continuous/dichotomous data and the achieved classification is stored.

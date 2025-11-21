@@ -45,7 +45,8 @@
 #'@section formula:
 #' a typical R formula of the form `y ~ x1 + x2 + …` can be provided as well as a non-linear formula
 #' including variables and parameters (as also used in `nls`) e.g. `y ~ 1/exp(x1 * beta1 + x2 * beta2)`,
-#'  where `beta` are the parameters to be estimated. Using a non-linear formula, `non-linear` must be set `TRUE`.
+#'  where `beta` are the parameters to be estimated. If an intercept should be estimated in a non-linear formula,
+#'  this must be explicitly given and named "INTERCEPT". Using a non-linear formula, `non-linear` must be set `TRUE`.
 #' Additionally, it is possible to include a grouping variable for repeated measures by using
 #' `“| xg”` where `xg` is the column containing the group-memberships. The resulting formula will look
 #' like this:  `y ~ x1 + x2 +… | xg`.  In `flexmix`, this is called the concomitant variable specification:
@@ -72,7 +73,7 @@
 #'  each latent class), a `list` of named vectors should be used . In this case, there must be one entry
 #'  in the list for each latent class.  Each start value vector must include start values for sigma and
 #'  theta. Currently, it is necessary to use the names `"sigma"` and `"theta"` for these values.
-#'  If users are unsure for which variables start values must be provided, this can be checked by
+#'  If users are unsure for which variables start values must be provided (in the linear formula case), this can be checked by
 #'  calling `colnames(model.matrix(formula,data))`. In this call, the `formula` should not include the
 #'  grouping variable.
 #'
@@ -81,7 +82,8 @@
 #' in some situations, it can be useful to identify the latent classes on
 #' only one `type` of data while estimating the model parameters on both `types` of data. In such cases,
 #' the input variable `latent` can be used to specify on which type of data the classification should be done.
-#'  If `“cont”` or `“dich”` is used, the input parameter `id_col` must be specified and gives the name,
+#'  If `“cont”` or `“dich”` is used, `formula` must contain a grouping variable and additionally the
+#'  input parameter `id_col` must be specified and gives the name,
 #'  i.e. a `character string`, of the grouping variable for classification. Some groups may be removed from
 #'  the data, since they have only continuous or only dichotomous observations. Then in a first step,
 #'  a model is estimated only on the continuous/dichotomous data and the achieved classification is stored.
@@ -257,11 +259,6 @@ hyreg2 <-function(formula,
   }else{  # close non_linear FALSE
 
     # ADAPTIONS FOR NON-LINEAR FUNCTIONS
-    # intercept check
-    #  int <- intercept_check(formula)
-    #  if(int & !is.element("(Intercept)", colnames(data))){
-    #    data$"(Intercept)" <- rep(1,dim(data)[1])
-    #  }
 
     # save data and formula in the environment
     assign("formula_non", formula_short, envir=the)
@@ -378,7 +375,7 @@ hyreg2 <-function(formula,
 
   }else{
 
-    # if stv is a list, both classes have to depend on the same variable set,
+    # if stv is a list, both classes have to depend on the same set of variables,
     # stv of different classes have same names (hence using stv[[1]] is okay here)
     # different set of variables for each class not supported yet!
 
@@ -404,7 +401,8 @@ hyreg2 <-function(formula,
 
     # hard coding for stv as list because formulas must be the same for all components
     # change this if formulas can differ between components
-    assign("stv", stv, envir=the) # adapt
+
+    assign("stv", stv, envir=the)
 
     if(!is.list(stv)){
       assign("stv_cont", stv[!is.element(names(stv),c("sigma","theta", variables_dich))], envir = the)
@@ -452,7 +450,6 @@ hyreg2 <-function(formula,
 
     idframe <- data.frame(id = data[,id_col],type)
     idcount <- as.data.frame(table(unique(idframe)))
-    #as.character(idcount[idcount$Freq == 0,"id"])
     data <- data[!is.element(as.character(data[,id_col]), as.character(idcount[idcount$Freq == 0,"id"])),]
     type <- idframe[!is.element(as.character(idframe[,"id"]), as.character(idcount[idcount$Freq == 0,"id"])),"type"]
 
@@ -523,7 +520,7 @@ hyreg2 <-function(formula,
       data <- merge(data, unique(data_dich[,c(id_col,"mod_comp")]), by = id_col)
       data <- data[order(data$roworder), ]
 
-      # später auch ausgeben können, welche ID zu welcher Klasse zugeordnet wurde
+      # which id belongs to which class
       id_classes <- data_dich[,c(id_col,"mod_comp")]
     }
 
@@ -550,7 +547,6 @@ hyreg2 <-function(formula,
         warning( paste("One or more components are empty. Setting mod to NULL."))
       }else{
         model <- list(FLXMRhyreg(type= type[data$mod_comp == unique(xy$mod_comp)],
-                                 #type = type,
                                  stv = stv, # stv can be a list
                                  type_cont = type_cont,
                                  type_dich = type_dich,
@@ -636,7 +632,8 @@ summary_hyreg2 <- function(object){
 }
 
 
-##############################
+#########################
+
 #' extract parameter estimates as named vector
 #'
 #' @description function to export coefficient values and names from a `model` fitted with `hyreg2` or `hyreg2_het`
