@@ -19,7 +19,7 @@ FLXMRhyreg(
   optimizer = "optim",
   lower = -Inf,
   upper = Inf,
-  non_linear = FALSE,
+  formula_type_classic = TRUE,
   ...
 )
 }
@@ -57,7 +57,8 @@ set to \code{"L-BFGS-B"}, default \code{-INF},}
 \item{upper}{upper bound for censored data. If this is used, \code{opt_method} must be
 set to \code{"L-BFGS-B"},default \code{INF}}
 
-\item{non_linear}{\code{logical}; is the provided \code{formula} non-linear? default \code{FALSE}}
+\item{formula_type_classic}{\code{logical}; is the provided \code{formula} a typical R formula containing only variables
+or does it include variables and parameters? default \code{TRUE}}
 
 \item{...}{additional arguments for \code{\link[flexmix:flexmix]{flexmix::flexmix()}} or \code{\link[bbmle:mle2]{bbmle::mle2()}}}
 }

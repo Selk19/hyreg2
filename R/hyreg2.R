@@ -35,7 +35,7 @@
 #' `variables_both` and `variables_dich` must be provided as well.
 #' @param variables_dich `character` vector; variables to be fitted only on dichotomous data, if provided,
 #'  `variables_both` and `variables_cont` must be provided as well.
-#'  @param formula_type_classic `logical`; is the provided `formula` a classical R formula containing only variables
+#' @param formula_type_classic `logical`; is the provided `formula` a classical R formula containing only variables
 #'   or does it include variables and parameters? default `TRUE`
 #' @param ... additional arguments for [flexmix::flexmix()] or [bbmle::mle2()]
 #'
@@ -164,7 +164,7 @@ hyreg2 <-function(formula,
                   variables_both = NULL,
                   variables_dich = NULL,
                   variables_cont = NULL,
-                  formula_type_classic = TRUE
+                  formula_type_classic = TRUE,
                   # additional arguments for flexmix or optimizer ?
                   ...){
 

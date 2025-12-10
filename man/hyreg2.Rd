@@ -24,12 +24,13 @@ hyreg2(
   variables_both = NULL,
   variables_dich = NULL,
   variables_cont = NULL,
-  non_linear = FALSE,
+  formula_type_classic = TRUE,
   ...
 )
 }
 \arguments{
-\item{formula}{model \code{formula}, can be linear or non-linear. Using \verb{|xg} will include a grouping variable \code{xg}. see Details.}
+\item{formula}{model \code{formula}, can be linear or non-linear. For non-linear formulas, variables and parameters
+must be provided and \code{formula_type_classic} must be set to \code{FALSE}. Using \verb{|xg} will include a grouping variable \code{xg}. see Details.}
 
 \item{data}{a \code{data.frame} containing the data. see Details.}
 
@@ -73,11 +74,13 @@ are included, \code{variables_cont} and \code{variables_dich} must be provided a
 see Details.}
 
 \item{variables_dich}{\code{character} vector; variables to be fitted only on dichotomous data, if provided,
-\code{variables_both} and \code{variables_cont} must be provided as well.
-@param non_linear \code{logical}; is the provided \code{formula} non-linear? default \code{FALSE}}
+\code{variables_both} and \code{variables_cont} must be provided as well.}
 
 \item{variables_cont}{\code{character} vector; variables to be fitted only on continous data. If provided,
 \code{variables_both} and \code{variables_dich} must be provided as well.}
+
+\item{formula_type_classic}{\code{logical}; is the provided \code{formula} a classical R formula containing only variables
+or does it include variables and parameters? default \code{TRUE}}
 
 \item{...}{additional arguments for \code{\link[flexmix:flexmix]{flexmix::flexmix()}} or \code{\link[bbmle:mle2]{bbmle::mle2()}}}
 }
@@ -92,10 +95,11 @@ see details of different inputs listed below
 }
 \section{formula}{
 
-a typical R formula of the form \verb{y ~ x1 + x2 + …} can be provided as well as a non-linear formula
-including variables and parameters (as also used in \code{nls}) e.g. \code{y ~ 1/exp(x1 * beta1 + x2 * beta2)},
-where \code{beta} are the parameters to be estimated. If an intercept should be estimated in a non-linear formula,
-this must be explicitly given and named "INTERCEPT". Using a non-linear formula, \code{non-linear} must be set \code{TRUE}.
+a classical R formula containing only variables(e.g.\verb{y ~ x1 + x2 + …}) can be provided as well as a formula
+including variables and parameters e.g. \code{y ~ x1 * beta1 + x2 * beta2}  or \code{y ~ 1/exp(x1 * beta1 + x2 * beta2)},
+where \code{beta} are the parameters to be estimated. Non-linear models can be estimated using a variables and parameters formula.
+If the provided formula contains variables and parameters, \code{formula_type_classic} must be set to \code{FALSE}.
+In this case, to estimate a model containing an intercept this must be explicitly given and named "INTERCEPT".
 Additionally, it is possible to include a grouping variable for repeated measures by using
 \verb{“| xg”} where \code{xg} is the column containing the group-memberships. The resulting formula will look
 like this:  \verb{y ~ x1 + x2 +… | xg}.  In \code{flexmix}, this is called the concomitant variable specification:
