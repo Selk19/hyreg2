@@ -30,7 +30,7 @@ hyreg2_het(
 )
 }
 \arguments{
-\item{formula}{linear model \code{formula}. Using \verb{|x} will include a grouping variable \code{x}. see Details.}
+\item{formula}{linear model \code{formula}. Using \verb{|xg} will include a grouping variable \code{xg}. see Details.}
 
 \item{formula_sigma}{linear \code{formula} linear formula for sigma estimation. If \code{formula_sigma} is not provided,
 \code{formula} (excluding any grouping variables) is used by default, see Details}

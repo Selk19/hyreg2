@@ -293,15 +293,15 @@ FLXMRhyreg_het <- function(data,
         the$counter <- 1
 
 
-
-        stv_in <- stv # without sigma !
-        stv_sigma_in <- stv_sigma
-
         if(is.list(stv)){
           stv_in <- stv[[the$counter]]
+        }else{
+          stv_in <- stv # without sigma !
         }
         if(is.list(stv_sigma)){
           stv_sigma_in <- stv_sigma[[the$counter]]
+        }else{
+          stv_sigma_in <- stv_sigma
         }
 
 
@@ -317,19 +317,21 @@ FLXMRhyreg_het <- function(data,
           the$counter <- the$counter + 1
 
 
-          stv_in <- stv # without sigma !
-          stv_sigma_in <- stv_sigma
-
           if(is.list(stv)){
             stv_in <- stv[[the$counter]]
+          }else{
+            stv_in <- stv # without sigma !
           }
           if(is.list(stv_sigma)){
             stv_sigma_in <- stv_sigma[[the$counter]]
+          }else{
+            stv_sigma_in <- stv_sigma
           }
 
 
+
           fit_mle <- bbmle::mle2(minuslogl = logLik2,
-                                 start = c(stv,stv_sigma),
+                                 start = c(stv_in,stv_sigma_in),
                                  optimizer = optimizer,
                                  method = opt_method,
                                  lower = lower,

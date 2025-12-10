@@ -3,7 +3,7 @@
 #'
 #' @description Estimation of hybrid model for EQ-5D data
 #'
-#' @param formula linear model `formula`. Using `|x` will include a grouping variable `x`. see Details.
+#' @param formula linear model `formula`. Using `|xg` will include a grouping variable `xg`. see Details.
 #' @param formula_sigma linear `formula` linear formula for sigma estimation. If `formula_sigma` is not provided,
 #' `formula` (excluding any grouping variables) is used by default, see Details
 #' @param data a `data.frame` containing the data. see Details.

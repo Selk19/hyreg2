@@ -25,7 +25,8 @@
 #'  set to `"L-BFGS-B"`, default `-INF`,
 #' @param upper  upper bound for censored data. If this is used, `opt_method` must be
 #'  set to `"L-BFGS-B"`,default `INF`
-#' @param non_linear `logical`; is the provided `formula` non-linear? default `FALSE`
+#' @param formula_type_classic `logical`; is the provided `formula` a typical R formula containing only variables
+#'   or does it include variables and parameters? default `TRUE`
 #' @param ... additional arguments for [flexmix::flexmix()] or [bbmle::mle2()]
 #'
 #' @return a `model` object, that can be used in [hyreg2] as input for parameter `model` in [flexmix::flexmix()]
@@ -94,7 +95,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
                        optimizer = "optim",
                        lower = -Inf,
                        upper = Inf,
-                       non_linear = FALSE,
+                       formula_type_classic = TRUE,
                        ...
 )
 {
@@ -106,7 +107,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
     return(NA)
   }
 
-  z <- new("FLXMRglm", weighted=TRUE, formula=formula, #  change formula for non_linear?
+  z <- new("FLXMRglm", weighted=TRUE, formula=formula, #  change formula for formula_type_classic?
            name=paste("FLXMRhyreg"), offset = offset,
            family="hyreg", refit=hyregrefit)
 
@@ -125,7 +126,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
         if("offset" %in% names(dotarg)) offset <- dotarg$offset
 
 
-        if(non_linear == FALSE){
+        if(formula_type_classic == FALSE){
           # LINEAR
           if(type == type_cont){
             p <- x %*% para$coef[is.element(names(para$coef),c(variables_cont,variables_both))]  # Xb in xreg
@@ -161,9 +162,9 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
         sigma <- exp(sigma)
 
-        if(isFALSE(non_linear)){
+        if(isTRUE(formula_type_classic)){
 
-          # LINEAR
+          # classic
           x1 <- x[type == type_cont,c(variables_cont,variables_both)]
           x2 <-  x[type == type_dich,c(variables_dich,variables_both)]
 
@@ -176,7 +177,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
         }else{
 
-          # NON-LINEAR
+          # VARS_AND_PARAMS
           Xb1 <- as.matrix(eval_formula_non(the$formula_cont, # formula_non only for cont
                                             the$data[type == type_cont,],
                                             para$coef[c(variables_cont,variables_both)]))
@@ -248,9 +249,9 @@ FLXMRhyreg <- function(formula= . ~ . ,
         stv_dich <- stv[!is.element(names(stv),c("sigma","theta", variables_cont))]
 
 
-        if(isFALSE(non_linear)){
+        if(isTRUE(formula_type_classic)){
 
-          # LINEAR
+          # classic
           x1 <- x[type == type_cont,c(variables_cont,variables_both)]
           x2 <-  x[type == type_dich,c(variables_dich,variables_both)]
 
@@ -266,7 +267,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
         }else{
 
-          # NON-LINEAR
+          # VARS_AND_PARAMS
           Xb1 <- as.matrix(eval_formula_non(the$formula_cont, # formula_non only for cont
                                             the$data[type == type_cont,],
                                             stv_cont))
@@ -312,7 +313,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
       }
 
       # set names of inputs for logLik2
-      if(isFALSE(non_linear)){
+      if(isTRUE(formula_type_classic)){
         bbmle::parnames(logLik2) <- c(colnames(x),"sigma","theta")
       }else{
         if(is.list(stv)){
@@ -364,7 +365,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
 
         }else{
-          if(isFALSE(non_linear)){
+          if(isTRUE(formula_type_classic)){
             stv_new <- setNames(c(component$coef,component$sigma,component$theta),c(colnames(x),"sigma","theta"))
           }else{
             if(is.list(stv)){

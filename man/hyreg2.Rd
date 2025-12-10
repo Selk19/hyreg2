@@ -29,7 +29,7 @@ hyreg2(
 )
 }
 \arguments{
-\item{formula}{model \code{formula}, can be linear or non-linear. Using \verb{|x} will include a grouping variable \code{x}. see Details.}
+\item{formula}{model \code{formula}, can be linear or non-linear. Using \verb{|xg} will include a grouping variable \code{xg}. see Details.}
 
 \item{data}{a \code{data.frame} containing the data. see Details.}
 

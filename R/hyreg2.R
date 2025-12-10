@@ -4,7 +4,8 @@
 #'
 #' @description Estimation of hybrid model for EQ-5D data
 #'
-#' @param formula model `formula`, can be linear or non-linear. Using `|x` will include a grouping variable `x`. see Details.
+#' @param formula model `formula`, can be linear or non-linear. For non-linear formulas, variables and parameters
+#' must be provided and `formula_type_classic` must be set to `FALSE`. Using `|xg` will include a grouping variable `xg`. see Details.
 #' @param data a `data.frame` containing the data. see Details.
 #' @param type either the name of the column in `data` containing an indicator of whether an
 #'   observation is continuous or dichotomous (as `character`), or a `vector` containing the indicator.
@@ -34,7 +35,8 @@
 #' `variables_both` and `variables_dich` must be provided as well.
 #' @param variables_dich `character` vector; variables to be fitted only on dichotomous data, if provided,
 #'  `variables_both` and `variables_cont` must be provided as well.
-#'  @param non_linear `logical`; is the provided `formula` non-linear? default `FALSE`
+#'  @param formula_type_classic `logical`; is the provided `formula` a classical R formula containing only variables
+#'   or does it include variables and parameters? default `TRUE`
 #' @param ... additional arguments for [flexmix::flexmix()] or [bbmle::mle2()]
 #'
 #' @return model object of type `flexmix` or `list` of model objects of type `flexmix`
@@ -43,10 +45,11 @@
 #' see details of different inputs listed below
 #'
 #'@section formula:
-#' a typical R formula of the form `y ~ x1 + x2 + …` can be provided as well as a non-linear formula
-#' including variables and parameters (as also used in `nls`) e.g. `y ~ 1/exp(x1 * beta1 + x2 * beta2)`,
-#'  where `beta` are the parameters to be estimated. If an intercept should be estimated in a non-linear formula,
-#'  this must be explicitly given and named "INTERCEPT". Using a non-linear formula, `non-linear` must be set `TRUE`.
+#' a classical R formula containing only variables(e.g.`y ~ x1 + x2 + …`) can be provided as well as a formula
+#' including variables and parameters e.g. `y ~ x1 * beta1 + x2 * beta2`  or `y ~ 1/exp(x1 * beta1 + x2 * beta2)`,
+#'  where `beta` are the parameters to be estimated. Non-linear models can be estimated using a variables and parameters formula.
+#'  If the provided formula contains variables and parameters, `formula_type_classic` must be set to `FALSE`.
+#' In this case, to estimate a model containing an intercept this must be explicitly given and named "INTERCEPT".
 #' Additionally, it is possible to include a grouping variable for repeated measures by using
 #' `“| xg”` where `xg` is the column containing the group-memberships. The resulting formula will look
 #' like this:  `y ~ x1 + x2 +… | xg`.  In `flexmix`, this is called the concomitant variable specification:
@@ -161,7 +164,7 @@ hyreg2 <-function(formula,
                   variables_both = NULL,
                   variables_dich = NULL,
                   variables_cont = NULL,
-                  non_linear = FALSE,
+                  formula_type_classic = TRUE
                   # additional arguments for flexmix or optimizer ?
                   ...){
 
@@ -185,10 +188,10 @@ hyreg2 <-function(formula,
 
 
 
-  # STV CHECK BASED ON NON-LINEAR INPUT
-  if(isFALSE(non_linear)){
+  # STV CHECK BASED ON FORMULA_TYPE_CLASSIC
+  if(isTRUE(formula_type_classic)){
 
-    ### STV Check  LINEAR ###
+    ### STV Check Classic ###
     # check stv for names in x (model.matrix(formula,data))
 
     # no stv
@@ -256,9 +259,9 @@ hyreg2 <-function(formula,
         }
       }
     }
-  }else{  # close non_linear FALSE
+  }else{  # close formula_type_classic TRUE
 
-    # ADAPTIONS FOR NON-LINEAR FUNCTIONS
+    # ADAPTIONS FOR FORMULA_TYPE_CLASSIC FALSE: VARS_AND_PARAMS
 
     # save data and formula in the environment
     assign("formula_non", formula_short, envir=the)
@@ -269,7 +272,8 @@ hyreg2 <-function(formula,
     formula_short <- get_data_vars(formula_short, data)
 
 
-    ### STV Check NON-LINEAR ###
+    ### STV Check FORMULA_TYPE_CLASSIC FALSE ###
+
     # check stv for names in formula
     vars <- all.vars(the$formula_non[[3]])[!is.element(all.vars(the$formula_non[[3]]),names(data))]
 
@@ -338,7 +342,7 @@ hyreg2 <-function(formula,
         }
       }
     }
-  } # close non_linear check
+  } # close formula_type_classic FALSE check
 
 
 
@@ -396,8 +400,9 @@ hyreg2 <-function(formula,
   }
 
 
-  ### PREPARE M-STEP FOR NON-LINEAR ###
-  if(isTRUE(non_linear)){
+  ### PREPARE M-STEP FOR FORMULA_TYPE_CLASSIC FALSE ###
+
+  if(isFALSE(formula_type_classic)){
 
     # hard coding for stv as list because formulas must be the same for all components
     # change this if formulas can differ between components
@@ -431,7 +436,7 @@ hyreg2 <-function(formula,
                              optimizer = optimizer,
                              lower = lower,
                              upper = upper,
-                             non_linear = non_linear))
+                             formula_type_classic = formula_type_classic))
 
 
 
@@ -474,7 +479,7 @@ hyreg2 <-function(formula,
                                optimizer = optimizer,
                                lower = lower,
                                upper = upper,
-                               non_linear = non_linear))
+                               formula_type_classic = formula_type_classic))
 
 
       mod <- flexmix::flexmix(formula = formula, data = data_cont, k = k, model = model, control = control)
@@ -508,7 +513,7 @@ hyreg2 <-function(formula,
                                optimizer = optimizer,
                                lower = lower,
                                upper = upper,
-                               non_linear = non_linear))
+                               formula_type_classic = formula_type_classic))
 
 
       mod <- flexmix::flexmix(formula = formula, data = data_dich, k = k, model = model, control = control)
@@ -557,7 +562,7 @@ hyreg2 <-function(formula,
                                  optimizer = optimizer,
                                  lower = lower,
                                  upper = upper,
-                                 non_linear = non_linear))
+                                 formula_type_classic = formula_type_classic))
 
         assign("data", xy, envir = the)
 

@@ -613,6 +613,6 @@ for(i in 1:length(simulated_data$y)){
 
 
 ### EXPORT ####
-usethis::use_data(simulated_data_norm, overwrite = TRUE)
-usethis::use_data(simulated_data_mo, overwrite = TRUE)
-usethis::use_data(simulated_data, overwrite = TRUE)
+#usethis::use_data(simulated_data_norm, overwrite = TRUE)
+#usethis::use_data(simulated_data_mo, overwrite = TRUE)
+#usethis::use_data(simulated_data, overwrite = TRUE)
