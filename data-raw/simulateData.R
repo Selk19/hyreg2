@@ -21,7 +21,7 @@ x_tto <- matrix(rnorm(n_samples_tto * length(beta)), ncol = length(beta))
 x_dce <- matrix(rnorm(n_samples_dce * length(beta)), ncol = length(beta))
 
 
-### LINEAR ###
+### Formula classic ###
 #Xb (linear predictor following formula xb = x1*beta1 + x2*beta2 + x3*beta3)
 Xb_tto <- x_tto %*% beta
 Xb_dce <- (x_dce %*% beta) * theta
@@ -35,11 +35,11 @@ y_dce <- rbinom(n_samples_dce, size = 1, prob = logistic_tmp)  # binary outcomes
 
 
 
-### NON-LINEAR ###
-formula <- y ~ 1/exp(x1 * X1 + x2 * X2 )
+### Formula vars-and-params ###
+formula <- y ~ (x1 * beta1 + x2 * beta2 ) * (x1 *beta1 + x3 * beta3)
 x_tto_non <- data.frame(x1 = x_tto[,1], x2 = x_tto[,2], x3 = x_tto[,3])
 x_dce_non <- data.frame(x1 = x_dce[,1], x2 = x_dce[,2], x3 = x_dce[,3])
-beta_non <- setNames(beta[1:3], c("X1","X2","X3"))
+beta_non <- setNames(beta[1:3], c("beta1","beta2","beta3"))
 
 Xb_tto_non <- hyreg2:::eval_formula_non(formula, x_tto_non, beta_non)
 Xb_dce_non <- ( hyreg2:::eval_formula_non(formula, x_dce_non, beta_non)) * theta
@@ -94,7 +94,7 @@ x_tto <- matrix(rnorm(n_samples_tto * length(beta)), ncol = length(beta))
 x_dce <- matrix(rnorm(n_samples_dce * length(beta)), ncol = length(beta))
 
 
-### LINEAR ###
+### Formula classic ###
 #  Xb (linear predictor following formula xb = x1*beta1 + x2*beta2 + x3*beta3)
 Xb_tto <- x_tto %*% beta
 Xb_dce <- (x_dce %*% beta) * theta
@@ -107,11 +107,11 @@ y_dce <- rbinom(n_samples_dce, size = 1, prob = logistic_tmp)  # binary outcomes
 
 
 
-### NON-LINEAR ###
-formula <- y ~ 1/exp(x1 * X1 + x2 * X2 )
+### Formula vars-and-params ###
+formula <- y ~ (x1 * beta1 + x2 * beta2 ) * (x1 *beta1 + x3 * beta3)
 x_tto_non <- data.frame(x1 = x_tto[,1], x2 = x_tto[,2], x3 = x_tto[,3])
 x_dce_non <- data.frame(x1 = x_dce[,1], x2 = x_dce[,2], x3 = x_dce[,3])
-beta_non <- setNames(beta[1:3], c("X1","X2","X3"))
+beta_non <- setNames(beta[1:3], c("beta1","beta2","beta3"))
 
 Xb_tto_non <- hyreg2:::eval_formula_non(formula, x_tto_non, beta_non)
 Xb_dce_non <- ( hyreg2:::eval_formula_non(formula, x_dce_non, beta_non)) * theta

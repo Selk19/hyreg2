@@ -85,13 +85,14 @@ or does it include variables and parameters? default \code{TRUE}}
 \item{...}{additional arguments for \code{\link[flexmix:flexmix]{flexmix::flexmix()}} or \code{\link[bbmle:mle2]{bbmle::mle2()}}}
 }
 \value{
-model object of type \code{flexmix} or \code{list} of model objects of type \code{flexmix}
+model object of type \code{flexmix} or \code{list} of model objects of type \code{flexmix}.
+Please note, that the estimates for \code{sigma} and \code{theta} are on a log-scale and have to be transformed using \code{exp()}to get the correct estimated values.
 }
 \description{
 Estimation of hybrid model for EQ-5D data
 }
 \details{
-see details of different inputs listed below
+see details of different inputs listed below.
 }
 \section{formula}{
 
