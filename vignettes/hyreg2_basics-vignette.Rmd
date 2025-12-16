@@ -1,5 +1,5 @@
 ---
-title: "hyreg2_basics"
+title: "hyreg2 basics"
 output: 
   html_document:
     toc: true
@@ -9,7 +9,7 @@ editor_options:
   markdown: 
     wrap: sentence
 vignette: >
-  %\VignetteIndexEntry{hyreg2_basics}
+  %\VignetteIndexEntry{hyreg2 basics}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: references.bib
@@ -737,12 +737,15 @@ summary_hyreg2(mod_partialc)
 
 ```
 
-## Estimating models using variables-and-parameters-formula
+## Estimating models using non-classic formulas
 
-In the `hyreg2` function, linear and non-linear formulas can be provided including variables and parameters.
-For this purpose, `formula_type_classic` must be set to `FALSE`.
-In the given formula, additional parameters must be provided which are no column names in the datset e.g.`y ~ 1/exp(x1 * beta1 + x2 * beta2)` or `y ~ (x1 * beta1 + x2 * beta2 ) * (x1* beta1 + x3 * beta3)`where`beta` are the parameters to be estimated.
-We simulate a new column called `y_non` for the dataset simulated_data_norm and show, how to estimate a model using a variables-and-parameters-formula.
+
+All inputs and functionalities that have been considered so far are used with classic R formulas and the default setting (`TRUE`) for the input `formula_type_classic`. However, with this setting, it is not possible to estimate non-linear formulas or the 8-parameter model for EQ-5D data (XXX). Therefore, in `hyreg2`, it is possible to sepcify model formulas with variables and parameters (non-classic formulas).
+For example, if a model should be estimated for the mathematical equation  $\frac{1}{e^{x_1 * \beta_{1} + x_2 *  \beta_{2}}} = y$ this must be specified as a formula with additional parameters provided, which are not column names in the dataset: `formula = y ~ 1/exp(x1 * beta1 + x2 * beta2)`, where the `beta`s represent the parameters to be estimated and the`x`s are column names from the dataset. Additionally, `formula_type_classic` must be set to `FALSE`. When estimating an intercept, the formula must explicitly include a parameter named `"INTERCEPT"`(without a corresponding variable from the dataset), e.g. `formula = y ~  1/exp(INTERCEPT + x1 * beta1 + x2 * beta2)`
+
+We simulate a new column called `y_non` for the dataset simulated_data_norm and show how to estimate a model using non-classic formulas.
+
+.
 
 ```{r chunk-26, message=FALSE, warning=FALSE}
 
@@ -765,7 +768,7 @@ x_tto1 <- matrix(rnorm(n_samples_tto1 * length(beta_non1)), ncol = length(beta_n
 x_dce1 <- matrix(rnorm(n_samples_dce1 * length(beta_non1)), ncol = length(beta_non1))
 
 
-### NON-LINEAR ###
+### NON-classic ###
 # x1,x2 and x3 are columnnames of the dataset, beta1, beta2 and beta3 are the parameters to be estimated
 formula1 <- y ~ (x1 * beta1 + x2 * beta2 ) * (x1 *beta1 + x3 * beta3)
 x_tto_non1 <- data.frame(x1 = x_tto1[,1], x2 = x_tto1[,2], x3 = x_tto1[,3])
@@ -800,7 +803,7 @@ x_dce2 <- matrix(rnorm(n_samples_dce2 * length(beta_non2)), ncol = length(beta_n
 
 
 
-### NON-LINEAR ###
+### NON-classic ###
 # x1,x2 and x3 are columnnames of the dataset, beta1, beta2 and beta3 are the parameters to be estimated
 formula2 <- y  ~ (x1 * beta1 + x2 * beta2 ) * (x1 * beta1 + x3 * beta3)
 x_tto_non2 <- data.frame(x1 = x_tto2[,1], x2 = x_tto2[,2], x3 = x_tto2[,3])
@@ -856,10 +859,9 @@ rm(n_samples_tto1,
 
 ```
 
-If an intercept should be estimated, this must be explicitly given in for formula and named `"INTERCEPT"`.
-The provided input for `stv` must now contain the additional parameter names and not the variable names from the dataset.
+If `formula_type_classic = FALSE`, the provided input for `stv` must contain the parameter names (e.g. beta1) and not the variable names (e.g. x1) from the dataset.
 All functionalities described above (expect accounting for heteroscedasticity) can be used with variables-and-parameters-formulas as well.
-If partial coefficients should be used, the provided variabales_vectors must contain the names of the additional parameters and not the variable names from the dataset.
+If partial coefficients should be used, the provided variables_vectors must contain the names of the parameters and not the variable names from the dataset.
 
 ```{r chunk-25, message=FALSE, warning=FALSE, results='hide'}
 set.seed(259)

@@ -35,8 +35,8 @@
 #' `variables_both` and `variables_dich` must be provided as well.
 #' @param variables_dich `character` vector; variables to be fitted only on dichotomous data, if provided,
 #'  `variables_both` and `variables_cont` must be provided as well.
-#' @param formula_type_classic `logical`; is the provided `formula` a classical R formula containing only variables
-#'   or does it include variables and parameters? default `TRUE`
+#' @param formula_type_classic `logical`; is the provided `formula` a classic R formula containing only variables (`TRUE`)
+#'   or does it include both variables and parameters (`FALSE`)? default `TRUE`, see Details
 #' @param ... additional arguments for [flexmix::flexmix()] or [bbmle::mle2()]
 #'
 #' @return model object of type `flexmix` or `list` of model objects of type `flexmix`.
@@ -47,11 +47,11 @@
 #'
 #'
 #'@section formula:
-#' a classical R formula containing only variables(e.g.`y ~ x1 + x2 + …`) can be provided as well as a formula
-#' including variables and parameters e.g. `y ~ x1 * beta1 + x2 * beta2`  or `y ~ 1/exp(x1 * beta1 + x2 * beta2)`,
-#'  where `beta` are the parameters to be estimated. Non-linear models can be estimated using a variables and parameters formula.
-#'  If the provided formula contains variables and parameters, `formula_type_classic` must be set to `FALSE`.
-#' In this case, to estimate a model containing an intercept this must be explicitly given and named "INTERCEPT".
+#' a classic R formula containing only variables(e.g.`y ~ x1 + x2 + …`) can be provided as well as a formula
+#' including variables and parameters (non-classic) e.g. `y ~ x1 * beta1 + x2 * beta2`  or `y ~ 1/exp(x1 * beta1 + x2 * beta2)`,
+#'  where `beta` are the parameters to be estimated  and the`x`s are column names from the dataset. Non-linear models can be estimated using a non-classic formula.
+#'  If the provided formula is non-classic, `formula_type_classic` must be set to `FALSE`.
+#' When estimating an intercept, the formula must explicitly include a parameter named `"INTERCEPT"`(without a corresponding variable from the dataset)
 #' Additionally, it is possible to include a grouping variable for repeated measures by using
 #' `“| xg”` where `xg` is the column containing the group-memberships. The resulting formula will look
 #' like this:  `y ~ x1 + x2 +… | xg`.  In `flexmix`, this is called the concomitant variable specification:
