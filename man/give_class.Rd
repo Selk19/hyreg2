@@ -11,7 +11,7 @@ give_class(data, model, id_col = NULL)
 
 \item{model}{a flexmix \code{model}object estimated using \code{\link[=hyreg2]{hyreg2()}} or \code{\link[=hyreg2_het]{hyreg2_het()}}}
 
-\item{id_col}{\code{character} string, name of grouping variable, which must be a column of the provided \code{data}.
+\item{id_col}{\code{character}-string, name of grouping variable, which must be a column of the provided \code{data}.
 the parameter must be specified, if the provided \code{model} was estimated under control for \code{groups}}
 }
 \value{
@@ -19,8 +19,8 @@ the parameter must be specified, if the provided \code{model} was estimated unde
 an input. second column named \code{"mod_comp"} indicating the assigned class for this group or observation
 }
 \description{
-This function can be used to decode the classified classes by the model generates using \code{hyreg2} or \code{hyreg2_het} and see,
-which group or observation was signed to which class
+This function can be used to decode the classified classes by the model generated using
+\code{hyreg2} or \code{hyreg2_het}
 }
 \examples{
 # estimate a model using simulated_data_norm

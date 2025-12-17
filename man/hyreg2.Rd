@@ -2,7 +2,7 @@
 % Please edit documentation in R/hyreg2.R
 \name{hyreg2}
 \alias{hyreg2}
-\title{function for model estimation for EQ-5D valuesets}
+\title{Estimating hybrid models}
 \usage{
 hyreg2(
   formula,
@@ -79,8 +79,8 @@ see Details.}
 \item{variables_cont}{\code{character} vector; variables to be fitted only on continous data. If provided,
 \code{variables_both} and \code{variables_dich} must be provided as well.}
 
-\item{formula_type_classic}{\code{logical}; is the provided \code{formula} a classical R formula containing only variables
-or does it include variables and parameters? default \code{TRUE}}
+\item{formula_type_classic}{\code{logical}; is the provided \code{formula} a classic R formula containing only variables (\code{TRUE})
+or does it include both variables and parameters (\code{FALSE})? default \code{TRUE}, see Details}
 
 \item{...}{additional arguments for \code{\link[flexmix:flexmix]{flexmix::flexmix()}} or \code{\link[bbmle:mle2]{bbmle::mle2()}}}
 }
@@ -89,18 +89,19 @@ model object of type \code{flexmix} or \code{list} of model objects of type \cod
 Please note, that the estimates for \code{sigma} and \code{theta} are on a log-scale and have to be transformed using \code{exp()}to get the correct estimated values.
 }
 \description{
-Estimation of hybrid model for EQ-5D data
+Estimation of hybrid model using continuous and dichotomous data e.g. EQ-5D data
 }
 \details{
 see details of different inputs listed below.
 }
 \section{formula}{
 
-a classical R formula containing only variables(e.g.\verb{y ~ x1 + x2 + …}) can be provided as well as a formula
-including variables and parameters e.g. \code{y ~ x1 * beta1 + x2 * beta2}  or \code{y ~ 1/exp(x1 * beta1 + x2 * beta2)},
-where \code{beta} are the parameters to be estimated. Non-linear models can be estimated using a variables and parameters formula.
-If the provided formula contains variables and parameters, \code{formula_type_classic} must be set to \code{FALSE}.
-In this case, to estimate a model containing an intercept this must be explicitly given and named "INTERCEPT".
+a classic R formula containing only variables(e.g.\verb{y ~ x1 + x2 + …}) can be provided as well as a formula
+including variables and parameters (non-classic) e.g. \code{y ~ x1 * beta1 + x2 * beta2}  or \code{y ~ 1/exp(x1 * beta1 + x2 * beta2)},
+where \code{beta} are the parameters to be estimated and the\code{x}s are column names from the dataset.
+Non-linear models and the 8-parameter model for EQ-5D data can only be estimated using a non-classic formula.
+If the provided formula is non-classic, \code{formula_type_classic} must be set to \code{FALSE}.
+When estimating an intercept, the formula must explicitly include a parameter named \code{"INTERCEPT"}(without a corresponding variable from the dataset)
 Additionally, it is possible to include a grouping variable for repeated measures by using
 \verb{“| xg”} where \code{xg} is the column containing the group-memberships. The resulting formula will look
 like this:  \verb{y ~ x1 + x2 +… | xg}.  In \code{flexmix}, this is called the concomitant variable specification:

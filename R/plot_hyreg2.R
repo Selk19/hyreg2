@@ -2,12 +2,12 @@
 
 #' decode classes by the model
 #'
-#' @description This function can be used to decode the classified classes by the model generates using `hyreg2` or `hyreg2_het` and see,
-#'  which group or observation was signed to which class
+#' @description This function can be used to decode the classified classes by the model generated using
+#' `hyreg2` or `hyreg2_het`
 #'
 #' @param data a `dataframe`, which was used to estimate the `model`
 #' @param model a flexmix `model`object estimated using [hyreg2()] or [hyreg2_het()]
-#' @param id_col `character` string, name of grouping variable, which must be a column of the provided `data`.
+#' @param id_col `character`-string, name of grouping variable, which must be a column of the provided `data`.
 #'          the parameter must be specified, if the provided `model` was estimated under control for `groups`
 #'
 #'
@@ -80,12 +80,12 @@ give_class <- function(data,
 
 #' plot function for `hyreg2`
 #'
-#' @description This function can be used to visualize model results by `hyreg2` or `hygre2_het`
+#' @description Function to visualize model results by `hyreg2` or `hygre2_het`
 #'
 #'
 #' @param data a `dataframe`, which was used to estimate the `model` using [hyreg2()] or [hyreg2_het()]
-#' @param x `charachter` string, column of `data` to be plotted in x-axis
-#' @param y `charachter` string, column of `data` to be plotted in y-axis
+#' @param x `charachter` string, column of `data` to be plotted on x-axis
+#' @param y `charachter` string, column of `data` to be plotted on y-axis
 #' @param id_col `charachter` sting, grouping variable, same as was given in `model`.
 #'            if model was estimated without grouping, see Details
 #' @param class_df_model `dataframe` of two columns indicating which group belongs to which class,
@@ -97,13 +97,13 @@ give_class <- function(data,
 #'
 #'
 #'
-#' @return `ggplot` object visualizing x against y by classes from the model
+#' @return `ggplot` object visualizing x against y by classes
 #'
 #' @details
-#' `id_col_df` has to be provided anyway, even if the model was estimated without grouping variable.
+#' `id_col` must be provided anyway, even if the model was estimated without grouping variable.
 #' Since there might be no grouping varibale in the `data`, we recommend to create a new column called `"observation"`
 #' in data using the `rownames`/`observationnumbers` as `charachter` values and use this column as
-#' input for `id_col` in `plot_hyreg2`, additionally you can then use `class_df_model` =  `give_class(data,model,"observation")`,
+#' input for `id_col` in `plot_hyreg2`, additionally you can use `class_df_model` =  `give_class(data,model,"observation")`,
 #' see example
 #'
 #' @examples
@@ -144,13 +144,13 @@ give_class <- function(data,
 #'
 #'
 
-# include color option
+
 plot_hyreg2 <- function(data,
                        x,
                        y,
                        id_col,
                        class_df_model,  # you can use give_class() to generate class_df_model
-                       type_to_plot = NULL, #list of two elements list("type","TTO")
+                       type_to_plot = NULL, #list of two elements e.g. list("type","TTO")
                        colors = NULL # optional colour vector
 ){
 

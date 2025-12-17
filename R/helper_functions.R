@@ -47,13 +47,13 @@ refit <- function(object){
 
 
 
-### HELPER FUNCTIONS FOR USE OF NON-LINEAR FORMULAS ####
+### HELPER FUNCTIONS FOR USE OF NON-CLASSIC FORMULAS ####
 
 ################################
 ### eval non-linear formulas ###
 ################################
 
-# function to get Xb during M-step for non-linear case
+# function to get Xb during M-step for non-classic case
 eval_formula_non <- function(formula, data, stv, form_back = F){
 
   rhs <- formula[[3]]
@@ -77,7 +77,7 @@ eval_formula_non <- function(formula, data, stv, form_back = F){
     form_wght <- call("+", intercept_val, form_wght)
   }
 
-  if(form_back == TRUE){ # get formula back before it is evaluated
+  if(form_back == TRUE){ # return formula before it is evaluated
     return(form_wght)
   }
 
@@ -87,15 +87,6 @@ eval_formula_non <- function(formula, data, stv, form_back = F){
   return(xb)
 }
 
-
-
-# like xreg does
-# eval_formula_non_xreg <- function(formula, data, stv) {
-#   form_text <- paste(deparse(formula[[3]]), collapse = "")
-#   with(as.list(stv),
-#        with(data,
-#             eval(parse(text = form_text))))
-# }
 
 
 
@@ -130,6 +121,7 @@ replace_vars <- function(formula, stv){
 # which variables from formula are part of data colnames?
 # create formula to be uses in flexmix call
 # returns a formula which can be used in flexmix
+
 get_data_vars <- function(formula, data) {
 
   # split up formula
@@ -248,7 +240,7 @@ formulacheck_variables <- function(formula, data, stv) {
 }
 
 # check formula for variables in stv,
-# fct used in stv check for non-linear fcts
+# fct used in stv check for non-classic fcts
 get_stv_vars <- function(formula, stv) {
   return(intersect(all.vars(formula[[3]]), names(stv)))
 }

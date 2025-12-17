@@ -10,7 +10,7 @@ summary_hyreg2(object)
 \item{object}{\code{modelobject} generated with \code{\link[=hyreg2]{hyreg2()}} or \code{\link[=hyreg2_het]{hyreg2_het()}}}
 }
 \value{
-\code{summary} object of \code{\link[bbmle:mle2]{bbmle::mle2()}} model,  Please note,
+\code{summary} object of \code{\link[bbmle:mle2]{bbmle::mle2()}} model,  Please note
 that the outputs for \code{sigma} and \code{theta} are on a log-scale and have to be transformed using \code{exp()}to get the correct estimated values.
 }
 \description{

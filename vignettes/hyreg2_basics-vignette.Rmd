@@ -739,9 +739,12 @@ summary_hyreg2(mod_partialc)
 
 ## Estimating models using non-classic formulas
 
-
-All inputs and functionalities that have been considered so far are used with classic R formulas and the default setting (`TRUE`) for the input `formula_type_classic`. However, with this setting, it is not possible to estimate non-linear formulas or the 8-parameter model for EQ-5D data (XXX). Therefore, in `hyreg2`, it is possible to sepcify model formulas with variables and parameters (non-classic formulas).
-For example, if a model should be estimated for the mathematical equation  $\frac{1}{e^{x_1 * \beta_{1} + x_2 *  \beta_{2}}} = y$ this must be specified as a formula with additional parameters provided, which are not column names in the dataset: `formula = y ~ 1/exp(x1 * beta1 + x2 * beta2)`, where the `beta`s represent the parameters to be estimated and the`x`s are column names from the dataset. Additionally, `formula_type_classic` must be set to `FALSE`. When estimating an intercept, the formula must explicitly include a parameter named `"INTERCEPT"`(without a corresponding variable from the dataset), e.g. `formula = y ~  1/exp(INTERCEPT + x1 * beta1 + x2 * beta2)`
+All inputs and functionalities that have been considered so far are used with classic R formulas and the default setting (`TRUE`) for the input `formula_type_classic`.
+However, with this setting, it is not possible to estimate non-linear formulas or the 8-parameter model for EQ-5D data[@devlin2022] .
+Therefore, in `hyreg2`, it is possible to specify model formulas with variables and parameters (non-classic formulas).
+For example, if a model should be estimated for the mathematical equation $\frac{1}{e^{x_1 * \beta_{1} + x_2 *  \beta_{2}}} = y$, this must be specified as a formula with additional parameters provided, which are not column names in the dataset: `formula = y ~ 1/exp(x1 * beta1 + x2 * beta2)`, where the `beta`s represent the parameters to be estimated and the`x`s are column names from the dataset.
+Additionally, `formula_type_classic` must be set to `FALSE`.
+When estimating an intercept, the formula must explicitly include a parameter named `"INTERCEPT"`(without a corresponding variable from the dataset), e.g. `formula = y ~  1/exp(INTERCEPT + x1 * beta1 + x2 * beta2)`
 
 We simulate a new column called `y_non` for the dataset simulated_data_norm and show how to estimate a model using non-classic formulas.
 

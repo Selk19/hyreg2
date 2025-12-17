@@ -17,9 +17,9 @@ plot_hyreg2(
 \arguments{
 \item{data}{a \code{dataframe}, which was used to estimate the \code{model} using \code{\link[=hyreg2]{hyreg2()}} or \code{\link[=hyreg2_het]{hyreg2_het()}}}
 
-\item{x}{\code{charachter} string, column of \code{data} to be plotted in x-axis}
+\item{x}{\code{charachter} string, column of \code{data} to be plotted on x-axis}
 
-\item{y}{\code{charachter} string, column of \code{data} to be plotted in y-axis}
+\item{y}{\code{charachter} string, column of \code{data} to be plotted on y-axis}
 
 \item{id_col}{\code{charachter} sting, grouping variable, same as was given in \code{model}.
 if model was estimated without grouping, see Details}
@@ -34,16 +34,16 @@ Second: \code{value} of column \code{type}, that should be used for the plot, se
 \item{colors}{\code{charachter} vector, colors to be used in \code{ggplot}, default \code{NULL} - than colors are choosen automatically}
 }
 \value{
-\code{ggplot} object visualizing x against y by classes from the model
+\code{ggplot} object visualizing x against y by classes
 }
 \description{
-This function can be used to visualize model results by \code{hyreg2} or \code{hygre2_het}
+Function to visualize model results by \code{hyreg2} or \code{hygre2_het}
 }
 \details{
-\code{id_col_df} has to be provided anyway, even if the model was estimated without grouping variable.
+\code{id_col} must be provided anyway, even if the model was estimated without grouping variable.
 Since there might be no grouping varibale in the \code{data}, we recommend to create a new column called \code{"observation"}
 in data using the \code{rownames}/\code{observationnumbers} as \code{charachter} values and use this column as
-input for \code{id_col} in \code{plot_hyreg2}, additionally you can then use \code{class_df_model} =  \code{give_class(data,model,"observation")},
+input for \code{id_col} in \code{plot_hyreg2}, additionally you can use \code{class_df_model} =  \code{give_class(data,model,"observation")},
 see example
 }
 \examples{

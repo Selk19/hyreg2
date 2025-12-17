@@ -1,6 +1,4 @@
 
-# Write R package
-# https://tinyheero.github.io/jekyll/update/2015/07/26/making-your-first-R-package.html
 
 #' M-step driver to be used in flexmix
 #'
@@ -79,7 +77,6 @@
 
 ### FLXMRhyreg ###
 
-#### WITH SIGNA AND THETA INCLUDED IN ESTIMATION ###
 
 FLXMRhyreg <- function(formula= . ~ . ,
                        family=c("hyreg"),
@@ -103,7 +100,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
   # refit function has to depend on x,y,w.
   hyregrefit <- function(x, y, w) {
-    warning(paste0("Not defined", "Please try hyreg2:::refit"))
+    warning(paste0("Not defined"))
     return(NA)
   }
 
@@ -126,8 +123,8 @@ FLXMRhyreg <- function(formula= . ~ . ,
         if("offset" %in% names(dotarg)) offset <- dotarg$offset
 
 
-        if(formula_type_classic == FALSE){
-          # LINEAR
+        if(formula_type_classic == TRUE){
+          # CLASSIC
           if(type == type_cont){
             p <- x %*% para$coef[is.element(names(para$coef),c(variables_cont,variables_both))]  # Xb in xreg
           }
@@ -135,7 +132,8 @@ FLXMRhyreg <- function(formula= . ~ . ,
             p <- (x %*% para$coef[is.element(names(para$coef),c(variables_dich,variables_both))]) * para$theta
           }
         }else{
-          # NON-LINEAR
+
+          # NON-CLASSIC
           if(type == type_cont){
             p <- eval_formula_non(the$formula_non,the$data,para$coef[is.element(names(para$coef),c(variables_cont,variables_both))])
           }
@@ -166,10 +164,22 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
           # classic
           x1 <- x[type == type_cont,c(variables_cont,variables_both)]
-          x2 <-  x[type == type_dich,c(variables_dich,variables_both)]
+          x2 <- x[type == type_dich,c(variables_dich,variables_both)]
 
-          Xb1 <- x1 %*% para$coef[colnames(x1)] # only cont and both variables
-          Xb2 <- (x2 %*% para$coef[colnames(x2)]) * exp(theta)  # only dich and both variables
+          if(length(c(variables_cont,variables_both)) == 1){
+            Xb1 <- as.matrix(x1 * para$coef[c(variables_cont,variables_both)])
+            colnames(Xb1) <- c(variables_cont,variables_both)
+          }else{
+            Xb1 <- x1 %*% para$coef[colnames(x1)]
+          }
+
+          if(length(c(variables_dich,variables_both)) == 1){
+            Xb2 <- as.matrix( (x2 * para$coef[c(variables_dich,variables_both)]) * exp(theta) )
+            colnames(Xb2) <- c(variables_dich,variables_both)
+          }else{
+            Xb2 <-(x2 %*% para$coef[colnames(x2)]) * exp(theta)
+          }
+
 
           #  Xb2 <- (x2[variables_both] %*% para$coef[variables_both]) * exp(theta) +
           #         (x2[variables_dich] %*% para$coef[variables_dich])  # theta only for variables_both
@@ -177,7 +187,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
         }else{
 
-          # VARS_AND_PARAMS
+          # non-classic
           Xb1 <- as.matrix(eval_formula_non(the$formula_cont, # formula_non only for cont
                                             the$data[type == type_cont,],
                                             para$coef[c(variables_cont,variables_both)]))
@@ -234,7 +244,7 @@ FLXMRhyreg <- function(formula= . ~ . ,
 
       ### LIKELIHOOD FUNCTION to be used in ML Estimation ###
 
-      # function to use in mle, same as logLik but depending on stv and giving out the neg logL directly
+      # function to be used in mle, same as logLik but depending on stv and giving out the neg logL directly
       logLik2 <- function(stv){
 
         # prepare data
@@ -255,19 +265,31 @@ FLXMRhyreg <- function(formula= . ~ . ,
           x1 <- x[type == type_cont,c(variables_cont,variables_both)]
           x2 <-  x[type == type_dich,c(variables_dich,variables_both)]
 
-          Xb1 <- x1 %*% stv_cont[colnames(x1)]
-          Xb2 <- x2 %*% stv_dich[colnames(x2)]
+          if(length(stv_cont) == 1){
+            Xb1 <- as.matrix(x1 * stv_cont)
+            colnames(Xb1) <- stv_cont
+          }else{
+             Xb1 <- x1 %*% stv_cont[colnames(x1)]
+          }
+
+          if(length(stv_dich) == 1){
+            Xb2 <- as.matrix(x2 * stv_dich)
+            colnames(Xb2) <- stv_dich
+          }else{
+            Xb2 <- x2 %*% stv_dich[colnames(x2)]
+          }
+
 
           Xb2 <- Xb2*theta
 
 
           # for variables_dich use theta only with variables_both?
           # Xb2 <- (x2[variables_both] %*% stv_dich[variables_both]) * theta +
-          #  (x2[variables_dich] %*% stv_dich[variables_dich])  # only dich and both variables, theta only for variables_both
+          #  (x2[variables_dich] %*% stv_dich[variables_dich])
 
         }else{
 
-          # VARS_AND_PARAMS
+          # non-classic
           Xb1 <- as.matrix(eval_formula_non(the$formula_cont, # formula_non only for cont
                                             the$data[type == type_cont,],
                                             stv_cont))
@@ -369,9 +391,9 @@ FLXMRhyreg <- function(formula= . ~ . ,
             stv_new <- setNames(c(component$coef,component$sigma,component$theta),c(colnames(x),"sigma","theta"))
           }else{
             if(is.list(stv)){
-              stv_new <- setNames(c(component$coef,component$sigma,component$theta),c(names(the$stv[[1]]))) # order importatn, maybe flexiblize?
+              stv_new <- setNames(c(component$coef,component$sigma,component$theta),c(names(the$stv[[1]]))) # order important, maybe flexiblize?
             }else{
-              stv_new <- setNames(c(component$coef,component$sigma,component$theta),c(names(the$stv))) # order importatn, maybe flexiblize?
+              stv_new <- setNames(c(component$coef,component$sigma,component$theta),c(names(the$stv))) # order important, maybe flexiblize?
             }
           }
 

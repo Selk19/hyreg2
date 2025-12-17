@@ -10,15 +10,38 @@ library(hyreg2)
 ### USE SIMULATED_DATA_NORM ###
 ###############################
 
-
-# random numbers from normal dist
-#formula <- y ~  -1 + exp(  x1 + x2 + x3) | id
+#classic
 formula <- y ~  -1 + x1 + x2 + x3 | id
+
+# non-classic
+formula = y ~   1/exp( INTERCEPT + x1 * beta1 + x2 * beta2) | id
 
 k <- 2
 
-stv <- setNames(c(0.2,0.2,0.2,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
+stv1 <- setNames(c(0.2,0.2,0.2,1,1),c(c("INTERCEPT","beta1","beta2"),c("sigma","theta")))
+stv2<- setNames(c(2,1,0.5,1,1),c(colnames(simulated_data_norm)[3:5],c("sigma","theta")))
 control = list(iter.max = 1000, verbose = 4)
+
+
+
+formula = formula
+data =  simulated_data_norm
+type =  simulated_data_norm$type
+stv = stv1
+k = k
+
+type_cont = "TTO"
+type_dich = "DCE_A"
+opt_method = "L-BFGS-B"
+latent = "cont"
+id_col = "id"
+variables_both = NULL
+variables_cont = NULL
+variables_dich = NULL
+formula_type_classic = FALSE
+upper = 2
+lower = -Inf
+
 
 
 hyflex_mod <- hyreg2(formula = formula,
@@ -26,28 +49,88 @@ hyflex_mod <- hyreg2(formula = formula,
                      type =  simulated_data_norm$type,
                      stv = stv,
                      k = k,
-                     type_cont = "TTO",
-                     type_dich = "DCE_A",
-                     opt_method = "L-BFGS-B",
+                     type_cont = type_cont,
+                     type_dich = type_dich,
+                     opt_method = opt_method,
+                     upper = upper,
+                     lower = lower,
                      control = control,
-                     latent = "cont",
-                     id_col = "id"
-                    # non_linear = TRUE
+                     latent = latent ,
+                     id_col = id_col,
+                     variables_both =   variables_both,
+                     variables_cont =   variables_cont,
+                     variables_dich =  variables_dich,
+                     formula_type_classic = formula_type_classic
 )
+
+
 
 
 summary(hyflex_mod)
 summary_hyreg2(hyflex_mod)
 
-# ratio of correct classification:
-# if latent was "both"
-(sum(hyflex_mod@cluster == simulated_data_norm$class))/dim(simulated_data_norm)[1]
+plot_hyreg2(data = simulated_data_norm,
+            x = "id",
+            y= "y",
+            id_col = "id",
+            class_df_model = give_class(data = simulated_data_norm,
+                                        model = hyflex_mod,
+                                        id_col = "id"))
 
-# if latent was "cont" or "dich"
-proof <- merge(unique(simulated_data_norm[,c("id","class")]),hyflex_mod[["id_classes"]], by = "id")
-sum((proof$class == proof$mod_comp)/dim(proof)[1])
 
 
+### hyreg2_het ###
+formula <- y ~  -1 + x1 + x2 + x3 | id
+formula_sigma <- y ~   x1 + x2 + x3
+
+
+stv <- setNames(c(0.2,0.2,0.2,1),c(c("x1","x2","x3"),c("theta")))
+stv_sigma <- setNames(c(0.2,0.2,1,3),c("x1","x2","x3","(Intercept)"))
+
+data =  simulated_data_norm
+type =  simulated_data_norm$type
+k = 2
+
+type_cont = "TTO"
+type_dich = "DCE_A"
+opt_method = "L-BFGS-B"
+latent = "cont"
+id_col = "id"
+variables_both = NULL
+variables_cont = NULL
+variables_dich = NULL
+upper = Inf
+lower = -Inf
+
+hyflex_mod_het <- hyreg2_het(formula = formula,
+                         formula_sigma = formula_sigma,
+                         stv_sigma = stv_sigma,
+                     data =  simulated_data_norm,
+                     type =  simulated_data_norm$type,
+                     stv = stv,
+                     k = k,
+                     type_cont = type_cont,
+                     type_dich = type_dich,
+                     opt_method = opt_method,
+                     upper = upper,
+                     lower = lower,
+                     control = control,
+                     latent = latent ,
+                     id_col = id_col,
+                     variables_both =   variables_both,
+                     variables_cont =   variables_cont,
+                     variables_dich =  variables_dich
+)
+
+summary_hyreg2(hyflex_mod_het)
+
+plot_hyreg2(data = simulated_data_norm,
+            x = "id",
+            y= "y",
+            id_col = "id",
+            class_df_model = give_class(data = simulated_data_norm,
+                                        model = hyflex_mod_het,
+                                        id_col = "id"))
 
 
 ############################
@@ -99,10 +182,6 @@ mod1 <- hyreg2(formula = formula,
                 variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
                  "mo4","sc4","ua4","pd4","ad4","ua5","pd5", "ad5")
 )
-
-# if you get an Error like this:
-# Error in names(object) <- nm : attempt to set an attribute on NULL
-# use rm(counter) and try again
 
 
 
@@ -168,9 +247,6 @@ mod1 <- hyreg2(formula = formula,
                id_col = "id"
 )
 
-# if you get an Error like this:
-# Error in names(object) <- nm : attempt to set an attribute on NULL
-# use rm(counter) and try again
 
 
 ### SUMMARY ###
@@ -187,85 +263,6 @@ summary_hyreg2(mod1)
 # if latent was "cont" or "dich"
 proof <- merge(unique(simulated_data[,c("id","class")]),mod1[["id_classes"]], by = "id")
 sum((proof$class == proof$mod_comp)/dim(proof)[1])
-
-
-
-
-#########################
-### SIMULATED_DATA_MO ###
-#########################
-
-#### Using simulated_data_mo ####
-
-formula <- y ~ -1 + mo2 + mo3 + mo4 +  mo5 |id
-
-
-k <- 2
-
-control = list(iter.max = 5000, verbose = 5)
-stv_mo <- setNames(c(rep(0.3,4),1,1),c(colnames(simulated_data_mo)[3:6],c("sigma","theta")))
-
-stv_mo1 <- setNames(c(rep(0.1,4),1,1),c(colnames(simulated_data_mo)[3:6],c("sigma","theta")))
-stv_mo2 <- setNames(c(rep(0.6,4),1,1),c(colnames(simulated_data_mo)[3:6],c("sigma","theta")))
-stvl <- list(stv_mo1,stv_mo2)
-
-
-modMO <- hyreg2(formula = formula,
-                data = simulated_data_mo,
-                type = simulated_data_mo$type,
-                stv = stvl,
-                # upper = 2,
-                # lower = 0,
-                k = k,
-                type_cont = "TTO",
-                type_dich = "DCE_A",
-                opt_method = "L-BFGS-B",
-                control = control,
-                latent = "cont",
-               # classes_only = TRUE,
-                id_col = "id"
-
-)
-
-summary(modMO)
-summary_hyreg2(modMO)
-
-
-# proportion of correct classification:
-# latent was "both"
-(sum(modMO@cluster != simulated_data_mo$class))/dim(simulated_data_mo)[1]
-
-
-# if latent was "cont" or "dich"
-proof <- merge(unique(simulated_data_mo[,c("id","class")]),modMO[["id_classes"]], by = "id")
-sum((proof$class == proof$mod_comp)/dim(proof)[1])
-
-
-
-### use getstv to generate stv values ###
-
-# use latent = "cont" and k = 1 in code above to generate modMO
-
-modMO2 <- hyreg2(formula = formula,
-                data = simulated_data_mo,
-                type = simulated_data_mo$type,
-                stv = getstv(modMO),
-                # upper = 2,
-                # lower = 0,
-                k = 2,
-                type_cont = "TTO",
-                type_dich = "DCE_A",
-                opt_method = "L-BFGS-B",
-                control = control,
-                latent = "cont",
-                id_col = "id"
-)
-
-
-summary_hyreg2(modMO2)
-
-
-
 
 
 
@@ -316,10 +313,7 @@ mod1 <- hyreg2_het(formula = formula,
                    opt_method = "L-BFGS-B",
                    control = control,
                    latent = "cont",
-                   id_col = "id",
-                  # variables_cont = c("mo5","sc5"),
-                 #  variables_both = c("mo2","sc2","ua2","pd2","ad2","mo3","sc3","ua3","pd3","ad3",
-                  #  "mo4","sc4","ua4","pd4","ad4","ua5","pd5", "ad5")
+                   id_col = "id"
 )
 
 # if you get an Error like this:
