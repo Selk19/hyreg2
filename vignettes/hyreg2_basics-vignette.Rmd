@@ -22,8 +22,7 @@ bibliography: references.bib
 Our R package `hyreg2` allows users to estimate models on a combination of continuous and dichotomous data using a combined likelihood.
 Latent classes can be detected using the EM-algorithm[@dempster1977].
 The package was originally written to address preference heterogeneity or use a data-driven subgrouping of participants while estimating EQ-5D value sets[@devlin2022].
-However, it can be applied to any situation in which a combined likelihood of continuous and dichotomous data should be maximized.
-(XXX BIOSTATISTICS)
+However, it can be applied to any situation in which a combined likelihood of continuous and dichotomous data should be maximized, e.g. as usual in environmental economics [@cameron1987].
 
 **Functions**
 
