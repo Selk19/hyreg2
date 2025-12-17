@@ -1,7 +1,7 @@
 Package: hyreg2
 Type: Package
 Title: Estimate Latent Classes on a Mixture of Continuous and Dichotomous Data
-Version: 1.1.0
+Version: 1.2.0
 Authors@R: c(person(given = "Svenja",
                       family = "Elkenkamp",
                       role = c("aut", "cre"),
