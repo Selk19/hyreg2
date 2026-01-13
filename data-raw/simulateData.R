@@ -35,7 +35,7 @@ y_dce <- rbinom(n_samples_dce, size = 1, prob = logistic_tmp)  # binary outcomes
 
 
 
-### Formula vars-and-params ###
+### Formula non-classic ###
 formula <- y ~ (x1 * beta1 + x2 * beta2 ) * (x1 *beta1 + x3 * beta3)
 x_tto_non <- data.frame(x1 = x_tto[,1], x2 = x_tto[,2], x3 = x_tto[,3])
 x_dce_non <- data.frame(x1 = x_dce[,1], x2 = x_dce[,2], x3 = x_dce[,3])
@@ -107,7 +107,7 @@ y_dce <- rbinom(n_samples_dce, size = 1, prob = logistic_tmp)  # binary outcomes
 
 
 
-### Formula vars-and-params ###
+### Formula non-classic ###
 formula <- y ~ (x1 * beta1 + x2 * beta2 ) * (x1 *beta1 + x3 * beta3)
 x_tto_non <- data.frame(x1 = x_tto[,1], x2 = x_tto[,2], x3 = x_tto[,3])
 x_dce_non <- data.frame(x1 = x_dce[,1], x2 = x_dce[,2], x3 = x_dce[,3])
